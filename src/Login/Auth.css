@@ -1,0 +1,135 @@
+
+/* --- Auth (Login/Register) --- */
+.auth-root {
+  min-height: 100vh;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+}
+
+.auth-logo {
+  width: 160px;
+  margin-bottom: 20px;
+}
+
+.auth-box {
+  background: #fff;
+  border-radius: 48px;
+  box-shadow: 0 10px 60px #00000020;
+  width: 480px;
+  max-width: 95vw;
+  padding: 48px 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.auth-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+label {
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.auth-input {
+  width: 100%;
+  height: 44px;
+  border: none;
+  background: #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 0 14px;
+}
+
+.auth-input:focus {
+  outline: 2px solid #0071bc;
+  background: #f4faff;
+}
+
+.auth-forgot {
+  text-align: right;
+  margin-top: -8px;
+  font-size: 14px;
+}
+
+.auth-link {
+  color: #0071bc;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+.auth-btn-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.auth-btn {
+  background: #0071bc;
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 28px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  align-self: center;
+  width: auto;
+  max-width: max-content;
+}
+
+.auth-btn.main {
+  background: #0071bc;
+}
+
+.auth-btn.google {
+  background: #fff;
+  color: #0071bc;
+  border: 2px solid #0071bc;
+}
+
+.auth-btn.google .google-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.auth-btn:hover {
+  background: #005fa3;
+  color: #fff;
+}
+
+.auth-btn.google:hover {
+  background: #e6f1fa;
+  color: #0071bc;
+}
+
+.auth-bottom {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 15px;
+}
+
+.auth-required {
+  color: #e24646;
+  font-weight: bold;
+}

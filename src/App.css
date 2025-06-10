@@ -1,0 +1,281 @@
+.home-root {
+  background: #fff;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* Banner */
+.banner {
+  display: flex;
+  background: #0071bc;
+  padding: 48px 32px 0 32px;
+  min-height: 350px;
+}
+
+.banner-left {
+  flex: 1;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-right: 24px;
+}
+
+.banner-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.banner-subtitle {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.banner-desc {
+  font-size: 16px;
+  text-align: center;
+  max-width: 600px;
+}
+
+.banner-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding-left: 24px; /* Thêm padding nếu muốn cách text */
+}
+
+.banner-right img {
+  width: 100%;        /* Chiếm toàn bộ chiều ngang phần .banner-right */
+  height: auto;
+  max-width: 100%;    /* Không vượt quá 1 nửa banner */
+  max-height: 320px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Steps */
+.steps {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  background: #e6f1fa;
+  padding: 40px 0;
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 180px;
+}
+
+.step img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 12px;
+}
+
+.step-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #003366;
+  text-align: center;
+}
+
+/* Section: Giám Định ADN Là Gì? */
+.adn-section {
+  display: flex;
+  width: 100%;
+  min-height: 420px;
+  background: #fff;
+  padding: 48px 32px 48px 32px;
+  gap: 40px;
+  box-sizing: border-box;
+}
+
+.adn-section-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 340px;
+  max-width: 520px;
+}
+
+.adn-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 14px;
+}
+
+.adn-desc {
+  font-size: 16px;
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+.adn-choose {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+.adn-choose-icon {
+  width: 20px;
+  margin-right: 6px;
+}
+
+.adn-benefits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 24px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.adn-benefit {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px #0001;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 0 12px 0;
+  min-width: 120px;
+  min-height: 90px;
+  font-weight: bold;
+  font-size: 16px;
+  gap: 8px;
+  transition: box-shadow 0.2s;
+}
+.adn-benefit:hover {
+  box-shadow: 0 4px 16px #0071bc33;
+}
+
+.adn-benefit img {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 6px;
+}
+
+.adn-section-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.adn-img {
+  width: 100%;
+  max-width: 633px;
+  border-radius: 24px;
+  object-fit: cover;
+  box-shadow: 0 4px 16px #0001;
+}
+
+.adn-pricing-section {
+  width: 100%;
+  padding: 48px 0 64px 0;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.adn-pricing-title {
+  color: #1a2cff;
+  font-size: 36px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 48px;
+  letter-spacing: 1px;
+}
+
+.adn-pricing-list {
+  display: flex;
+  gap: 64px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.adn-pricing-box {
+  background: #7ed0ff;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px #0001;
+  width: 340px;
+  padding: 32px 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.adn-pricing-price {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.adn-pricing-price.blue { color: #1a2cff; }
+.adn-pricing-price.red { color: #e24646; }
+
+.adn-pricing-old {
+  color: #222;
+  font-size: 18px;
+  text-decoration: line-through;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.adn-pricing-type {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.adn-pricing-type.pink { color: #e246c4; }
+.adn-pricing-type.yellow { color: #ffd700; }
+
+.adn-pricing-desc {
+  font-size: 15px;
+  color: #222;
+  margin-bottom: 16px;
+  text-align: center;
+  min-height: 48px;
+}
+
+.adn-pricing-features {
+  list-style: disc inside;
+  color: #003366;
+  font-size: 15px;
+  margin-bottom: 20px;
+  padding-left: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.adn-pricing-btn {
+  background: #1a2cff;
+  color: #fff;
+  font-weight: bold;
+  font-size: 18px;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 32px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+
+.adn-pricing-btn:hover {
+  background: #0033cc;
+}
