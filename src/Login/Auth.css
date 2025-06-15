@@ -103,9 +103,10 @@ label {
 }
 
 .auth-btn.google {
-  background: #fff;
-  color: #0071bc;
+  background: #0071bc;
+  color: #fff;
   border: 2px solid #0071bc;
+  text-decoration: none;
 }
 
 .auth-btn.google .google-icon {
@@ -132,4 +133,17 @@ label {
 .auth-required {
   color: #e24646;
   font-weight: bold;
+}
+.auth-error {
+  color: #ff0000;
+  background: rgba(255, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.auth-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
