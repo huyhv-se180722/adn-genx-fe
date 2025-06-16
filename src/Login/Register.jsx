@@ -4,7 +4,7 @@ import axios from "axios";
 import logo from "../assets/logo.png";
 import "./Auth.css";
 
-const API_BASE_URL = "https://2642-2405-4802-8033-c420-6d55-f41-2cf0-d4b0.ngrok-free.app";
+const API_BASE_URL = "https://0bb6-42-118-214-24.ngrok-free.app";
 const GOOGLE_REDIRECT_URI = "http://localhost:3000/oauth2/callback";
 
 export default function Register() {

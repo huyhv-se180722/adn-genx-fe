@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../Context/AuthContext";
 
-const API_BASE_URL = "https://2642-2405-4802-8033-c420-6d55-f41-2cf0-d4b0.ngrok-free.app";
+const API_BASE_URL = "https://0bb6-42-118-214-24.ngrok-free.app";
 
 export default function GoogleCallback() {
   const navigate = useNavigate();

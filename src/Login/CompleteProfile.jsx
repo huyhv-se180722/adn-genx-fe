@@ -33,7 +33,7 @@ export default function CompleteProfile() {
         e.preventDefault();
 
         try {
-            await axios.post("https://2642-2405-4802-8033-c420-6d55-f41-2cf0-d4b0.ngrok-free.app/api/v1/auth/google-register", formData);
+            await axios.post("https://0bb6-42-118-214-24.ngrok-free.app/api/v1/auth/google-register", formData);
             alert("Hoàn tất đăng ký. Chuyển về trang chủ...");
             localStorage.removeItem("googleUser");
             navigate("/");

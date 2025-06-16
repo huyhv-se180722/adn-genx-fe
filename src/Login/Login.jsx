@@ -1,22 +1,54 @@
-import { useState, useContext } from "react";
+
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../Context/AuthContext";
 import logo from "../assets/logo.png";
 import logogoogle from "../assets/logogoogle.png";
+import { useState, useContext, useEffect } from "react";
 import "./Auth.css";
 
-const API_BASE_URL = "https://2642-2405-4802-8033-c420-6d55-f41-2cf0-d4b0.ngrok-free.app";
+const API_BASE_URL = "https://0bb6-42-118-214-24.ngrok-free.app";
 const GOOGLE_REDIRECT_URI = "https://accounts.google.com/o/oauth2/v2/auth?client_id=443615178916-5p9djk25jon368lljhovev11s40p19j1.apps.googleusercontent.com&redirect_uri=http://localhost:3000/oauth2/callback&response_type=code&scope=openid%20email%20profile&access_type=offline&prompt=consent";
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { login, isLoggedIn, user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     username: "",
     password: ""
   });
+  useEffect(() => {
+    const handleStorageChange = () => {
+      // Khi localStorage thay đổi (login/logout ở tab khác), kiểm tra lại trạng thái đăng nhập
+      if (localStorage.getItem("user")) {
+        alert("Bạn đã đăng nhập ở tab khác. Vui lòng reload trang!");
+        // Có thể tự động reload hoặc chuyển hướng
+        window.location.reload();
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+  // Chặn vào trang login khi đã đăng nhập
+  useEffect(() => {
+    if (isLoggedIn) {
+      switch (user?.role) {
+        case 'ADMIN':
+          navigate('/admin/dashboard');
+          break;
+        case 'RECORDER_STAFF':
+          navigate('/staff/dashboard');
+          break;
+        case 'LAB_STAFF':
+          navigate('/lab/dashboard');
+          break;
+        case 'CUSTOMER':
+        default:
+          navigate('/');
+      }
+    }
+  }, [isLoggedIn, user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,9 +74,24 @@ export default function Login() {
       // Lưu token và thông tin user vào context
       login(response.data);
 
-      // Kiểm tra và xử lý redirect
-      const redirectUrl = localStorage.getItem("redirectUrl");
-      navigate(redirectUrl || "/");
+      // Chuyển hướng theo role
+      switch (response.data.role) {
+        case 'ADMIN':
+          navigate('/admin/dashboard');
+          break;
+        case 'RECORDER_STAFF':
+          navigate('/staff/dashboard');
+          break;
+        case 'LAB_STAFF':
+          navigate('/lab/dashboard');
+          break;
+        case 'CUSTOMER':
+          navigate('/');
+          break;
+        default:
+          setError("Tài khoản không có quyền truy cập!");
+          navigate('/login');
+      }
       localStorage.removeItem("redirectUrl");
     } catch (err) {
       setError(err.response?.data?.message || "Tên đăng nhập hoặc mật khẩu không chính xác!");

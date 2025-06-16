@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import axios from 'axios';
 
 // Export AuthContext so it can be imported in other components
 export const AuthContext = createContext(null);
@@ -19,7 +20,7 @@ export const AuthProvider = ({ children }) => {
         const userData = JSON.parse(storedUser);
         setIsLoggedIn(true);
         setUser(userData);
-        setRole(userData.role); 
+        setRole(userData.role);
       } else {
         setIsLoggedIn(false);
         setUser(null);
@@ -31,7 +32,8 @@ export const AuthProvider = ({ children }) => {
 
     checkAuth();
   }, []);
-// Hàm login gọi sau khi đăng nhập thành công
+
+  // Hàm login gọi sau khi đăng nhập thành công
   const login = (userData) => {
     setIsLoggedIn(true);
     setUser(userData);
@@ -41,11 +43,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Logout function to clear auth state
-  const logout = () => {
+  const API_BASE_URL = "https://your-backend-domain/api/v1/auth";
+
+  const logout = async () => {
+    try {
+      // Gọi API logout để backend xóa refreshToken và cookie
+      await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
+    } catch (err) {
+      // Có thể log lỗi hoặc bỏ qua nếu backend không phản hồi
+      console.error("Logout backend error:", err);
+    }
     setIsLoggedIn(false);
     setUser(null);
-    
-    // Clear all stored data
+    setRole(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('redirectUrl');
@@ -71,17 +81,17 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-  value={{
-    isLoggedIn,
-    user,
-    loading,
-    login,
-    logout,
-    checkLogin,
-    checkAuthentication
-  }}
->
-
+      value={{
+        isLoggedIn,
+        user,
+        role, // Thêm role ở đây
+        loading,
+        login,
+        logout,
+        checkLogin,
+        checkAuthentication
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,12 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../Context/AuthContext";
 import iconSearch from "../assets/icon-search.png";
 import iconMail from "../assets/icon-mail.png";
 import iconPhone from "../assets/icon-phone.png";
 import iconlogo from "../assets/icon-logo.png";
 import './Header.css';
+
 const Header = () => {
   const navigate = useNavigate();
+  const { isLoggedIn, user, logout } = useAuth();
 
   const handleNavLogin = () => {
     navigate("/login");
@@ -16,9 +19,18 @@ const Header = () => {
     navigate("/register");
   };
 
-  const handleServiceClick = () => {
-    navigate("/service");
+  // const handleServiceClick = () => {
+  //   navigate("/service");
+  // };
+
+  const handleProfile = () => {
+    navigate("/profile");
   };
+
+  const handleLogout = async () => {
+  await logout();
+  navigate("/login");
+};
 
   return (
     <>
@@ -50,20 +62,37 @@ const Header = () => {
 
       <div className="navbar">
         <div className="nav-links">
-          <span className="nav-link active">TRANG CHỦ</span>
-          <span className="nav-link" onClick={handleServiceClick}>DỊCH VỤ</span>
-          <span className="nav-link">BẢNG GIÁ</span>
-          <span className="nav-link">HƯỚNG DẪN</span>
-          <span className="nav-link">KIẾN THỨC Y KHOA</span>
-          <span className="nav-link">TRA CỨU KẾT QUẢ</span>
+          <span className="nav-link active" onClick={() => navigate("/")}>TRANG CHỦ</span>
+          <span className="nav-link" onClick={() => navigate("/service")}>DỊCH VỤ</span>
+          <span className="nav-link" onClick={() => navigate("/pricing")}>BẢNG GIÁ</span>
+          <span className="nav-link" onClick={() => navigate("/guide")}>HƯỚNG DẪN</span>
+          <span className="nav-link" onClick={() => navigate("/knowledge")}>KIẾN THỨC Y KHOA</span>
+          <span className="nav-link" onClick={() => navigate("/result")}>TRA CỨU KẾT QUẢ</span>
         </div>
         <div className="nav-actions">
-          <button className="btn-login" onClick={handleNavLogin}>
-            Đăng nhập
-          </button>
-          <button className="btn-register" onClick={handleNavRegister}>
-            Đăng ký
-          </button>
+          {isLoggedIn ? (
+            <div className="user-menu">
+              <span
+                className="user-name"
+                onClick={handleProfile}
+                style={{ cursor: "pointer", marginRight: 16 }}
+              >
+                {user?.fullName || user?.username}
+              </span>
+              <button onClick={handleLogout} className="logout-btn">
+                Đăng xuất
+              </button>
+            </div>
+          ) : (
+            <>
+              <button className="btn-login" onClick={handleNavLogin}>
+                Đăng nhập
+              </button>
+              <button className="btn-register" onClick={handleNavRegister}>
+                Đăng ký
+              </button>
+            </>
+          )}
         </div>
       </div>
     </>
