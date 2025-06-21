@@ -1,33 +1,34 @@
-import './App.css'
-import { AuthProvider } from './Context/AuthContext.jsx'
-import Home from './Home.jsx'
-import Login from './Login/Login.jsx'
-import Register from './Login/Register.jsx'
-import Service from './Service/Service.jsx'
-import GoogleCallback from './Login/GoogleCallback.jsx';
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import React from 'react'
+import { Routes, Route } from 'react-router-dom'
+import Home from './page/Home'
+import Login from './page/Login'
+import AdminManage from './page/AdminManage'
+import CreateAccount from './page/CreateAccount'
+import AccountManage from './page/AccountManage'
+import CustomerManage from './page/CustomerManage'
+import ServiceManage from './page/ServiceManage'
+import BlogManage from './page/BlogManage'
+import BlogEdit from './page/BlogEdit'
+import NewBlog from './page/NewBlog'
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import CompleteProfile from "./Login/CompleteProfile";
-import FormPage from './FormADN/FormPage.jsx'
-import ProtectedRoute from './Context/PrivateRouter.jsx'
-function App() {
-  return (
-    <GoogleOAuthProvider clientId="443615178916-5p9djk25jon368lljhovev11s40p19j1.apps.googleusercontent.com">
 
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/service" element={<Service />} />
-            <Route path="/oauth2/callback" element={<GoogleCallback />} />
-            <Route path="/completeprofile" element={<CompleteProfile />} />
-            <Route path="/form" element={<ProtectedRoute> <FormPage /> </ProtectedRoute>} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </GoogleOAuthProvider>
+const App = () => {
+  return (
+    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/admin-manage" element={<AdminManage />} />
+      <Route path="/create-account" element={<CreateAccount />} />
+      <Route path="/account-manage" element={<AccountManage />} />
+      <Route path="/customer-manage" element={<CustomerManage />} />
+      <Route path="/service-manage" element={<ServiceManage />} />
+      <Route path="/blog-manage" element={<BlogManage />} />
+      <Route path="/blog-edit" element={<BlogEdit />} />
+      <Route path="/new-blog" element={<NewBlog />} />
+    </Routes>
+</GoogleOAuthProvider>
   )
 }
+
 export default App
