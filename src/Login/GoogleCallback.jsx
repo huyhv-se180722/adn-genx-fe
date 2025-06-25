@@ -1,9 +1,9 @@
 import { useEffect, useContext, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";  thay dong nay bang import axiosClient from "../config/axiosClient";
+import axiosClient from "../config/AxiosClient";
 import { AuthContext } from "../Context/AuthContext";
 
-const API_BASE_URL = "https://0bb6-42-118-214-24.ngrok-free.app";
 
 export default function GoogleCallback() {
   const navigate = useNavigate();
@@ -33,10 +33,11 @@ export default function GoogleCallback() {
   const handleGoogleLogin = async (code) => {
     setLoading(true);
     try {
-      const res = await axios.post(
-        `${API_BASE_URL}/api/v1/auth/login-google`,
-        { code }
-      );
+      // const res = await axios.post(
+      //   `${API_BASE_URL}/api/v1/auth/login-google`,
+      //   { code }
+      // );
+      const res = await axiosClient.post("/api/v1/auth/login-google", { code });
 
             console.log("✅ Google login success:", res.data);
       const user = res.data;
@@ -45,7 +46,7 @@ export default function GoogleCallback() {
       login(user);
       
       // Check if profile needs to be completed
-      if (!user.username || !user.phone || !user.fullName) {
+      if (!user.username || !user.phoneNumber || !user.fullName ) {
         // Store email for profile completion
         localStorage.setItem("googleUser", JSON.stringify({ 
           email: user.email,

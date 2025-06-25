@@ -8,12 +8,26 @@ import GoogleCallback from './Login/GoogleCallback.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import CompleteProfile from "./Login/CompleteProfile";
-import FormPage from './FormADN/FormPage.jsx'
-import ProtectedRoute from './Context/PrivateRouter.jsx'
+import FormPage from './FormADN/BookingPage.jsx'
+
 import AdminDashboard from './Admin/AdminDashboard.jsx'
-import StaffDashboard from './Staff/RecorderStaffDashboard.jsx'
+import StaffDashboard from './Staff/pages/StaffDashboard.jsx'
 import LabDashboard from './Lab/LabStaffDashboard.jsx'
 import PrivateRouter from './Context/PrivateRouter.jsx'
+
+
+import StaffBookings from './Staff/pages/StaffBookings.jsx'
+import SampleCollection from './Staff/pages/SampleCollection.jsx'
+import CollectionHistory from './Staff/pages/CollectionHistory.jsx'
+import StaffProfile from './Staff/pages/StaffProfile.jsx'
+
+import EnterKitInfo from './FormADN/EnterKitInfo/EnterKitInfo.jsx';
+
+import DanSuForm from './FormADN/Components/DanSuForm.jsx'
+import HanhChinhForm from './FormADN/Components/HanhChinhForm.jsx'
+import ListPage from './FormADN/ListPage.jsx'
+import PaymentResultPage from './FormADN/PaymentResult.jsx'
+
 
 function App() {
   return (
@@ -54,6 +68,24 @@ function App() {
                 Bạn không có quyền truy cập trang này.
               </div>
             } />
+
+            
+            <Route path="/customer/enter-kit-info" element={<EnterKitInfo />} />
+
+
+
+            {/* Test routes for development */}
+            <Route path="/staff/dashboards" element={<StaffDashboard />} />
+            <Route path="/staff/bookings" element={<StaffBookings />} />
+            <Route path="/staff/collection" element={<SampleCollection />} />
+            <Route path="/staff/history" element={<CollectionHistory />} />
+            <Route path="/profile" element={<StaffProfile />} />
+            {/* Test routes for booking cus */}
+            {/* <Route path="/test/Bookingpages" element={<FormPage />} /> */}
+            <Route path="/test/dansu" element={<DanSuForm />} />
+            <Route path="/test/hanhchinh" element={<HanhChinhForm />} />
+            <Route path="/test/list" element={<ListPage />} />
+            <Route path="/payment-result" element={<PaymentResultPage />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

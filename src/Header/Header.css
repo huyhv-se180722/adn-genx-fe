@@ -1,156 +1,160 @@
-/* Header */
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 24px 32px 0 32px;
-  height: 93px; /* Đặt chiều cao cố định cho header */
-  box-sizing: border-box;
-}
-
-.header-left {
-  flex: 1;
-}
-
-.search-box {
+/* Header luôn hiển thị ở trên cùng */
+.home-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1050;
   display: flex;
   align-items: center;
-  background: #fff;
-  border: 4px solid #000;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px #0002;
-  width: 350px;
-  height: 48px;
-  padding: 0 12px;
+  justify-content: space-between;
+  padding: 6px 20px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  height: 64px;
 }
 
-.search-box input {
+.main-content {
+  padding-top: 112px; /* 64px header + 48px navbar */
+}
+
+/* Logo ở giữa */
+.home-header-center .home-logo-img {
+  height: 64px;
+  
+  object-fit: contain;
+}
+
+/* Search box */
+.home-search-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  padding: 4px 8px;
+  background-color: #f1f5f9;
+}
+.home-search-box input {
   border: none;
-  outline: none;
-  font-size: 18px;
-  flex: 1;
   background: transparent;
+  outline: none;
+  padding: 4px;
+  width: 140px;
+  font-size: 14px;
 }
-
-.search-box img {
-  width: 40px;
-  height: 40px;
+.home-search-box img {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
   cursor: pointer;
 }
 
-.header-center {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.logo-img {
-  height: 64px;           /* Giảm chiều cao cho cân đối */
-  max-width: 180px;       /* Không vượt quá chiều rộng này */
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
-  transition: height 0.2s, max-width 0.2s;
-}
-
-.header-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;    /* Đảm bảo xếp dọc */
-  align-items: flex-end;     /* Căn phải */
-  justify-content: center;
-  gap: 8px;
-  min-width: 240px;          /* Đảm bảo đủ rộng cho cả 2 dòng */
-}
-
-.header-contact {
+/* Contact (mail/phone) */
+.home-header-contact {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 18px;
-  font-weight: bold;
-  min-width: 200px;          /* Đảm bảo các dòng đều nhau */
-  height: 32px;              /* Đảm bảo icon và text cùng chiều cao */
+  margin-left: 16px;
+  font-size: 14px;
 }
-.header-contact img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-  display: block;
+.home-header-contact img {
+  width: 18px;
+  margin-right: 6px;
 }
-.mail-red { color: #e24646; }
-.mail-blue { color: #5591e0; }
-.mail-black { color: #000; }
-.phone-bold { color: #000; }
+.home-mail-red { color: #e53e3e; font-weight: bold; }
+.home-mail-blue { color: #3182ce; font-weight: bold; }
+.home-mail-black { color: #1a202c; }
+.home-phone-bold { font-weight: bold; }
 
-/* Navbar */
-.navbar {
-  position: sticky;
-  top: 93px;         /* Đúng bằng chiều cao header */
-  z-index: 99;
-  background: #0071bc;
+/* Navbar dưới header */
+.home-navbar {
+  position: fixed;
+  top: 64px;
+  left: 0; right: 0;
+  z-index: 1040;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding: 0 32px;
-  height: 55px;      /* Giữ nguyên chiều cao */
-  box-sizing: border-box;
-  transition: none;  /* Không hiệu ứng thay đổi kích thước */
+  padding: 6px 20px;
+  background-color: #0071bc;
+  border-bottom: 1px solid #e2e8f0;
+  height: 48px;
 }
 
-.nav-links {
-  display: flex;
-  gap: 32px;
-}
-
-.nav-link {
-  color: #fff;
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 0 4px;
-  transition: color 0.2s;
-}
-.nav-link:hover {
-  color: #ffd700; /* Màu vàng khi hover */
-}
-
-
-.nav-link.active,
-/* .nav-link:hover {
-  text-decoration: underline;
-  color: #ffd700;
-} */
-
-.nav-actions {
+/* Link navigation */
+.home-nav-links {
   display: flex;
   gap: 16px;
 }
-
-.btn-login,
-.btn-register {
-  background: #fff;
-  color: #0069ab;
-  border: none;
-  border-radius: 24px;
-  padding: 12px 28px;
+.home-nav-link {
   font-size: 16px;
-  font-weight: bold;
+  color: #fff;
   cursor: pointer;
-  transition: background 0.2s;
+  padding: 0px 10px;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+.home-nav-link:hover,
+.home-nav-link.active {
+  background-color: #e2e8f0;
+  color: #3182ce;
+  font-weight: bold;
 }
 
-.btn-register {
-  background: #f8f8f8;
-  color: #000;
+/* Button & Auth */
+.home-nav-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.home-btn-login,
+.home-btn-register,
+.home-logout-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 600;
+}
+.home-btn-login {
+  background-color: transparent;
+  color: #fff;
+  border: 1.5px solid #fff;
+}
+.home-btn-login:hover {
+  background-color: #fff;
+  color: #3182ce;
+}
+.home-btn-register {
+  background-color: #fff;
+  color: #3182ce;
+}
+.home-btn-register:hover {
+  background-color: #e2e8f0;
+  color: #2b6cb0;
+}
+.home-logout-btn {
+  background-color: #e53e3e;
+  color: white;
+}
+.home-logout-btn:hover {
+  background-color: #c53030;
+}
+.home-user-name {
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+  margin-right: 8px;
 }
 
-.btn-login:hover,
-.btn-register:hover {
-  background: #e6e6e6;
+/* Responsive */
+@media (max-width: 900px) {
+  .home-header, .home-navbar { padding: 6px 8px; }
+}
+@media (max-width: 600px) {
+  .home-header, .home-navbar { padding: 2px 4px; }
+  .home-header { height: 48px; }
+  .home-navbar { top: 48px; height: 40px; }
+  .home-header-center .home-logo-img { height: 32px; }
+  .home-search-box input { width: 80px; font-size: 12px; }
+  body { padding-top: 88px; }
 }

@@ -1,14 +1,17 @@
 
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
 import { AuthContext } from "../Context/AuthContext";
 import logo from "../assets/logo.png";
 import logogoogle from "../assets/logogoogle.png";
 import { useState, useContext, useEffect } from "react";
 import "./Auth.css";
+// import API_BASE_URL from "../config/api";
+// const API_BASE_URL = "https://4cd2-118-69-70-166.ngrok-free.app";
 
-const API_BASE_URL = "https://0bb6-42-118-214-24.ngrok-free.app";
-const GOOGLE_REDIRECT_URI = "https://accounts.google.com/o/oauth2/v2/auth?client_id=443615178916-5p9djk25jon368lljhovev11s40p19j1.apps.googleusercontent.com&redirect_uri=http://localhost:3000/oauth2/callback&response_type=code&scope=openid%20email%20profile&access_type=offline&prompt=consent";
+
+import axiosClient from "../config/AxiosClient";
+const GOOGLE_REDIRECT_URI = `https://accounts.google.com/o/oauth2/v2/auth?client_id=443615178916-5p9djk25jon368lljhovev11s40p19j1.apps.googleusercontent.com&redirect_uri=${import.meta.env.VITE_GOOGLE_REDIRECT}&response_type=code&scope=openid%20email%20profile&access_type=offline&prompt=consent`;
 export default function Login() {
   const navigate = useNavigate();
   const { login, isLoggedIn, user } = useContext(AuthContext);
@@ -69,7 +72,8 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/v1/auth/login`, formData);
+      //const response = await axios.post(`${API_BASE_URL}/api/v1/auth/login`, formData);
+      const response = await axiosClient.post("/api/v1/auth/login", formData);
 
       // Lưu token và thông tin user vào context
       login(response.data);

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+//import axios from 'axios'; thay bang import axiosClient from "../config/axiosClient"; // <-- Thêm dòng này
+import axiosClient from '../config/AxiosClient';
 
 // Export AuthContext so it can be imported in other components
 export const AuthContext = createContext(null);
@@ -13,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   // Check trạng thái đăng nhập khi app load
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       const storedUser = localStorage.getItem('user');
 
       if (token && storedUser) {
@@ -33,33 +34,35 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  // Hàm login gọi sau khi đăng nhập thành công
+  // Hàm login gọi sau khi đăng nhập thành công, sua ten bien
   const login = (userData) => {
     setIsLoggedIn(true);
     setUser(userData);
     setRole(userData.role);
-    localStorage.setItem('token', userData.token);
+    localStorage.setItem('accessToken', userData.accessToken);
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
   // Logout function to clear auth state
-  const API_BASE_URL = "https://your-backend-domain/api/v1/auth";
+  // const API_BASE_URL = "https://4cd2-118-69-70-166.ngrok-free.app/api/v1/auth"; xoa dong nay
 
   const logout = async () => {
+
     try {
-      // Gọi API logout để backend xóa refreshToken và cookie
-      await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
-    } catch (err) {
-      // Có thể log lỗi hoặc bỏ qua nếu backend không phản hồi
-      console.error("Logout backend error:", err);
-    }
-    setIsLoggedIn(false);
-    setUser(null);
-    setRole(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('redirectUrl');
-  };
+      console.log("Gọi hàm logout");
+    // Gọi API logout dùng axiosClient có withCredentials
+    await axiosClient.post("/api/v1/auth/logout");
+  } catch (err) {
+    console.error("Logout backend error:", err);
+  }
+  
+  setIsLoggedIn(false);
+  setUser(null);
+  setRole(null);
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('user');
+  localStorage.removeItem('redirectUrl');
+};
 
   // Check if user is authenticated
   const checkAuthentication = () => {

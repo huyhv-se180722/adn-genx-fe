@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios"; thay dong nay import axiosClient from "../config/AxiosClient";
+import axiosClient from "../config/AxiosClient";
+import { AuthContext } from "../Context/AuthContext"; // them dong nay no do thieu
 
 export default function CompleteProfile() {
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
     const [formData, setFormData] = useState({
         username: "",
         email: "",
         fullName: "",
-        phone: ""
+        phoneNumber: ""
     });
 
     useEffect(() => {
@@ -31,14 +34,22 @@ export default function CompleteProfile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        if (!formData.username || !formData.phoneNumber) {
+            alert("❌ Vui lòng điền đầy đủ thông tin!");
+            return;
+        }
         try {
-            await axios.post("https://0bb6-42-118-214-24.ngrok-free.app/api/v1/auth/google-register", formData);
-            alert("Hoàn tất đăng ký. Chuyển về trang chủ...");
-            localStorage.removeItem("googleUser");
-            navigate("/");
+            const res = await axiosClient.post("/api/v1/auth/google-register", formData);
+
+            // Nếu backend trả user mới → đăng nhập lại
+            if (res.data?.result) {
+                // Optional: call login API lại nếu muốn auto đăng nhập
+                alert("✅ Hoàn tất đăng ký. Vui lòng đăng nhập lại!");
+                localStorage.removeItem("googleUser");
+                navigate("/login");
+            }
         } catch (err) {
-            alert("Lỗi gửi thông tin: " + (err.response?.data?.message || err.message));
+            alert("❌Lỗi gửi thông tin: " + (err.response?.data?.message || err.message));
         }
     };
 
@@ -56,7 +67,7 @@ export default function CompleteProfile() {
                 <input name="email" required value={formData.email} disabled className="auth-input" />
 
                 <label>Số điện thoại</label>
-                <input name="phone" required value={formData.phone} onChange={handleChange} className="auth-input" />
+                <input name="phoneNumber" required value={formData.phoneNumber} onChange={handleChange} className="auth-input" />
 
                 <button type="submit" className="auth-btn main">HOÀN TẤT</button>
             </form>

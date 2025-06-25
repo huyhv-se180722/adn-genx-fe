@@ -137,7 +137,7 @@ const Home = () => {
         </div>
 
         {/* Section: Xét nghiệm ADN tại Gene+ */}
-        <div className="adn-pricing-section">
+        <div className="adn-pricing-section" id="adn-pricing-section">
           <div className="adn-pricing-title">XÉT NGHIỆM ADN TẠI GENE+</div>
           <div className="adn-pricing-list">
             <div className="adn-pricing-box">

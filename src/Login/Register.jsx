@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
+import axiosClient from "../config/AxiosClient";
 import logo from "../assets/logo.png";
 import "./Auth.css";
 
-const API_BASE_URL = "https://0bb6-42-118-214-24.ngrok-free.app";
-const GOOGLE_REDIRECT_URI = "http://localhost:3000/oauth2/callback";
+// const API_BASE_URL = "https://4cd2-118-69-70-166.ngrok-free.app";
+// const GOOGLE_REDIRECT_URI = "http://localhost:3000/oauth2/callback";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ export default function Register() {
     username: "",
     email: "",
     fullName: "",
-    phone: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: ""
   });
@@ -31,9 +32,9 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { username, email, fullName, phone, password, confirmPassword } = formData;
+    const { username, email, fullName, phoneNumber, password, confirmPassword } = formData;
     // Kiểm tra các trường bắt buộc
-    if (!username || !email || !fullName || !phone || !password || !confirmPassword) {
+    if (!username || !email || !fullName || !phoneNumber || !password || !confirmPassword) {
       setError("Vui lòng điền đầy đủ thông tin!");
       return;
     }
@@ -52,21 +53,26 @@ export default function Register() {
 
     // Kiểm tra định dạng số điện thoại
     const phoneRegex = /^[0-9]{9,11}$/;
-    if (!phoneRegex.test(phone)) {
+    if (!phoneRegex.test(phoneNumber)) {
       setError("Số điện thoại không hợp lệ!");
       return;
     }
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/v1/auth/register`, {
-        username: formData.username,
-        email: formData.email,
-        fullName: formData.fullName,
-        phone: formData.phone,
-        password: formData.password
-      });
+    // Log dữ liệu gửi đi
+    const dataToSend = {
+      username: formData.username,
+      email: formData.email,
+      fullName: formData.fullName,
+      phoneNumber: formData.phoneNumber,
+      password: formData.password
+    };
+    console.log("Dữ liệu gửi lên backend:", dataToSend);
 
+    const response = await axiosClient.post("/api/v1/auth/register", dataToSend);
+
+      
       alert("Đăng ký thành công!");
       navigate("/login");
     } catch (err) {
@@ -123,9 +129,9 @@ export default function Register() {
           </label>
           <input
             type="tel"
-            name="phone"
+            name="phoneNumber"
             className="auth-input"
-            value={formData.phone}
+            value={formData.phoneNumber}
             onChange={handleChange}
           />
 
