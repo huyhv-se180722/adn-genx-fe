@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosClient from "../config/AxiosClient";
 import { useLocation, useNavigate } from "react-router-dom";
-import LabSidebarNav from "../Lab/LabSidebarNav"; // Sidebar bạn đã có sẵn
+import LabSidebarNav from "../Lab/LabSidebarNav";
 
 const LOCUS_LIST = [
   "Amelogenin", "D3S1358", "D1S1656", "D2S441", "D10S1248", "D13S317", "Penta E",
@@ -97,6 +97,17 @@ export default function EnterResult() {
     }
   };
 
+  // ✅ HÀM GỬI LẠI MÃ TRA CỨU
+  const handleResendTrackingInfo = async () => {
+    try {
+      await axiosClient.post(`/api/adn-results/resend-tracking-info/${bookingId}`);
+      alert("📨 Mã tra cứu đã được gửi lại cho khách hàng.");
+    } catch (err) {
+      console.error("❌ Lỗi khi gửi lại mã tra cứu:", err);
+      alert("Không thể gửi lại mã tra cứu.");
+    }
+  };
+
   const handleExport = async () => {
     try {
       const res = await axiosClient.get(`/api/adn-results/export/${bookingId}`, {
@@ -113,12 +124,10 @@ export default function EnterResult() {
 
   return (
     <div className="d-flex">
-      {/* Sidebar trái */}
       <div className="p-3 border-end" style={{ width: "260px", minHeight: "100vh", background: "#f8f9fa" }}>
         <LabSidebarNav />
       </div>
 
-      {/* Nội dung chính */}
       <div className="p-4 flex-grow-1 container">
         <h4 className="fw-bold mb-3">Nhập kết quả xét nghiệm ADN</h4>
 
@@ -144,9 +153,7 @@ export default function EnterResult() {
                     <th>Locus</th>
                     {participants.map((p) => (
                       <th key={p.kitCode}>
-                        {p.fullName}
-                        <br />
-                        <small>{p.relationship} – {p.kitCode}</small>
+                        {p.fullName}<br /><small>{p.relationship} – {p.kitCode}</small>
                       </th>
                     ))}
                   </tr>
@@ -204,7 +211,8 @@ export default function EnterResult() {
               </div>
             </div>
 
-            <div className="mb-4 d-flex gap-2">
+            {/* 🔄 ĐÃ SỬA: Thêm nút gửi lại mã tra cứu vào đây */}
+            <div className="mb-4 d-flex gap-2 flex-wrap">
               <button
                 onClick={() => setShowConfirmModal(true)}
                 disabled={isSaved}
@@ -212,12 +220,22 @@ export default function EnterResult() {
               >
                 💾 {isSaved ? "Đã lưu" : "Lưu kết quả"}
               </button>
+
               <button
                 onClick={handleExport}
                 className="btn btn-outline-primary"
               >
                 📄 Xuất PDF
               </button>
+
+              {isSaved && (
+                <button
+                  onClick={handleResendTrackingInfo}
+                  className="btn btn-outline-success"
+                >
+                  📩 Gửi lại mã tra cứu
+                </button>
+              )}
             </div>
           </>
         )}

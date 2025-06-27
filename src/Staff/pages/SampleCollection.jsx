@@ -25,6 +25,7 @@ export default function SampleCollection() {
   const [bookings, setBookings] = useState([]);
   const [kitInputs, setKitInputs] = useState({});
   const [sampleTypes, setSampleTypes] = useState({});
+  const [fingerprintFiles, setFingerprintFiles] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [size] = useState(5);
@@ -57,17 +58,30 @@ export default function SampleCollection() {
     setSampleTypes((prev) => ({ ...prev, [participantId]: value }));
   };
 
+  const handleFingerprintChange = (participantId, file) => {
+    setFingerprintFiles((prev) => ({ ...prev, [participantId]: file }));
+  };
+
   const handleConfirm = async (booking, participant) => {
-    const isHospital = booking.collectionMethod === 'HOSPITAL';
     const kitCode = kitInputs[participant.id];
     const sampleType = sampleTypes[participant.id];
+    const fingerprint = fingerprintFiles[participant.id];
 
     try {
-      if (isHospital) {
+      if (booking.collectionMethod === 'HOSPITAL') {
         if (!kitCode || !sampleType) return;
+        const formData = new FormData();
+        formData.append('kitCode', kitCode);
+        formData.append('sampleType', sampleType);
+        if (booking.serviceId === 2 && fingerprint) {
+          formData.append('fingerprintImage', fingerprint);
+        }
         await axiosClient.put(
           `/api/v1/staff/sample-collection/participants/${participant.id}/kit-code`,
-          { kitCode, sampleType }
+          formData,
+          {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          }
         );
       } else if (
         booking.collectionMethod === 'HOME' &&
@@ -84,7 +98,6 @@ export default function SampleCollection() {
           `/api/v1/staff/sample-collection/${participant.id}/confirm`
         );
       }
-
       fetchBookings();
     } catch (error) {
       console.error(error);
@@ -110,7 +123,7 @@ export default function SampleCollection() {
             <StaffSidebarNav />
           </aside>
           <main className="col-md-10 ms-sm-auto px-4 py-4">
-            <h4 className="fw-bold mb-3">🧪 Ghi nhận mẫu</h4>
+            <h4 className="fw-bold mb-3">🦢 Ghi nhận mẫu</h4>
 
             <input
               type="text"
@@ -122,11 +135,8 @@ export default function SampleCollection() {
 
             {bookings.map((booking) => {
               const allConfirmed =
-                Array.isArray(booking.participants) &&
-                booking.participants.length > 0 &&
-                booking.participants.every(
-                  (p) => p.sampleStatus === 'CONFIRMED'
-                );
+                booking.participants?.length > 0 &&
+                booking.participants.every((p) => p.sampleStatus === 'CONFIRMED');
 
               return (
                 <div key={booking.id} className="card mb-4 shadow-sm">
@@ -158,22 +168,24 @@ export default function SampleCollection() {
                             <th>Trạng thái mẫu</th>
                             <th>Mã kit</th>
                             <th>Loại mẫu</th>
+                            {bookings.some((b) =>
+                              b.participants.some(
+                                (p) =>
+                                  b.collectionMethod === 'HOSPITAL' &&
+                                  p.sampleStatus === 'PENDING' &&
+                                  b.serviceId === 2
+                              )
+                            ) && <th>Vân tay</th>}
                             <th>Thao tác</th>
                           </tr>
                         </thead>
                         <tbody>
                           {booking.participants.map((p) => {
-                            const color =
-                              sampleStatusColors[p.sampleStatus] || 'secondary';
-                            const label =
-                              sampleStatusLabels[p.sampleStatus] || 'Không xác định';
-
-                            const showInput =
-                              booking.collectionMethod === 'HOSPITAL' &&
-                              p.sampleStatus === 'PENDING';
-
-                            const showButton =
-                              ['PENDING', 'WAITING_FOR_COLLECTION'].includes(p.sampleStatus);
+                            const color = sampleStatusColors[p.sampleStatus] || 'secondary';
+                            const label = sampleStatusLabels[p.sampleStatus] || 'Không xác định';
+                            const showInput = booking.collectionMethod === 'HOSPITAL' && p.sampleStatus === 'PENDING';
+                            const showFileInput = showInput && booking.serviceId === 2;
+                            const showButton = ['PENDING', 'WAITING_FOR_COLLECTION'].includes(p.sampleStatus);
 
                             return (
                               <tr key={p.id}>
@@ -211,6 +223,25 @@ export default function SampleCollection() {
                                     p.sampleType || <i>—</i>
                                   )}
                                 </td>
+                                {showFileInput || p.fingerprintLink ? (
+                                  <td>
+                                    {showFileInput ? (
+                                      <input
+                                        type="file"
+                                        className="form-control form-control-sm"
+                                        accept="image/*"
+                                        onChange={(e) => handleFingerprintChange(p.id, e.target.files[0])}
+                                      />
+                                    ) : p.fingerprintLink ? (
+                                      <a href={p.fingerprintLink} target="_blank" rel="noopener noreferrer">
+                                        Xem ảnh
+                                      </a>
+                                    ) : (
+                                      <i>—</i>
+                                    )}
+                                  </td>
+                                ) : null}
+
                                 <td>
                                   {showButton && (
                                     <button

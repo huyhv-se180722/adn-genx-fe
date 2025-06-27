@@ -1,27 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import SockJS from "sockjs-client";
+import { Stomp } from "@stomp/stompjs";
 import axiosClient from "../config/AxiosClient";
 import { useAuth } from "../Context/AuthContext";
 import "./Notification.css";
 
 export default function Notification() {
   const navigate = useNavigate();
-  const { user } = useAuth(); // Lấy role và userId nếu cần
+  const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const stompClientRef = useRef(null);
+  const wsConnected = useRef(false);
 
-  // Load thông báo khi component mount
   useEffect(() => {
-    fetchNotifications();
-    // eslint-disable-next-line
-  }, []);
+    if (user?.username) {
+      fetchNotifications();
+      if (!wsConnected.current) {
+        connectWebSocket();
+        wsConnected.current = true;
+      }
+    }
+    return () => {
+      if (stompClientRef.current && stompClientRef.current.connected) {
+        stompClientRef.current.disconnect(() =>
+          console.log("🛑 WebSocket disconnected")
+        );
+        wsConnected.current = false;
+      }
+    };
+  }, [user?.username]);
 
-  // Đóng dropdown khi click ra ngoài
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest(".notification-wrapper")) {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".notification-wrapper")) {
         setIsDropdownOpen(false);
       }
     };
@@ -29,7 +45,6 @@ export default function Notification() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  // Gọi API lấy thông báo
   const fetchNotifications = async () => {
     try {
       const [allRes, unreadRes] = await Promise.all([
@@ -39,40 +54,68 @@ export default function Notification() {
       const data = Array.isArray(allRes.data.result) ? allRes.data.result : [];
       setNotifications(data);
       setUnreadCount(unreadRes.data.result ?? 0);
+      setLoaded(true);
     } catch (err) {
-      console.error("Lỗi khi lấy thông báo:", err);
-      setNotifications([]);
-      setUnreadCount(0);
+      console.error("❌ Lỗi khi lấy thông báo:", err);
     }
   };
 
-  // Khi click vào 1 thông báo
+  const connectWebSocket = () => {
+    console.log("🔌 Kết nối WebSocket...");
+    const socketFactory = () => new SockJS(`/ws`);
+    const client = Stomp.over(socketFactory);
+    client.debug = () => {};
+
+    client.connect(
+      {},
+      () => {
+        console.log("✅ WebSocket connected");
+        client.subscribe("/user/queue/notifications", (message) => {
+          const noti = JSON.parse(message.body);
+          setNotifications((prev) => [noti, ...prev]);
+          setUnreadCount((prev) => prev + 1);
+          setIsDropdownOpen(true);
+          const audio = new Audio("/assets/notification.mp3");
+          audio.play().catch(() => {});
+          setTimeout(() => setIsDropdownOpen(false), 5000);
+        });
+      },
+      (error) => {
+        console.error("❌ WebSocket error:", error);
+      }
+    );
+
+    stompClientRef.current = client;
+  };
+
+  const handleBellClick = async () => {
+    if (!isDropdownOpen && !loaded && user?.username) {
+      await fetchNotifications();
+    }
+    setIsDropdownOpen((prev) => !prev);
+  };
+
   const handleNotificationClick = async (n) => {
     try {
       if (!n.read) {
         await axiosClient.post(`/api/notifications/${n.id}/read`);
         setNotifications((prev) =>
-          prev.map((item) =>
-            item.id === n.id ? { ...item, read: true } : item
-          )
+          prev.map((item) => (item.id === n.id ? { ...item, read: true } : item))
         );
         setUnreadCount((prev) => Math.max(prev - 1, 0));
       }
 
-      // Điều hướng theo role
       const role = user?.role?.toLowerCase?.() || "customer";
-
       if (n.bookingId) {
         navigate(`/${role}/bookings/${n.bookingId}`);
       } else {
         navigate(`/${role}/dashboard`);
       }
     } catch (err) {
-      console.error("Lỗi khi xử lý thông báo:", err);
+      console.error("❌ Lỗi khi xử lý thông báo:", err);
     }
   };
 
-  // Tạo nội dung hiển thị tùy loại
   const getNotificationMessage = (n) => {
     switch (n.type) {
       case "BOOKING_CONFIRMED":
@@ -88,10 +131,7 @@ export default function Notification() {
 
   return (
     <div className="notification-wrapper">
-      <div
-        className="notification-bell"
-        onClick={() => setIsDropdownOpen((prev) => !prev)}
-      >
+      <div className="notification-bell" onClick={handleBellClick}>
         <Bell color="#333" size={20} />
         {unreadCount > 0 && (
           <span className="notification-badge">{unreadCount}</span>
@@ -103,11 +143,11 @@ export default function Notification() {
           {notifications.length === 0 ? (
             <div className="notification-empty">Không có thông báo nào</div>
           ) : (
-            notifications.map((n, index) => (
+            notifications.map((n) => (
               <div
-                key={index}
+                key={n.id}
                 className={`notification-item ${!n.read ? "unread" : ""}`}
-                onClick={() => handleNotificationClick(n)}
+                // onClick={() => handleNotificationClick(n)}
               >
                 {!n.read && <span className="notification-dot" />}
                 {getNotificationMessage(n)}

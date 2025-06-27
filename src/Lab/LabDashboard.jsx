@@ -188,7 +188,6 @@ export default function LabDashboard() {
   const location = useLocation();
   const rowsPerPage = 10;
 
-  // Đọc tab từ URL ?tab=COMPLETED|PENDING
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tabParam = params.get("tab");
@@ -197,7 +196,6 @@ export default function LabDashboard() {
     }
   }, [location.search]);
 
-  // Gọi API mỗi khi tab, page, hoặc searchText thay đổi
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -250,6 +248,16 @@ export default function LabDashboard() {
       } else {
         console.error("🔥 Export PDF error:", err);
       }
+    }
+  };
+
+  const handleResendTrackingInfo = async (bookingId) => {
+    try {
+      await axiosClient.post(`/api/adn-results/resend-tracking-info/${bookingId}`);
+      alert("📨 Mã tra cứu đã được gửi lại cho khách hàng.");
+    } catch (err) {
+      console.error("❌ Lỗi khi gửi lại mã tra cứu:", err);
+      alert("Không thể gửi lại mã tra cứu.");
     }
   };
 
@@ -323,13 +331,22 @@ export default function LabDashboard() {
                           Nhập kết quả
                         </button>
                       ) : (
-                        <button
-                          className="btn btn-sm btn-secondary"
-                          onClick={() => handleExportPDF(booking.id)}
-                        >
-                          <i className="bi bi-file-earmark-pdf me-1" />
-                          Xem PDF
-                        </button>
+                        <div className="d-flex flex-column flex-md-row gap-2">
+                          <button
+                            className="btn btn-sm btn-secondary"
+                            onClick={() => handleExportPDF(booking.id)}
+                          >
+                            <i className="bi bi-file-earmark-pdf me-1" />
+                            Xem PDF
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-success"
+                            onClick={() => handleResendTrackingInfo(booking.id)}
+                          >
+                            <i className="bi bi-envelope-paper me-1" />
+                            Gửi lại mã tra cứu
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -364,3 +381,4 @@ export default function LabDashboard() {
     </div>
   );
 }
+

@@ -92,14 +92,16 @@ export default function LabSidebarNav({ onLogout }) {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const handleLogout = async () => { // Sửa lại thành async
-    if (onLogout) {
-      await onLogout();
-    } else {
-      await logout(); // Gọi logout từ context
-      navigate("/login");
-    }
-  };
+  const handleLogout = async () => {
+  try {
+    await logout(); // Xoá accessToken, setUser(null)
+    setTimeout(() => {
+      navigate("/login"); // Điều hướng sau 1 nhịp, tránh race-condition
+    }, 10);
+  } catch (err) {
+    console.error("Logout error:", err);
+  }
+};
 
   // Hàm kiểm tra đường dẫn hiện tại có khớp với path không
   const isActive = (itemPath) => {

@@ -31,6 +31,7 @@ import HanhChinhForm from './FormADN/Components/HanhChinhForm.jsx'
 import ListPage from './FormADN/ListPage.jsx'
 import PaymentResultPage from './FormADN/PaymentResult.jsx'
 import CustomerProfile from './Customer/CustomerProfile.jsx'
+import LookupResult from './Components/SearchResult/LookupResult.jsx'
 
 
 function App() {
@@ -44,6 +45,10 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/service" element={<Service />} />
+
+
+            
+            <Route path="/result" element={<LookupResult />} />
             <Route path="/oauth2/callback" element={<GoogleCallback />} />
             <Route path="/completeprofile" element={<CompleteProfile />} />
             <Route path="/form" element={
