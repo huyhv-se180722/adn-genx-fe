@@ -8,7 +8,7 @@ export default function CompleteProfile() {
     const navigate = useNavigate();
     const { login } = useContext(AuthContext);
     const [formData, setFormData] = useState({
-        username: "",
+        // username: "",
         email: "",
         fullName: "",
         phoneNumber: ""
@@ -34,7 +34,7 @@ export default function CompleteProfile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.username || !formData.phoneNumber) {
+        if ( !formData.phoneNumber || !formData.email || !formData.fullName) {
             alert("❌ Vui lòng điền đầy đủ thông tin!");
             return;
         }
@@ -57,8 +57,8 @@ export default function CompleteProfile() {
         <div className="auth-root">
             <h2>Hoàn tất hồ sơ</h2>
             <form className="auth-box" onSubmit={handleSubmit}>
-                <label>Tên người dùng</label>
-                <input name="username" required value={formData.username} onChange={handleChange} className="auth-input" />
+                {/* <label>Tên người dùng</label>
+                <input name="username" required value={formData.username} onChange={handleChange} className="auth-input" /> */}
 
                 <label>Họ và tên</label>
                 <input name="fullName" required value={formData.fullName} onChange={handleChange} className="auth-input" />

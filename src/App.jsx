@@ -3,7 +3,7 @@ import { AuthProvider } from './Context/AuthContext.jsx'
 import Home from './Home.jsx'
 import Login from './Login/Login.jsx'
 import Register from './Login/Register.jsx'
-import Service from './Service/Service.jsx'
+import Service from './Components/Service/Service.jsx'
 import GoogleCallback from './Login/GoogleCallback.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -12,9 +12,12 @@ import FormPage from './FormADN/BookingPage.jsx'
 
 import AdminDashboard from './Admin/AdminDashboard.jsx'
 import StaffDashboard from './Staff/pages/StaffDashboard.jsx'
-import LabDashboard from './Lab/LabStaffDashboard.jsx'
+
 import PrivateRouter from './Context/PrivateRouter.jsx'
 
+import LabDashboard from "./Lab/LabDashboard.jsx"
+
+import EnterResult from './Lab/EnterResult.jsx'
 
 import StaffBookings from './Staff/pages/StaffBookings.jsx'
 import SampleCollection from './Staff/pages/SampleCollection.jsx'
@@ -27,6 +30,7 @@ import DanSuForm from './FormADN/Components/DanSuForm.jsx'
 import HanhChinhForm from './FormADN/Components/HanhChinhForm.jsx'
 import ListPage from './FormADN/ListPage.jsx'
 import PaymentResultPage from './FormADN/PaymentResult.jsx'
+import CustomerProfile from './Customer/CustomerProfile.jsx'
 
 
 function App() {
@@ -53,39 +57,91 @@ function App() {
                 <AdminDashboard />
               </PrivateRouter>
             } />
-            <Route path="/staff/dashboard" element={
-              <PrivateRouter allowedRole="RECORDER_STAFF">
-                <StaffDashboard />
-              </PrivateRouter>
-            } />
-            <Route path="/lab/dashboard" element={
+
+            <Route path="/lab/dashboard" element={<LabDashboard />} />
+            <Route path="/lab/enter-result" element={<EnterResult />} />
+
+            {/* <Route path="/lab/dashboard" element={
               <PrivateRouter allowedRole="LAB_STAFF">
                 <LabDashboard />
               </PrivateRouter>
-            } />
+            } /> */}
+
+
             <Route path="/unauthorized" element={
               <div style={{ padding: 40, textAlign: "center", color: "red", fontWeight: "bold" }}>
                 Bạn không có quyền truy cập trang này.
               </div>
             } />
 
-            
-            <Route path="/customer/enter-kit-info" element={<EnterKitInfo />} />
-
-
-
-            {/* Test routes for development */}
-            <Route path="/staff/dashboards" element={<StaffDashboard />} />
-            <Route path="/staff/bookings" element={<StaffBookings />} />
-            <Route path="/staff/collection" element={<SampleCollection />} />
-            <Route path="/staff/history" element={<CollectionHistory />} />
-            <Route path="/profile" element={<StaffProfile />} />
+            {/* CUSTOMER */}
+            <Route path="/customer/enter-kit-info" element={
+              <PrivateRouter allowedRole="CUSTOMER">
+                <EnterKitInfo />
+              </PrivateRouter>
+            } />
             {/* Test routes for booking cus */}
             {/* <Route path="/test/Bookingpages" element={<FormPage />} /> */}
-            <Route path="/test/dansu" element={<DanSuForm />} />
+            <Route path="/test/dansu" element={
+              <PrivateRouter allowedRole="CUSTOMER">
+                <DanSuForm />
+              </PrivateRouter>
+            } />
+            <Route path="/test/hanhchinh" element={
+              <PrivateRouter allowedRole="CUSTOMER">
+                <HanhChinhForm />
+              </PrivateRouter>
+            } />
+            <Route path="/test/list" element={
+              <PrivateRouter allowedRole="CUSTOMER">
+                <ListPage />
+              </PrivateRouter>
+            } />
+            <Route path="/payment-result" element={
+              <PrivateRouter allowedRole="CUSTOMER">
+                <PaymentResultPage />
+              </PrivateRouter>
+            } />
+            <Route path="/customer/profile" element={
+              <PrivateRouter allowedRole="CUSTOMER">
+                <CustomerProfile />
+              </PrivateRouter>
+            } />    
+
+
+            {/* STAFF */}
+            <Route path="/staff/dashboard" element={
+              <PrivateRouter allowedRole="RECORDER_STAFF">
+                <StaffDashboard />
+              </PrivateRouter>
+            } />
+            <Route path="/staff/bookings" element={
+              <PrivateRouter allowedRole="RECORDER_STAFF">
+                <StaffBookings />
+              </PrivateRouter>
+            } />
+            <Route path="/staff/collection" element={
+              <PrivateRouter allowedRole="RECORDER_STAFF">
+                <SampleCollection />
+              </PrivateRouter>
+            } />
+            <Route path="/staff/history" element={
+              <PrivateRouter allowedRole="RECORDER_STAFF">
+                <CollectionHistory />
+              </PrivateRouter>
+            } />
+            <Route path="/staff/profile" element={
+              <PrivateRouter allowedRole="RECORDER_STAFF">
+                <StaffProfile />
+              </PrivateRouter>
+            } />
+
+            {/* Test routes for booking cus */}
+            {/* <Route path="/test/Bookingpages" element={<FormPage />} /> */}
+            {/* <Route path="/test/dansu" element={<DanSuForm />} />
             <Route path="/test/hanhchinh" element={<HanhChinhForm />} />
             <Route path="/test/list" element={<ListPage />} />
-            <Route path="/payment-result" element={<PaymentResultPage />} />
+            <Route path="/payment-result" element={<PaymentResultPage />} /> */}
           </Routes>
         </BrowserRouter>
       </AuthProvider>

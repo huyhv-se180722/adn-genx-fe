@@ -24,6 +24,7 @@ const sampleStatusColors = {
 export default function SampleCollection() {
   const [bookings, setBookings] = useState([]);
   const [kitInputs, setKitInputs] = useState({});
+  const [sampleTypes, setSampleTypes] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [size] = useState(5);
@@ -52,16 +53,21 @@ export default function SampleCollection() {
     setKitInputs((prev) => ({ ...prev, [participantId]: value }));
   };
 
+  const handleSampleTypeChange = (participantId, value) => {
+    setSampleTypes((prev) => ({ ...prev, [participantId]: value }));
+  };
+
   const handleConfirm = async (booking, participant) => {
     const isHospital = booking.collectionMethod === 'HOSPITAL';
     const kitCode = kitInputs[participant.id];
+    const sampleType = sampleTypes[participant.id];
 
     try {
       if (isHospital) {
-        if (!kitCode) return;
+        if (!kitCode || !sampleType) return;
         await axiosClient.put(
           `/api/v1/staff/sample-collection/participants/${participant.id}/kit-code`,
-          { kitCode }
+          { kitCode, sampleType }
         );
       } else if (
         booking.collectionMethod === 'HOME' &&
@@ -72,7 +78,7 @@ export default function SampleCollection() {
         );
       } else if (
         booking.collectionMethod === 'HOME' &&
-        participant.sampleStatus === 'KIT_SENT'
+        participant.sampleStatus === 'WAITING_FOR_COLLECTION'
       ) {
         await axiosClient.put(
           `/api/v1/staff/sample-collection/${participant.id}/confirm`
@@ -151,6 +157,7 @@ export default function SampleCollection() {
                             <th>CMND/CCCD</th>
                             <th>Trạng thái mẫu</th>
                             <th>Mã kit</th>
+                            <th>Loại mẫu</th>
                             <th>Thao tác</th>
                           </tr>
                         </thead>
@@ -166,7 +173,7 @@ export default function SampleCollection() {
                               p.sampleStatus === 'PENDING';
 
                             const showButton =
-                              ['PENDING', 'KIT_SENT'].includes(p.sampleStatus);
+                              ['PENDING', 'WAITING_FOR_COLLECTION'].includes(p.sampleStatus);
 
                             return (
                               <tr key={p.id}>
@@ -181,13 +188,27 @@ export default function SampleCollection() {
                                       type="text"
                                       className="form-control form-control-sm"
                                       value={kitInputs[p.id] || ''}
-                                      onChange={(e) =>
-                                        handleKitInput(p.id, e.target.value)
-                                      }
+                                      onChange={(e) => handleKitInput(p.id, e.target.value)}
                                       placeholder="Nhập mã kit"
                                     />
                                   ) : (
                                     p.kitCode || <i>—</i>
+                                  )}
+                                </td>
+                                <td>
+                                  {showInput ? (
+                                    <select
+                                      className="form-select form-select-sm"
+                                      value={sampleTypes[p.id] || ''}
+                                      onChange={(e) => handleSampleTypeChange(p.id, e.target.value)}
+                                    >
+                                      <option value="">--Chọn--</option>
+                                      <option value="BLOOD">Máu</option>
+                                      <option value="HAIR">Tóc</option>
+                                      <option value="NAIL">Móng tay</option>
+                                    </select>
+                                  ) : (
+                                    p.sampleType || <i>—</i>
                                   )}
                                 </td>
                                 <td>

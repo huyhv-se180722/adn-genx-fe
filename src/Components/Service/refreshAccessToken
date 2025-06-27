@@ -1,4 +1,4 @@
-import axiosClient from "../config/AxiosClient";
+import axiosClient from "../../config/AxiosClient";
 
 // Hàm gọi API để lấy access token mới từ refresh token (đang nằm trong cookie)
 export async function refreshAccessToken() {

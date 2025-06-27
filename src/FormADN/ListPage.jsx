@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axiosClient from "../config/AxiosClient";
+import Header from "../Header/Header"; // đường dẫn đến Header tùy vào cấu trúc project của bạn
 
 export default function ListPage() {
   const [orders, setOrders] = useState([]);
@@ -9,7 +10,6 @@ export default function ListPage() {
 
   useEffect(() => {
     loadOrders();
-    // eslint-disable-next-line
   }, [statusFilter]);
 
   const loadOrders = async () => {
@@ -73,147 +73,174 @@ export default function ListPage() {
     order.participants.some((p) => p.kitCode && p.kitCode.trim() !== "");
 
   return (
-    <div className="container py-4">
-      <h2>Danh sách đơn đăng ký</h2>
+    <Header>
+      <div className="container py-4">
+        <div className="bg-white shadow-sm rounded p-4">
+          <h2 className="fw-bold mb-4">Danh sách đơn đăng ký</h2>
 
-      {message && (
-        <div
-          style={{
-            background: message.includes("thành công") ? "#e0f7fa" : "#ffebee",
-            color: message.includes("thành công") ? "#00796b" : "#c62828",
-            padding: "8px 12px",
-            borderRadius: 6,
-            marginBottom: 12,
-            textAlign: "center",
-          }}
-        >
-          {message}
-        </div>
-      )}
+          {message && (
+            <div
+              className={`alert ${message.includes("thành công") ? "alert-success" : "alert-danger"
+                } text-center`}
+            >
+              {message}
+            </div>
+          )}
 
-      <div className="filters mb-3">
-        <label className="me-2">Lọc theo trạng thái:</label>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          disabled={loading}
-        >
-          <option value="">Tất cả</option>
-          <option value="PAID">Đã thanh toán</option>
-          <option value="UNPAID">Chưa thanh toán</option>
-          <option value="PENDING">Đang chờ</option>
-          <option value="FAILED">Thất bại</option>
-          <option value="CANCELLED">Đã hủy</option>
-        </select>
-      </div>
+          <div className="d-flex align-items-center gap-2 mb-4">
+            <span className="fw-semibold">📊 Lọc theo trạng thái:</span>
+            <div style={{ minWidth: 200 }}>
+              <select
+                className="form-select form-select-sm border-dark"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                disabled={loading}
+              >
+                <option value="">Tất cả</option>
+                <option value="PAID">Đã thanh toán</option>
+                <option value="UNPAID">Chưa thanh toán</option>
+                <option value="PENDING">Đang chờ</option>
+                <option value="FAILED">Thất bại</option>
+                <option value="CANCELLED">Đã hủy</option>
+              </select>
+            </div>
+          </div>
 
-      {loading ? (
-        <div className="text-center my-4">Đang tải...</div>
-      ) : (
-        <div className="table-responsive">
-          <table className="table table-bordered">
-            <thead className="table-light">
-              <tr>
-                <th>Mã đơn</th>
-                <th>Họ tên</th>
-                <th>Loại dịch vụ</th>
-                <th>Ngày đăng ký</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array.isArray(orders) && orders.length > 0 ? (
-                orders.map((order) => {
-                  const kitSent = isKitSent(order);
-                  const disableCancel =
-                    order.paymentStatus !== "PAID" || loading || hasKitCode(order);
+          {loading ? (
+            <div className="text-center my-4">Đang tải...</div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-hover align-middle">
+                <thead className="table-light">
+                  <tr>
+                    <th className="text-muted">#</th>
+                    <th className="text-muted">Mã đơn</th>
+                    <th className="text-muted">Khách hàng</th>
+                    <th className="text-muted">Dịch vụ</th>
+                    <th className="text-muted">Ngày tạo</th>
+                    <th className="text-muted">Trạng thái</th>
+                    <th className="text-muted">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.isArray(orders) && orders.length > 0 ? (
+                    orders.map((order, index) => {
+                      const status = order.paymentStatus;
+                      const statusBadge = {
+                        PAID: "success",
+                        UNPAID: "danger",
+                        PENDING: "primary",
+                        FAILED: "secondary",
+                        CANCELLED: "dark",
+                      }[status] || "light";
 
-                  return (
-                    <tr key={order.id}>
-                      <td>{order.code || order.id}</td>
-                      <td>{order.participants?.[0]?.fullName || "Không rõ"}</td>
-                      <td>
-                        {order.serviceId === 1
-                          ? "Dân sự"
-                          : order.serviceId === 2
-                            ? "Hành chính"
-                            : "Khác"}
-                      </td>
-                      <td>
-                        {order.createdAt
-                          ? new Date(order.createdAt).toLocaleDateString("vi-VN")
-                          : "Không rõ"}
-                      </td>
-                      <td className={`status-${order.paymentStatus}`}>
-                        {formatStatus(order.paymentStatus)}
-                      </td>
-                      <td>
-                        {order.paymentStatus === "PAID" &&
-                          Array.isArray(order.participants) &&
-                          order.participants.map((p) => {
-                            const shouldShowEnterKitButton =
-                              p.sampleStatus === "KIT_SENT" &&
-                              order.collectionMethod === "HOME" &&
-                              (!p.kitCode || p.kitCode.trim() === "");
+                      const kitSent = isKitSent(order);
+                      const disableCancel =
+                        order.paymentStatus !== "PAID" || loading || hasKitCode(order);
 
-                            return (
-                              <div key={p.id} className="mb-1">
-                                {shouldShowEnterKitButton ? (
-                                  <button
-                                    className="btn btn-info btn-sm"
-                                    style={{ marginRight: 4 }}
-                                    onClick={() =>
-                                      window.location.href = `/customer/enter-kit-info?participantId=${p.id}`
-                                    }
-                                  >
-                                    Điền thông tin kit: {p.fullName || p.id}
-                                  </button>
-                                ) : (
-                                  
-                                  p.kitCode && (
-                                    <span className="text-success fw-semibold">
-                                      ✅ Đã nhập kit: {p.fullName}
-                                    </span>
-                                  )
-                                )}
+                      return (
+                        <tr key={order.id}>
+                          <td>{index + 1}</td>
+                          <td className="fw-semibold">#{order.code || order.id}</td>
+                          <td>
+                            <div className="d-flex align-items-center">
+                              <div
+                                className="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center me-2"
+                                style={{ width: 32, height: 32, fontSize: 14 }}
+                              >
+                                {order.customerName?.[0] ||
+                                  order.participants?.[0]?.fullName?.[0] ||
+                                  "?"}
                               </div>
-                            );
-                          })}
+                              <span className="fw-semibold">
+                                {order.customerName ||
+                                  order.participants?.[0]?.fullName ||
+                                  "Không rõ"}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="text-muted">
+                            {order.serviceId === 1
+                              ? "Dân sự"
+                              : order.serviceId === 2
+                                ? "Hành chính"
+                                : "Khác"}
+                          </td>
+                          <td className="text-muted">
+                            {order.createdAt
+                              ? new Date(order.createdAt).toLocaleDateString("vi-VN")
+                              : "Không rõ"}
+                          </td>
+                          <td>
+                            <span className={`badge bg-${statusBadge}`}>
+                              {formatStatus(order.paymentStatus)}
+                            </span>
+                          </td>
+                          <td>
+                            {order.paymentStatus === "PAID" &&
+                              Array.isArray(order.participants) &&
+                              order.participants.map((p) => {
+                                const shouldShowEnterKitButton =
+                                  p.sampleStatus === "KIT_SENT" &&
+                                  order.collectionMethod === "HOME" &&
+                                  (!p.kitCode || p.kitCode.trim() === "");
 
-                        {/* Nút Hủy đơn nếu không còn ai cần điền kit */}
-                        {!(
-                          Array.isArray(order.participants) &&
-                          order.participants.some(
-                            (p) =>
-                              p.sampleStatus === "KIT_SENT" &&
-                              order.collectionMethod === "HOME" &&
-                              (!p.kitCode || p.kitCode.trim() === "")
-                          )
-                        ) && (
-                            <button
-                              className="btn btn-danger btn-sm"
-                              disabled={disableCancel}
-                              onClick={() => cancelOrder(order.id)}
-                            >
-                              Hủy đơn
-                            </button>
-                          )}
+                                return (
+                                  <div key={p.id} className="mb-1">
+                                    {shouldShowEnterKitButton ? (
+                                      <button
+                                        className="btn btn-outline-info btn-sm me-2 mt-1"
+                                        onClick={() =>
+                                          (window.location.href = `/customer/enter-kit-info?participantId=${p.id}`)
+                                        }
+                                      >
+                                        Điền kit: {p.fullName || p.id}
+                                      </button>
+                                    ) : (
+                                      p.kitCode && (
+                                        <span className="text-success fw-semibold d-inline-block mt-1">
+                                          ✅ Đã nhập: {p.fullName}
+                                        </span>
+                                      )
+                                    )}
+                                  </div>
+                                );
+                              })}
+
+                            {!(
+                              Array.isArray(order.participants) &&
+                              order.participants.some(
+                                (p) =>
+                                  p.sampleStatus === "KIT_SENT" &&
+                                  order.collectionMethod === "HOME" &&
+                                  (!p.kitCode || p.kitCode.trim() === "")
+                              )
+                            ) && (
+                                <button
+                                  className={`btn btn-sm mt-2 ${disableCancel ? "btn-outline-danger" : "btn-danger"}`}
+                                  disabled={disableCancel}
+                                  onClick={() => cancelOrder(order.id)}
+                                >
+                                  Hủy đơn
+                                </button>
+                              )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="7" className="text-center">
+                        Không có đơn đăng ký nào.
                       </td>
                     </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan="6" className="text-center">
-                    Không có đơn đăng ký nào.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </Header>
   );
 }

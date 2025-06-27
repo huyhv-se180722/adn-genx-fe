@@ -1,5 +1,5 @@
 import axios from "axios";
-import { refreshAccessToken } from "../Service/refreshAccessToken";
+import { refreshAccessToken } from "../Components/Service/refreshAccessToken";
 
 
 const axiosClient = axios.create({

@@ -180,7 +180,7 @@
   object-fit: cover;
   box-shadow: 0 4px 16px #0001;
 }
-
+/* 
 .adn-pricing-section {
   width: 100%;
   padding: 48px 0 64px 0;
@@ -280,4 +280,156 @@
 
 .adn-pricing-btn:hover {
   background: #0033cc;
+} */
+.adn-pricing-section {
+  width: 100%;
+  padding: 64px 20px;
+  background: url('assets/background-image.png') no-repeat center center/cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Đổi background-image thành file bạn vừa upload */
+.adn-pricing-title {
+  font-size: 36px;
+  font-weight: bold;
+  color: #111;
+  margin-bottom: 48px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.adn-pricing-list {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Box cơ bản */
+.adn-pricing-box {
+  background: #ffffff99;
+  color: #111;
+  border-radius: 16px;
+  padding: 32px 24px;
+  width: 340px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+/* Gói hành chính nổi bật */
+.adn-pricing-box.highlight {
+  background: #1111119f;
+  color: #fff;
+  border: 2px solid #ffd700;
+  transform: scale(1.05);
+}
+
+/* Label như “Cơ bản”, “Phổ biến” */
+.tag {
+  position: absolute;
+  top: -12px;
+  left: 16px;
+  background: #ccc;
+  color: #111;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.tag.popular {
+  background: #22c55e;
+  color: #fff;
+}
+
+.adn-pricing-price {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.adn-pricing-price.blue {
+  color: #1a2cff;
+}
+
+.adn-pricing-price.red {
+  color: #e24646;
+}
+
+.adn-pricing-old {
+  text-decoration: line-through;
+  font-size: 16px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.adn-pricing-box.highlight .adn-pricing-old {
+  color: #aaa;
+}
+
+.adn-pricing-type {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.adn-pricing-type.pink {
+  color: #e246c4;
+}
+
+.adn-pricing-type.yellow {
+  color: #ffd700;
+}
+
+.adn-pricing-desc {
+  font-size: 14px;
+  margin-bottom: 20px;
+  min-height: 50px;
+}
+
+.adn-pricing-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.adn-pricing-features li {
+  margin: 6px 0;
+}
+
+.adn-pricing-btn {
+  background: #1a2cff;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: auto;
+}
+
+.adn-pricing-box.highlight .adn-pricing-btn {
+  background: #ffd700;
+  color: #111;
+}
+
+.adn-pricing-btn:hover {
+  background: #0033cc;
+}
+
+.adn-pricing-box.highlight .adn-pricing-btn:hover {
+  background: #e6c200;
 }

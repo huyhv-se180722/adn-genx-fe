@@ -8,12 +8,13 @@ export default function EnterKitInfo() {
   const participantId = searchParams.get("participantId");
 
   const [kitCode, setKitCode] = useState("");
+  const [sampleType, setSampleType] = useState("HAIR");
   const [message, setMessage] = useState("");
   const [participant, setParticipant] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const { accessToken } = useAuth();
-  const navigate = useNavigate(); // 👈 Thêm hook điều hướng
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchParticipant = async () => {
@@ -49,17 +50,20 @@ export default function EnterKitInfo() {
     try {
       await axiosClient.put(
         `/api/v1/customer/sample-collection/participants/${participantId}/kit-code`,
-        { kitCode },
+        {
+          kitCode,
+          sampleType, // ✅ Thêm sampleType gửi lên
+        },
         {
           headers: {
             Authorization: "Bearer " + accessToken,
           },
         }
       );
-      setMessage("✅ Gửi mã kit thành công!");
+      setMessage("✅ Gửi thông tin kit thành công!");
     } catch (err) {
       console.error(err);
-      setMessage("❌ Gửi mã kit thất bại.");
+      setMessage("❌ Gửi thông tin kit thất bại.");
     } finally {
       setLoading(false);
     }
@@ -67,31 +71,79 @@ export default function EnterKitInfo() {
 
   return (
     <div className="container py-4">
-      <h3>Nhập mã kit</h3>
+      <h3>Nhập thông tin kit</h3>
       {participant && (
         <p>
           Người tham gia: <strong>{participant.fullName}</strong>
         </p>
       )}
 
-      <input
-        type="text"
-        className="form-control mb-2"
-        placeholder="Nhập mã kit..."
-        value={kitCode}
-        onChange={(e) => setKitCode(e.target.value)}
-      />
+      <div className="mb-3">
+        <label className="form-label">Mã kit</label>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Nhập mã kit..."
+          value={kitCode}
+          onChange={(e) => setKitCode(e.target.value)}
+        />
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Loại mẫu</label>
+        <div>
+          <div className="form-check form-check-inline">
+            <input
+              className="form-check-input"
+              type="radio"
+              id="hair"
+              value="HAIR"
+              checked={sampleType === "HAIR"}
+              onChange={(e) => setSampleType(e.target.value)}
+            />
+            <label className="form-check-label" htmlFor="hair">
+              Tóc
+            </label>
+          </div>
+          <div className="form-check form-check-inline">
+            <input
+              className="form-check-input"
+              type="radio"
+              id="nail"
+              value="NAIL"
+              checked={sampleType === "NAIL"}
+              onChange={(e) => setSampleType(e.target.value)}
+            />
+            <label className="form-check-label" htmlFor="nail">
+              Móng tay
+            </label>
+          </div>
+          <div className="form-check form-check-inline">
+            <input
+              className="form-check-input"
+              type="radio"
+              id="blood"
+              value="BLOOD"
+              checked={sampleType === "BLOOD"}
+              onChange={(e) => setSampleType(e.target.value)}
+            />
+            <label className="form-check-label" htmlFor="blood">
+              Máu
+            </label>
+          </div>
+        </div>
+      </div>
+
       <button
         className="btn btn-primary"
         onClick={handleSubmit}
         disabled={loading}
       >
-        Gửi mã kit
+        Gửi thông tin kit
       </button>
 
       {message && <div className="mt-3 alert alert-info">{message}</div>}
 
-      {/* ✅ Nút quay lại chỉ hiển thị khi gửi thành công */}
       {message.includes("✅") && (
         <button
           className="btn btn-outline-secondary mt-3"

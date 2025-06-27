@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from "../Context/AuthContext";
 import iconSearch from "../assets/icon-search.png";
 import iconMail from "../assets/icon-mail.png";
 import iconPhone from "../assets/icon-phone.png";
 import iconlogo from "../assets/icon-logo.png";
+import Notification from "./Notification";
 import './Header.css';
+
+const userDefaultAvatar = "https://i.pravatar.cc/32";
 
 const Header = ({ children }) => {
   const navigate = useNavigate();
@@ -14,10 +17,24 @@ const Header = ({ children }) => {
 
   const handleNavLogin = () => navigate("/login");
   const handleNavRegister = () => navigate("/register");
-  const handleProfile = () => navigate("/profile");
+  const handleProfile = () => navigate("/customer/profile");
+
   const handleLogout = async () => {
     await logout();
     navigate("/login");
+  };
+
+  const handleClickAdnRegister = () => {
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        const el = document.getElementById("adn-pricing-section");
+        el?.scrollIntoView({ behavior: "smooth" });
+      }, 500);
+    } else {
+      const el = document.getElementById("adn-pricing-section");
+      el?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -30,13 +47,7 @@ const Header = ({ children }) => {
           </div>
         </div>
         <div className="home-header-center">
-          <img
-            src={iconlogo}
-            alt="GeneX Logo"
-            className="home-logo-img"
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/")}
-          />
+          <img src={iconlogo} alt="GeneX Logo" className="home-logo-img" />
         </div>
         <div className="home-header-right">
           <div className="home-header-contact">
@@ -56,38 +67,38 @@ const Header = ({ children }) => {
 
       <div className="home-navbar">
         <div className="home-nav-links">
-          <span className={`home-nav-link${location.pathname === '/' ? ' active' : ''}`} onClick={() => navigate("/")}>TRANG CHỦ</span>
-          <span className={`home-nav-link${location.pathname === '/service' ? ' active' : ''}`} onClick={() => navigate("/service")}>DỊCH VỤ</span>
-          <span className={`home-nav-link${location.pathname === '/pricing' ? ' active' : ''}`} onClick={() => navigate("/pricing")}>BẢNG GIÁ</span>
-          <span className={`home-nav-link${location.pathname === '/guide' ? ' active' : ''}`} onClick={() => navigate("/guide")}>HƯỚNG DẪN</span>
-          <span className={`home-nav-link${location.pathname === '/knowledge' ? ' active' : ''}`} onClick={() => navigate("/knowledge")}>KIẾN THỨC Y KHOA</span>
-          <span className={`home-nav-link${location.pathname === '/result' ? ' active' : ''}`} onClick={() => navigate("/result")}>TRA CỨU KẾT QUẢ</span>
-          <span
-            className="home-nav-link"
-            onClick={() => {
-              if (location.pathname !== "/") {
-                navigate("/", { replace: false });
-                setTimeout(() => {
-                  const el = document.getElementById("adn-pricing-section");
-                  if (el) el.scrollIntoView({ behavior: "smooth" });
-                }, 300);
-              } else {
-                const el = document.getElementById("adn-pricing-section");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-          >
+          {[
+            { path: "/", label: "TRANG CHỦ" },
+            { path: "/service", label: "DỊCH VỤ" },
+            { path: "/pricing", label: "BẢNG GIÁ" },
+            { path: "/guide", label: "HƯỚNG DẪN" },
+            { path: "/knowledge", label: "KIẾN THỨC Y KHOA" },
+            { path: "/result", label: "TRA CỨU KẾT QUẢ" }
+          ].map(({ path, label }) => (
+            <span
+              key={path}
+              className={`home-nav-link${location.pathname === path ? ' active' : ''}`}
+              onClick={() => navigate(path)}
+            >
+              {label}
+            </span>
+          ))}
+          <span className="home-nav-link" onClick={handleClickAdnRegister}>
             ĐĂNG KÝ XÉT NGHIỆM ADN
           </span>
         </div>
+
         <div className="home-nav-actions">
           {isLoggedIn ? (
             <div className="home-user-menu">
-              <span
-                className="home-user-name"
+              <Notification/>
+              <img
+                src={user?.avatar || userDefaultAvatar}
+                alt="avatar"
+                className="home-avatar"
                 onClick={handleProfile}
-                style={{ cursor: "pointer", marginRight: 16 }}
-              >
+              />
+              <span className="home-user-name" onClick={handleProfile}>
                 {user?.fullName || user?.username}
               </span>
               <button onClick={handleLogout} className="home-logout-btn">
@@ -106,6 +117,7 @@ const Header = ({ children }) => {
           )}
         </div>
       </div>
+
       <div className="main-content">
         {children}
       </div>

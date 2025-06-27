@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import DanSuForm from "../FormADN/Components/DanSuForm";
-import HanhChinhForm from "../FormADN/Components/HanhChinhForm";
+import { useNavigate } from "react-router-dom";
 import "../FormADN/FormADN.css";
+
 export default function BookingPage() {
   const [type, setType] = useState("");
-  const [showForm, setShowForm] = useState(false);
   const [message, setMessage] = useState("");
+  const navigate = useNavigate(); // 👈 Thêm hook điều hướng
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -26,37 +26,45 @@ export default function BookingPage() {
       return;
     }
     setMessage("");
-    setShowForm(true);
+
+    if (type === "dan_su") {
+      navigate("/test/dansu"); // 👈 Chuyển sang trang dân sự
+    } else if (type === "hanh_chinh") {
+      navigate("/test/hanhchinh"); // 👈 Chuyển sang hành chính
+    }
   };
 
   return (
-    <div className="booking-container">
+    <div className="booking-container container py-4">
       {message && (
         <div
-          style={{
-            background: message.includes("thành công") ? "#e0f7fa" : "#ffebee",
-            color: message.includes("thành công") ? "#00796b" : "#c62828",
-            padding: "8px 12px",
-            borderRadius: 6,
-            marginBottom: 12,
-            textAlign: "center",
-          }}
+          className={`alert ${
+            message.includes("thành công") ? "alert-success" : "alert-danger"
+          }`}
         >
           {message}
         </div>
       )}
-      <h2>Chọn loại yêu cầu</h2>
-      <select value={type} onChange={(e) => setType(e.target.value)}>
-        <option value="">-- Chọn loại --</option>
-        <option value="dan_su">Dân sự</option>
-        <option value="hanh_chinh">Hành chính</option>
-      </select>
-      <button type="button" onClick={handleNext} style={{ marginLeft: 8 }}>
-        Tiếp theo
-      </button>
 
-      {showForm && type === "dan_su" && <DanSuForm />}
-      {showForm && type === "hanh_chinh" && <HanhChinhForm />}
+      <div className="card mb-4">
+        <div className="card-body">
+          <h4 className="card-title text-center mb-3 text-primary">Chọn loại yêu cầu</h4>
+          <div className="d-flex justify-content-center align-items-center">
+            <select
+              className="form-select me-2 w-50"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+            >
+              <option value="">-- Chọn loại --</option>
+              <option value="dan_su">Dân sự</option>
+              <option value="hanh_chinh">Hành chính</option>
+            </select>
+            <button className="btn btn-primary" type="button" onClick={handleNext}>
+              Tiếp theo
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

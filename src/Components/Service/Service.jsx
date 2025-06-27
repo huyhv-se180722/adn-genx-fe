@@ -1,12 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Service.css';
-import familyTest from '../assets/Service/family-test.png';
-import Header from '../Header/Header.jsx';
+import familyTest from '../../assets/Service/family-test.png';
+import Header from '../../Header/Header.jsx';
 
-import familyImage from '../assets/Service/family-image.png';
+import familyImage from '../../assets/Service/family-image.png';
 
-import buildingImage from '../assets/Service/building-image.png';
+import buildingImage from '../../assets/Service/building-image.png';
 const Service = () => {
   const navigate = useNavigate();
 

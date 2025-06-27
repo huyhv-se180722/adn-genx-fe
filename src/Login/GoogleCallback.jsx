@@ -39,33 +39,45 @@ export default function GoogleCallback() {
       // );
       const res = await axiosClient.post("/api/v1/auth/login-google", { code });
 
-            console.log("✅ Google login success:", res.data);
+      console.log("✅ Google login success:", res.data);
       const user = res.data;
-      
+
       // Always store the user data first
       login(user);
-      
+
       // Check if profile needs to be completed
-      if (!user.username || !user.phoneNumber || !user.fullName ) {
+      if (!user.username || !user.phoneNumber || !user.fullName) {
         // Store email for profile completion
-        localStorage.setItem("googleUser", JSON.stringify({ 
+        localStorage.setItem("googleUser", JSON.stringify({
           email: user.email,
-          accessToken: user.accessToken 
+          accessToken: user.accessToken
         }));
         navigate("/completeprofile");
       } else {
-        // User has complete profile, redirect to intended destination
-        const redirectUrl = localStorage.getItem("redirectUrl");
-        navigate(redirectUrl || "/");
+        // User has complete profile, redirect by role
+        switch (user.role) {
+          case "ADMIN":
+            navigate("/admin/dashboard");
+            break;
+          case "RECORDER_STAFF":
+            navigate("/staff/dashboard");
+            break;
+          case "LAB_STAFF":
+            navigate("/lab/dashboard");
+            break;
+          case "CUSTOMER":
+          default:
+            navigate("/");
+        }
         localStorage.removeItem("redirectUrl");
       }
-      } catch (err) {
-        console.error("❌ Google login error:", err?.response?.data || err.message);
-        console.log("⛔ Mã code đã gửi:", code);
-        navigate("/login");
-      } finally {
-        setLoading(false);
-      }
+    } catch (err) {
+      console.error("❌ Google login error:", err?.response?.data || err.message);
+      console.log("⛔ Mã code đã gửi:", code);
+      navigate("/login");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

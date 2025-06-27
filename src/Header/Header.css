@@ -158,3 +158,25 @@
   .home-search-box input { width: 80px; font-size: 12px; }
   body { padding-top: 88px; }
 }
+
+/* ✅ Avatar user */
+.home-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.home-user-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-avatar {
+  cursor: pointer;
+  width: 32px;height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
