@@ -1,46 +1,44 @@
-import { useEffect, useState } from 'react';
-import axiosClient from '../../config/AxiosClient';
-import '../StaffDashboard.css';
+import { useEffect, useState } from "react";
+import axiosClient from "../../config/AxiosClient";
+import "../StaffDashboard.css";
 
 const sampleStatusLabels = {
-  PENDING: 'Chờ xử lý',
-  WAITING_FOR_COLLECTION: 'Chờ lấy mẫu',
-  CONFIRMED: 'Đã lấy mẫu',
-  REJECTED: 'Bị từ chối',
-  NEED_RECOLLECT: 'Cần lấy lại mẫu',
+  PENDING: "Chờ xử lý",
+  WAITING_FOR_COLLECTION: "Chờ lấy mẫu",
+  CONFIRMED: "Đã lấy mẫu",
+  REJECTED: "Bị từ chối",
+  NEED_RECOLLECT: "Cần lấy lại mẫu",
 };
-
 const sampleStatusColors = {
-  PENDING: 'secondary',
-  WAITING_FOR_COLLECTION: 'warning',
-  CONFIRMED: 'success',
-  REJECTED: 'danger',
-  NEED_RECOLLECT: 'info',
+  PENDING: "secondary",
+  WAITING_FOR_COLLECTION: "warning",
+  CONFIRMED: "success",
+  REJECTED: "danger",
+  NEED_RECOLLECT: "info",
 };
-
 const collectionStatusLabels = {
-  COLLECTING: 'Đang thu mẫu',
-  SENT_TO_LAB: 'Đã gửi lab',
-  COMPLETED: 'Hoàn tất',
-  CANCELED: 'Đã hủy',
+  COLLECTING: "Đang thu mẫu",
+  SENT_TO_LAB: "Đã gửi lab",
+  COMPLETED: "Hoàn tất",
+  CANCELED: "Đã hủy",
 };
 const statusLabels = {
-  PENDING: 'Đang chờ xác nhận',
-  CONFIRMED: 'Đã xác nhận',
-  COLLECTED: 'Đã lấy mẫu',
+  PENDING: "Đang chờ xác nhận",
+  CONFIRMED: "Đã xác nhận",
+  COLLECTED: "Đã lấy mẫu",
 };
 
 const statusClasses = {
-  PENDING: 'bg-warning',
-  CONFIRMED: 'bg-info',
-  COLLECTED: 'bg-success',
+  PENDING: "bg-warning",
+  CONFIRMED: "bg-info",
+  COLLECTED: "bg-success",
 };
 
 const collectionStatusColors = {
-  COLLECTING: 'warning',
-  SENT_TO_LAB: 'info',
-  COMPLETED: 'success',
-  CANCELED: 'danger',
+  COLLECTING: "warning",
+  SENT_TO_LAB: "info",
+  COMPLETED: "success",
+  CANCELED: "danger",
 };
 
 export default function BookingDetailDialog({ open, onClose, booking }) {
@@ -53,10 +51,12 @@ export default function BookingDetailDialog({ open, onClose, booking }) {
     const fetchBookingDetail = async () => {
       setLoading(true);
       try {
-        const res = await axiosClient.get(`/api/v1/staff/booking/${booking.id}`);
+        const res = await axiosClient.get(
+          `/api/v1/staff/booking/${booking.id}`
+        );
         setBookingDetail(res.data);
       } catch (err) {
-        console.error('Lỗi khi lấy chi tiết booking:', err);
+        console.error("Lỗi khi lấy chi tiết booking:", err);
         setBookingDetail(null);
       } finally {
         setLoading(false);
@@ -67,14 +67,14 @@ export default function BookingDetailDialog({ open, onClose, booking }) {
   }, [open, booking?.id]);
 
   const formatDate = (dateString) => {
-    if (!dateString) return '—';
+    if (!dateString) return "—";
     const date = new Date(dateString);
-    return date.toLocaleString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -113,30 +113,50 @@ export default function BookingDetailDialog({ open, onClose, booking }) {
             <div className="staff-info-grid">
               <div className="staff-info-item">
                 <span className="staff-info-label">Người đăng ký:</span>
-                <span className="staff-info-value">{bookingDetail.customerName}</span>
+                <span className="staff-info-value">
+                  {bookingDetail.customerName}
+                </span>
               </div>
               <div className="staff-info-item">
                 <span className="staff-info-label">Số điện thoại:</span>
-                <span className="staff-info-value">{bookingDetail.phoneNumber}</span>
+                <span className="staff-info-value">
+                  {bookingDetail.phoneNumber}
+                </span>
               </div>
               <div className="staff-info-item">
                 <span className="staff-info-label">Dịch vụ:</span>
-                <span className="staff-info-value">{bookingDetail.serviceTypeName}</span>
+                <span className="staff-info-value">
+                  {bookingDetail.serviceTypeName}
+                </span>
+              </div>
+              <div className="staff-info-item">
+                <span className="staff-info-label">Loại Đơn:</span>
+                <span className="staff-info-value">
+                  {bookingDetail.caseType === "CIVIL"
+                    ? "Dân Sự"
+                    : bookingDetail.caseType === "ADMINISTRATIVE"
+                    ? "Hành Chính"
+                    : "—"}
+                </span>
               </div>
               <div className="staff-info-item">
                 <span className="staff-info-label">Hình thức lấy mẫu:</span>
                 {/* code nay bi lap co the thay doi */}
                 <span className="staff-info-value">
-                  {bookingDetail.collectionMethod === 'HOME'
-                    ? 'Tự thu tại nhà'
-                    : bookingDetail.collectionMethod === 'HOSPITAL'
-                      ? 'Tại bệnh viện'
-                      : '—'}
+                  {bookingDetail.collectionMethod === "HOME"
+                    ? "Tự thu tại nhà"
+                    : bookingDetail.collectionMethod === "HOSPITAL"
+                    ? "Tại bệnh viện"
+                    : "—"}
                 </span>
               </div>
               <div className="staff-info-item">
                 <span className="staff-info-label">Trạng thái đơn:</span>
-                <span className={`staff-status-badge ${statusClasses[bookingDetail.status]}`}>
+                <span
+                  className={`staff-status-badge ${
+                    statusClasses[bookingDetail.status]
+                  }`}
+                >
                   {statusLabels[bookingDetail.status]}
                 </span>
               </div>
@@ -153,7 +173,9 @@ export default function BookingDetailDialog({ open, onClose, booking }) {
                 <thead>
                   <tr>
                     <th>Họ tên</th>
-                    <th>Số CMND/CCCD</th>
+                    {bookingDetail.caseType !== "CIVIL" && (
+                      <th>Số CMND/CCCD</th>
+                    )}
                     <th>Mã kit</th>
                     <th>Nhân viên nhập</th>
                     <th>Thời gian nhập</th>
@@ -164,12 +186,26 @@ export default function BookingDetailDialog({ open, onClose, booking }) {
                   {bookingDetail.participants.map((p) => (
                     <tr key={p.id}>
                       <td>{p.fullName}</td>
-                      <td>{p.identityNumber}</td>
-                      <td>{p.kitCode || <span className="staff-empty-text">Chưa có</span>}</td>
-                      <td>{p.kitEnteredByName || <span className="staff-empty-text">—</span>}</td>
+                      {bookingDetail.caseType !== "CIVIL" && (
+                        <td>{p.identityNumber}</td>
+                      )}
+                      <td>
+                        {p.kitCode || (
+                          <span className="staff-empty-text">Chưa có</span>
+                        )}
+                      </td>
+                      <td>
+                        {p.kitEnteredByName || (
+                          <span className="staff-empty-text">—</span>
+                        )}
+                      </td>
                       <td>{formatDate(p.kitEnteredAt)}</td>
                       <td>
-                        <span className={`staff-status-badge ${sampleStatusColors[p.sampleStatus]}`}>
+                        <span
+                          className={`staff-status-badge ${
+                            sampleStatusColors[p.sampleStatus]
+                          }`}
+                        >
                           {sampleStatusLabels[p.sampleStatus]}
                         </span>
                       </td>
@@ -177,7 +213,9 @@ export default function BookingDetailDialog({ open, onClose, booking }) {
                   ))}
                   {bookingDetail.participants.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="staff-empty-row">Không có người tham gia</td>
+                      <td colSpan={6} className="staff-empty-row">
+                        Không có người tham gia
+                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -185,7 +223,6 @@ export default function BookingDetailDialog({ open, onClose, booking }) {
             </div>
           </div>
         </div>
-
         <div className="staff-modal-footer">
           <button className="staff-btn-close" onClick={onClose}>
             Đóng

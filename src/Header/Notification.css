@@ -38,6 +38,7 @@
   position: absolute;
   top: 40px;
   right: 0;
+transform: translateX(50%);
   width: 300px;
   max-height: 400px;
   background-color: #fff;

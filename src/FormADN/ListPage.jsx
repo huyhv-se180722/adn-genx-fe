@@ -1,32 +1,90 @@
 import React, { useState, useEffect } from "react";
 import axiosClient from "../config/AxiosClient";
-import Header from "../Header/Header"; // đường dẫn đến Header tùy vào cấu trúc project của bạn
+import Header from "../Header/Header";
+import { useSearchParams } from "react-router-dom";
 
 export default function ListPage() {
   const [orders, setOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [kitInputs, setKitInputs] = useState({});
+  const [highlightedId, setHighlightedId] = useState(null);
+
+  const [page, setPage] = useState(1); // Phân trang
+  const [size, setSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     loadOrders();
-  }, [statusFilter]);
+  }, [statusFilter, page]);
 
+// 👈 tự động mở chi tiết nếu có bookingId
+  useEffect(() => {
+    const bookingId = searchParams.get("bookingId"); 
+    if (bookingId) {
+      // fetchDetail(bookingId);
+      findPageOfBooking(bookingId);
+    }
+  }, [searchParams]);
+
+  const closeModal = () => {
+  setSelectedOrder(null); // Đóng modal
+  if (searchParams.has("bookingId")) {
+    searchParams.delete("bookingId"); // Xóa bookingId khỏi URL
+    setSearchParams(searchParams); // Cập nhật URL
+  }
+  };
+
+  // Tìm trang chứa bookingId và mở chi tiết
+  const findPageOfBooking = async (bookingId) => {
+  let currentPage = 0;
+  let found = false;
+
+  while (!found) {
+    try {
+      const res = await axiosClient.get(`/api/registrations?page=${currentPage}&size=${size}`);
+      const orders = res.data.content;
+
+      if (!orders || orders.length === 0) break;
+
+      const match = orders.find(order => order.id == bookingId);
+      if (match) {
+        setPage(currentPage + 1); // Chuyển đến đúng trang
+        setHighlightedId(bookingId);
+        fetchDetail(bookingId);
+        found = true;
+      } else {
+        currentPage++;
+        if (currentPage >= res.data.totalPages) break;
+      }
+    } catch (err) {
+      console.error("❌ Lỗi khi tìm trang booking:", err);
+      break;
+    }
+  }
+
+  if (!found) {
+    alert("Không tìm thấy đơn chứa mã booking này");
+  }
+};
+
+
+  // Tải danh sách đơn đăng ký
   const loadOrders = async () => {
     setLoading(true);
     setMessage("");
     try {
-      const url = `/api/registrations${statusFilter ? `?status=${statusFilter}` : ""}`;
+      const url = `/api/registrations?page=${page - 1}&size=${size}${
+        statusFilter ? `&status=${statusFilter}` : ""
+      }`;
       const res = await axiosClient.get(url);
-      let data = [];
-
-      if (Array.isArray(res.data)) {
-        data = res.data;
-      } else if (res.data && Array.isArray(res.data.data)) {
-        data = res.data.data;
-      }
-
-      setOrders(data);
+      const data = res.data;
+      setOrders(data.content || []);
+      setTotalPages(data.totalPages || 1);
     } catch (err) {
       console.error("❌ Lỗi khi tải danh sách đơn:", err);
       setMessage("Lỗi khi tải danh sách đơn đăng ký");
@@ -35,66 +93,165 @@ export default function ListPage() {
     }
   };
 
-  const cancelOrder = async (id) => {
-    if (!window.confirm("Bạn có chắc chắn muốn hủy đơn đăng ký này?")) return;
-    setLoading(true);
-    setMessage("");
+  const fetchDetail = async (id) => {
+    setDetailLoading(true);
     try {
-      await axiosClient.put(`/api/registrations/${id}/cancel`);
-      setMessage("✅ Hủy đơn thành công");
+      const res = await axiosClient.get(`/api/registrations/${id}`);
+      setSelectedOrder(res.data);
+      setHighlightedId(res.data.id);
+      const kits = {};
+      res.data?.participants?.forEach((p) => {
+        if (!p.kitCode && p.sampleStatus === "KIT_SENT") {
+          kits[p.id] = { kitCode: "", sampleType: "" };
+        }
+      });
+      setKitInputs(kits);
+    } catch (err) {
+      console.error("❌ Lỗi khi lấy chi tiết đơn:", err);
+      alert("Không thể tải chi tiết đơn");
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const cancelOrder = async (bookingId) => {
+    if (!window.confirm("⚠️ Bạn có chắc chắn muốn hủy đơn này không?")) return;
+    try {
+      await axiosClient.put(`/api/registrations/${bookingId}/cancel`);
+      alert("✅ Hủy đơn thành công");
+      setSelectedOrder(null);
       loadOrders();
     } catch (err) {
-      console.error("❌ Lỗi khi hủy đơn:", err);
-      setMessage("Lỗi khi hủy đơn đăng ký");
-    } finally {
-      setLoading(false);
+      console.error("❌ Hủy đơn thất bại:", err);
+      alert("❌ Hủy đơn thất bại");
+    }
+  };
+
+  const updateKitCode = async (participantId) => {
+    const input = kitInputs[participantId];
+    if (!input?.kitCode || !input?.sampleType) {
+      alert("⚠️ Vui lòng nhập đầy đủ mã kit và chọn loại mẫu.");
+      return;
+    }
+    if (
+      !window.confirm(
+        "⚠️ Bạn có chắc chắn đã nhập đúng mã kit và chọn đúng loại mẫu?"
+      )
+    )
+      return;
+    try {
+      const formData = new FormData();
+      formData.append("kitCode", input.kitCode);
+      formData.append("sampleType", input.sampleType);
+      await axiosClient.put(
+        `/api/v1/customer/sample-collection/participants/${participantId}/kit-code`,
+        formData
+      );
+      fetchDetail(selectedOrder.id);
+    } catch (err) {
+      console.error("❌ Lỗi khi nhập kit:", err);
+      alert("Không thể lưu mã kit");
     }
   };
 
   const formatStatus = (status) => {
     const map = {
-      PAID: "Đã thanh toán",
-      UNPAID: "Chưa thanh toán",
-      PENDING: "Đang chờ",
-      FAILED: "Thất bại",
-      CANCELLED: "Đã hủy",
+      PAID: { label: "Đã thanh toán", className: "badge bg-success" },
+      UNPAID: { label: "Chưa thanh toán", className: "badge bg-secondary" },
+      PENDING: { label: "Đang chờ", className: "badge bg-warning text-dark" },
+      FAILED: { label: "Thất bại", className: "badge bg-danger" },
+      CANCELLED: { label: "Đã hủy", className: "badge bg-dark" },
     };
-    return map[status] || status;
+
+    const item = map[status];
+    if (!item)
+      return <span className="badge bg-light text-dark">Không rõ</span>;
+
+    return <span className={item.className}>{item.label}</span>;
   };
 
-  const isKitSent = (order) =>
-    order.collectionMethod === "HOME" &&
-    order.paymentStatus === "PAID" &&
-    Array.isArray(order.participants) &&
-    order.participants.some((p) => p.sampleStatus === "KIT_SENT");
+  const formatSampleType = (sampleType) => {
+    const map = {
+      BLOOD: "Máu",
+      NAIL: "Móng",
+      HAIR: "Tóc",
+    };
+    return map[sampleType] || sampleType || "Không rõ";
+  };
 
-  const hasKitCode = (order) =>
-    Array.isArray(order.participants) &&
-    order.participants.some((p) => p.kitCode && p.kitCode.trim() !== "");
+  const formatGender = (gender) => {
+    const map = {
+      MALE: "Nam",
+      FEMALE: "Nữ",
+      OTHER: "Khác",
+    };
+    return map[gender] || "Không";
+  };
+
+  const formatCollectionMethod = (method) => {
+    const map = {
+      HOME: "Tại nhà",
+      HOSPITAL: "Tại bệnh viện",
+    };
+    return map[method] || "Không";
+  };
+
+  const formatSampleStatus = (status) => {
+    const map = {
+      PENDING: "Đang chờ xử lí",
+      KIT_SENT: "Yêu cầu thu mẫu",
+      WAITING_FOR_COLLECTION: "Chờ xác nhận mẫu",
+      CONFIRMED: "Xác nhận",
+    };
+    return map[status] || "Không";
+  };
+
+  const formatValue = (value) => {
+    return !value || (typeof value === "string" && value.trim() === "")
+      ? "Không"
+      : value;
+  };
+
+  const renderCMND = (p) => {
+    if (!p.identityNumber && !p.issueDate && !p.issuePlace) return null;
+    let extras = [];
+    if (p.issueDate) extras.push(formatValue(p.issueDate));
+    if (p.issuePlace) extras.push(formatValue(p.issuePlace));
+    return (
+      <p>
+        <strong>CMND:</strong> {formatValue(p.identityNumber)}
+        {extras.length ? ` (${extras.join(", ")})` : ""}
+      </p>
+    );
+  };
 
   return (
     <Header>
       <div className="container py-4">
         <div className="bg-white shadow-sm rounded p-4">
           <h2 className="fw-bold mb-4">Danh sách đơn đăng ký</h2>
-
           {message && (
             <div
-              className={`alert ${message.includes("thành công") ? "alert-success" : "alert-danger"
-                } text-center`}
+              className={`alert ${
+                message.includes("thành công")
+                  ? "alert-success"
+                  : "alert-danger"
+              } text-center`}
             >
               {message}
             </div>
           )}
 
-          <div className="d-flex align-items-center gap-2 mb-4">
-            <span className="fw-semibold">📊 Lọc theo trạng thái:</span>
-            <div style={{ minWidth: 200 }}>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <label className="me-2 mb-0">Lọc trạng thái:</label>
               <select
-                className="form-select form-select-sm border-dark"
+                className="form-select form-select-sm d-inline-block w-auto"
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                disabled={loading}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setPage(1); // Reset về trang 1 khi đổi filter
+                }}
               >
                 <option value="">Tất cả</option>
                 <option value="PAID">Đã thanh toán</option>
@@ -106,141 +263,235 @@ export default function ListPage() {
             </div>
           </div>
 
-          {loading ? (
-            <div className="text-center my-4">Đang tải...</div>
-          ) : (
-            <div className="table-responsive">
-              <table className="table table-hover align-middle">
-                <thead className="table-light">
-                  <tr>
-                    <th className="text-muted">#</th>
-                    <th className="text-muted">Mã đơn</th>
-                    <th className="text-muted">Khách hàng</th>
-                    <th className="text-muted">Dịch vụ</th>
-                    <th className="text-muted">Ngày tạo</th>
-                    <th className="text-muted">Trạng thái</th>
-                    <th className="text-muted">Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.isArray(orders) && orders.length > 0 ? (
-                    orders.map((order, index) => {
-                      const status = order.paymentStatus;
-                      const statusBadge = {
-                        PAID: "success",
-                        UNPAID: "danger",
-                        PENDING: "primary",
-                        FAILED: "secondary",
-                        CANCELLED: "dark",
-                      }[status] || "light";
+          <table className="table table-hover">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Dịch vụ</th>
+                <th>Ngày tạo</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order, index) => (
+                <tr key={order.id} className={highlightedId === order.id ? "table-info" : ""}>
+                  <td>{(page - 1) * size + index + 1}</td>
+                  <td>#{order.code}</td>
+                  <td>{formatValue(order.customerName)}</td>
+                  <td>{formatValue(order.serviceTypeName)}</td>
+                  <td>
+                    {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                  </td>
+                  <td>{formatStatus(order.paymentStatus)}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={() => fetchDetail(order.id)}
+                    >
+                      Chi tiết
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-                      const kitSent = isKitSent(order);
-                      const disableCancel =
-                        order.paymentStatus !== "PAID" || loading || hasKitCode(order);
-
-                      return (
-                        <tr key={order.id}>
-                          <td>{index + 1}</td>
-                          <td className="fw-semibold">#{order.code || order.id}</td>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <div
-                                className="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center me-2"
-                                style={{ width: 32, height: 32, fontSize: 14 }}
-                              >
-                                {order.customerName?.[0] ||
-                                  order.participants?.[0]?.fullName?.[0] ||
-                                  "?"}
-                              </div>
-                              <span className="fw-semibold">
-                                {order.customerName ||
-                                  order.participants?.[0]?.fullName ||
-                                  "Không rõ"}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="text-muted">
-                            {order.serviceId === 1
-                              ? "Dân sự"
-                              : order.serviceId === 2
-                                ? "Hành chính"
-                                : "Khác"}
-                          </td>
-                          <td className="text-muted">
-                            {order.createdAt
-                              ? new Date(order.createdAt).toLocaleDateString("vi-VN")
-                              : "Không rõ"}
-                          </td>
-                          <td>
-                            <span className={`badge bg-${statusBadge}`}>
-                              {formatStatus(order.paymentStatus)}
-                            </span>
-                          </td>
-                          <td>
-                            {order.paymentStatus === "PAID" &&
-                              Array.isArray(order.participants) &&
-                              order.participants.map((p) => {
-                                const shouldShowEnterKitButton =
-                                  p.sampleStatus === "KIT_SENT" &&
-                                  order.collectionMethod === "HOME" &&
-                                  (!p.kitCode || p.kitCode.trim() === "");
-
-                                return (
-                                  <div key={p.id} className="mb-1">
-                                    {shouldShowEnterKitButton ? (
-                                      <button
-                                        className="btn btn-outline-info btn-sm me-2 mt-1"
-                                        onClick={() =>
-                                          (window.location.href = `/customer/enter-kit-info?participantId=${p.id}`)
-                                        }
-                                      >
-                                        Điền kit: {p.fullName || p.id}
-                                      </button>
-                                    ) : (
-                                      p.kitCode && (
-                                        <span className="text-success fw-semibold d-inline-block mt-1">
-                                          ✅ Đã nhập: {p.fullName}
-                                        </span>
-                                      )
-                                    )}
-                                  </div>
-                                );
-                              })}
-
-                            {!(
-                              Array.isArray(order.participants) &&
-                              order.participants.some(
-                                (p) =>
-                                  p.sampleStatus === "KIT_SENT" &&
-                                  order.collectionMethod === "HOME" &&
-                                  (!p.kitCode || p.kitCode.trim() === "")
-                              )
-                            ) && (
-                                <button
-                                  className={`btn btn-sm mt-2 ${disableCancel ? "btn-outline-danger" : "btn-danger"}`}
-                                  disabled={disableCancel}
-                                  onClick={() => cancelOrder(order.id)}
-                                >
-                                  Hủy đơn
-                                </button>
-                              )}
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    <tr>
-                      <td colSpan="7" className="text-center">
-                        Không có đơn đăng ký nào.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+          {/* Phân trang */}
+          {totalPages > 1 && (
+            <nav className="d-flex justify-content-center mt-3">
+              <ul className="pagination">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <li
+                    key={i}
+                    className={`page-item ${page === i + 1 ? "active" : ""}`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => setPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           )}
         </div>
       </div>
+
+      {/* Modal chi tiết */}
+      {selectedOrder && (
+        <div
+          className="modal fade show"
+          style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+          onClick={() => setSelectedOrder(null)}
+        >
+          <div
+            className="modal-dialog modal-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content">
+              <div className="modal-header bg-info text-white">
+                <h5 className="modal-title">
+                  Chi tiết đơn #{selectedOrder.code}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => closeModal()}
+                ></button>
+              </div>
+              <div className="modal-body">
+                {detailLoading ? (
+                  <p>Đang tải...</p>
+                ) : (
+                  <>
+                    <div className="row mb-3">
+                      <div className="col-md-6">
+                        <p>
+                          <strong>Khách hàng:</strong>{" "}
+                          {formatValue(selectedOrder.customerName)}
+                        </p>
+                        <p>
+                          <strong>Điện thoại:</strong>{" "}
+                          {formatValue(selectedOrder.phoneNumber)}
+                        </p>
+                        <p>
+                          <strong>Email:</strong>{" "}
+                          {formatValue(selectedOrder.email)}
+                        </p>
+                      </div>
+                      <div className="col-md-6">
+                        <p>
+                          <strong>Ghi nhận:</strong>{" "}
+                          {formatValue(selectedOrder.recordStaffName)}
+                        </p>
+                        <p>
+                          <strong>Dịch vụ:</strong>{" "}
+                          {formatValue(selectedOrder.serviceTypeName)}
+                        </p>
+                        <p>
+                          <strong>Hình thức lấy mẫu:</strong>{" "}
+                          {formatCollectionMethod(
+                            selectedOrder.collectionMethod
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <h5 className="text-primary">Người tham gia</h5>
+                    <div className="row">
+                      {selectedOrder.participants.map((p) => (
+                        <div className="col-md-6" key={p.id}>
+                          <div className="border p-3 rounded mb-3">
+                            <p>
+                              <strong>Họ tên:</strong> {formatValue(p.fullName)}
+                            </p>
+                            <p>
+                              <strong>Năm sinh:</strong>{" "}
+                              {formatValue(p.yearOfBirth)} |{" "}
+                              <strong>Giới tính:</strong>{" "}
+                              {formatGender(p.gender)}
+                            </p>
+                            <p>
+                              <strong>Quan hệ:</strong>{" "}
+                              {formatValue(p.relationship)}
+                            </p>
+                            {renderCMND(p)}
+                            <p>
+                              <strong>Trạng thái mẫu:</strong>{" "}
+                              {formatSampleStatus(p.sampleStatus)}
+                            </p>
+
+                            {p.kitCode ? (
+                              <>
+                                <p>
+                                  <strong>Mã kit:</strong> {p.kitCode}
+                                </p>
+                                <p>
+                                  <strong>Loại mẫu:</strong>{" "}
+                                  {formatSampleType(p.sampleType)}
+                                </p>
+                                <p className="text-success fw-semibold">
+                                  ✅ Đã nhập mã kit, không thể thay đổi
+                                </p>
+                              </>
+                            ) : p.sampleStatus === "KIT_SENT" ? (
+                              <>
+                                <div className="input-group input-group-sm mb-2">
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Nhập mã kit..."
+                                    value={kitInputs[p.id]?.kitCode || ""}
+                                    onChange={(e) => {
+                                      setKitInputs((prev) => ({
+                                        ...prev,
+                                        [p.id]: {
+                                          ...prev[p.id],
+                                          kitCode: e.target.value,
+                                        },
+                                      }));
+                                    }}
+                                  />
+                                </div>
+                                <select
+                                  className="form-select form-select-sm mb-2"
+                                  value={kitInputs[p.id]?.sampleType || ""}
+                                  onChange={(e) => {
+                                    setKitInputs((prev) => ({
+                                      ...prev,
+                                      [p.id]: {
+                                        ...prev[p.id],
+                                        sampleType: e.target.value,
+                                      },
+                                    }));
+                                  }}
+                                >
+                                  <option value="">-- Loại mẫu --</option>
+                                  <option value="BLOOD">Máu</option>
+                                  <option value="NAIL">Móng</option>
+                                  <option value="HAIR">Tóc</option>
+                                </select>
+                                <button
+                                  className="btn btn-success btn-sm"
+                                  onClick={() => updateKitCode(p.id)}
+                                >
+                                  Lưu
+                                </button>
+                              </>
+                            ) : null}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="modal-footer">
+                {selectedOrder.paymentStatus === "PAID" &&
+                  selectedOrder.status === "PENDING" && (
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => cancelOrder(selectedOrder.id)}
+                      disabled={loading}
+                    >
+                      Hủy đơn
+                    </button>
+                  )}
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={closeModal}
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Header>
   );
 }

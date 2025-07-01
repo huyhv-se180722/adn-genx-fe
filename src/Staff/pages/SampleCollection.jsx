@@ -1,24 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import axiosClient from '../../config/AxiosClient';
-import '../StaffDashboard.css';
-import StaffSidebarNav from '../../Staff/StaffSidebarNav';
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import axiosClient from "../../config/AxiosClient";
+import "../StaffDashboard.css";
+import StaffSidebarNav from "../../Staff/StaffSidebarNav";
 
 const sampleStatusLabels = {
-  PENDING: 'Chờ xử lý',
-  KIT_SENT: 'Đã gửi bộ kit',
-  WAITING_FOR_COLLECTION: 'Chờ lấy mẫu',
-  CONFIRMED: 'Đã lấy mẫu',
-  REJECTED: 'Bị từ chối',
-  NEED_RECOLLECT: 'Cần lấy lại mẫu',
+  PENDING: "Chờ xử lý",
+  KIT_SENT: "Đã gửi bộ kit",
+  WAITING_FOR_COLLECTION: "Chờ lấy mẫu",
+  CONFIRMED: "Đã lấy mẫu",
+  REJECTED: "Bị từ chối",
+  NEED_RECOLLECT: "Cần lấy lại mẫu",
 };
 
 const sampleStatusColors = {
-  PENDING: 'secondary',
-  KIT_SENT: 'primary',
-  WAITING_FOR_COLLECTION: 'warning',
-  CONFIRMED: 'success',
-  REJECTED: 'danger',
-  NEED_RECOLLECT: 'info',
+  PENDING: "secondary",
+  KIT_SENT: "primary",
+  WAITING_FOR_COLLECTION: "warning",
+  CONFIRMED: "success",
+  REJECTED: "danger",
+  NEED_RECOLLECT: "info",
 };
 
 export default function SampleCollection() {
@@ -26,10 +27,89 @@ export default function SampleCollection() {
   const [kitInputs, setKitInputs] = useState({});
   const [sampleTypes, setSampleTypes] = useState({});
   const [fingerprintFiles, setFingerprintFiles] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
+  const [previewFingerprintLinks, setPreviewFingerprintLinks] = useState({});
+  const [persistedFingerprintLinks, setPersistedFingerprintLinks] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [size] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
+  const [highlightedId, setHighlightedId] = useState(null); // Thêm state highlight
+  const [searchParams, setSearchParams] = useSearchParams(); // Thêm useSearchParams
+
+  // Tự động tìm và highlight đơn từ thông báo
+  useEffect(() => {
+    const bookingId = searchParams.get("bookingId");
+    if (bookingId) {
+      findPageOfBooking(bookingId);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    fetchBookings();
+  }, [page]);
+
+  // Reset highlight khi thay đổi search
+  useEffect(() => {
+    setHighlightedId(null);
+  }, [searchTerm]);
+
+  // Scroll đến đơn được highlight sau khi bookings đã load
+  useEffect(() => {
+    if (highlightedId && bookings.length > 0) {
+      const timer = setTimeout(() => {
+        const element = document.querySelector(`[data-booking-id="${highlightedId}"]`);
+        if (element) {
+          element.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center'
+          });
+        }
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedId, bookings]);
+
+  // Tìm trang chứa bookingId và highlight
+  const findPageOfBooking = async (bookingId) => {
+    let currentPage = 0;
+    let found = false;
+
+    while (!found) {
+      try {
+        const response = await axiosClient.get(
+          `/api/v1/staff/booking/all?page=${currentPage}&size=${size}`
+        );
+        
+        const bookings = response.data.content || [];
+        if (bookings.length === 0) break;
+
+        const match = bookings.find(booking => booking.id == bookingId);
+        if (match) {
+          setPage(currentPage + 1); // Chuyển đến đúng trang
+          setHighlightedId(parseInt(bookingId)); // Highlight đơn
+          found = true;
+
+          // Xóa bookingId khỏi URL sau khi tìm thấy
+          setSearchParams(prev => {
+            const newParams = new URLSearchParams(prev);
+            newParams.delete("bookingId");
+            return newParams;
+          });
+        } else {
+          currentPage++;
+          if (currentPage >= response.data.totalPages) break;
+        }
+      } catch (err) {
+        console.error("❌ Lỗi khi tìm trang booking:", err);
+        break;
+      }
+    }
+
+    if (!found) {
+      alert("Không tìm thấy đơn đăng ký này");
+    }
+  };
 
   const fetchBookings = () => {
     axiosClient
@@ -41,14 +121,19 @@ export default function SampleCollection() {
           participants: Array.isArray(b.participants) ? b.participants : [],
         }));
         setBookings(safe);
+
         setTotalPages(res.data.totalPages);
+        const fingerprintMap = {};
+        safe.forEach((b) => {
+          b.participants.forEach((p) => {
+            if (p.fingerprintImageUrl)
+              fingerprintMap[p.id] = p.fingerprintImageUrl;
+          });
+        });
+        setPersistedFingerprintLinks(fingerprintMap);
       })
       .catch((err) => console.error(err));
   };
-
-  useEffect(() => {
-    fetchBookings();
-  }, [page]);
 
   const handleKitInput = (participantId, value) => {
     setKitInputs((prev) => ({ ...prev, [participantId]: value }));
@@ -59,6 +144,18 @@ export default function SampleCollection() {
   };
 
   const handleFingerprintChange = (participantId, file) => {
+    if (file) {
+      const previewURL = URL.createObjectURL(file);
+      setPreviewFingerprintLinks((prev) => ({
+        ...prev,
+        [participantId]: previewURL,
+      }));
+      setPersistedFingerprintLinks((prev) => {
+        const updated = { ...prev };
+        delete updated[participantId];
+        return updated;
+      });
+    }
     setFingerprintFiles((prev) => ({ ...prev, [participantId]: file }));
   };
 
@@ -68,37 +165,39 @@ export default function SampleCollection() {
     const fingerprint = fingerprintFiles[participant.id];
 
     try {
-      if (booking.collectionMethod === 'HOSPITAL') {
+      if (booking.collectionMethod === "HOSPITAL") {
         if (!kitCode || !sampleType) return;
         const formData = new FormData();
-        formData.append('kitCode', kitCode);
-        formData.append('sampleType', sampleType);
+        formData.append("kitCode", kitCode);
+        formData.append("sampleType", sampleType);
         if (booking.serviceId === 2 && fingerprint) {
-          formData.append('fingerprintImage', fingerprint);
+          formData.append("fingerprintImage", fingerprint);
         }
+
         await axiosClient.put(
           `/api/v1/staff/sample-collection/participants/${participant.id}/kit-code`,
           formData,
           {
-            headers: { 'Content-Type': 'multipart/form-data' },
+            headers: { "Content-Type": "multipart/form-data" },
           }
         );
       } else if (
-        booking.collectionMethod === 'HOME' &&
-        participant.sampleStatus === 'PENDING'
+        booking.collectionMethod === "HOME" &&
+        participant.sampleStatus === "PENDING"
       ) {
         await axiosClient.put(
           `/api/v1/staff/sample-collection/participants/${participant.id}/send-kit`
         );
       } else if (
-        booking.collectionMethod === 'HOME' &&
-        participant.sampleStatus === 'WAITING_FOR_COLLECTION'
+        booking.collectionMethod === "HOME" &&
+        participant.sampleStatus === "WAITING_FOR_COLLECTION"
       ) {
         await axiosClient.put(
           `/api/v1/staff/sample-collection/${participant.id}/confirm`
         );
       }
-      fetchBookings();
+
+      await fetchBookings();
     } catch (error) {
       console.error(error);
     }
@@ -123,7 +222,7 @@ export default function SampleCollection() {
             <StaffSidebarNav />
           </aside>
           <main className="col-md-10 ms-sm-auto px-4 py-4">
-            <h4 className="fw-bold mb-3">🦢 Ghi nhận mẫu</h4>
+            <h4 className="fw-bold mb-3"> Ghi nhận mẫu</h4>
 
             <input
               type="text"
@@ -136,26 +235,44 @@ export default function SampleCollection() {
             {bookings.map((booking) => {
               const allConfirmed =
                 booking.participants?.length > 0 &&
-                booking.participants.every((p) => p.sampleStatus === 'CONFIRMED');
+                booking.participants.every(
+                  (p) => p.sampleStatus === "CONFIRMED"
+                );
 
               return (
-                <div key={booking.id} className="card mb-4 shadow-sm">
+                <div 
+                  key={booking.id}
+                  data-booking-id={booking.id}
+                  className={`card mb-4 shadow-sm ${
+                    highlightedId === booking.id ? "border-primary border-3 bg-light" : ""
+                  }`}
+                >
                   <div className="card-body">
                     <h5 className="card-title">
                       Đơn #{booking.code} – {booking.customerName}
                     </h5>
-                    <h6 className="card-subtitle mb-2 text-muted">
-                      Hình thức lấy mẫu:{' '}
+                    <p className="card-subtitle mb-2 text-muted">
+                      Hình thức lấy mẫu:{" "}
                       <strong>
-                        {booking.collectionMethod === 'HOME'
-                          ? 'TỰ THU TẠI NHÀ'
-                          : 'TẠI BỆNH VIỆN'}
+                        {booking.collectionMethod === "HOME"
+                          ? "TỰ THU TẠI NHÀ"
+                          : "TẠI BỆNH VIỆN"}
                       </strong>
-                    </h6>
+                    </p>
+                    <p className="card-subtitle mb-2 text-muted">
+                      Loại đơn:{" "}
+                      <strong>
+                        {booking.caseType === "CIVIL"
+                          ? "DÂN SỰ"
+                          : booking.caseType === "ADMINISTRATIVE"
+                          ? "HÀNH CHÍNH"
+                          : "—"}
+                      </strong>
+                    </p>
                     <p>
-                      Trạng thái đơn:{' '}
+                      Trạng thái đơn:{" "}
                       <span className="badge bg-info">
-                        {booking.sampleCollectionStatus || 'COLLECTING'}
+                        {booking.sampleCollectionStatus || "COLLECTING"}
                       </span>
                     </p>
 
@@ -164,43 +281,49 @@ export default function SampleCollection() {
                         <thead className="table-light">
                           <tr>
                             <th>Họ tên</th>
-                            <th>CMND/CCCD</th>
-                            <th>Trạng thái mẫu</th>
+                            {booking.caseType !== "CIVIL" && <th>CMND/CCCD</th>}
                             <th>Mã kit</th>
                             <th>Loại mẫu</th>
-                            {bookings.some((b) =>
-                              b.participants.some(
-                                (p) =>
-                                  b.collectionMethod === 'HOSPITAL' &&
-                                  p.sampleStatus === 'PENDING' &&
-                                  b.serviceId === 2
-                              )
-                            ) && <th>Vân tay</th>}
+
+                            {booking.caseType === "ADMINISTRATIVE" && (
+                              <th>Vân tay</th>
+                            )}
+                            <th>Trạng thái mẫu</th>
                             <th>Thao tác</th>
                           </tr>
                         </thead>
                         <tbody>
                           {booking.participants.map((p) => {
-                            const color = sampleStatusColors[p.sampleStatus] || 'secondary';
-                            const label = sampleStatusLabels[p.sampleStatus] || 'Không xác định';
-                            const showInput = booking.collectionMethod === 'HOSPITAL' && p.sampleStatus === 'PENDING';
-                            const showFileInput = showInput && booking.serviceId === 2;
-                            const showButton = ['PENDING', 'WAITING_FOR_COLLECTION'].includes(p.sampleStatus);
-
+                            const color =
+                              sampleStatusColors[p.sampleStatus] || "secondary";
+                            const label =
+                              sampleStatusLabels[p.sampleStatus] ||
+                              "Không xác định";
+                            const showInput =
+                              booking.collectionMethod === "HOSPITAL" &&
+                              p.sampleStatus === "PENDING";
+                            const showFileInput =
+                              showInput && booking.serviceId === 2;
+                            const showButton = [
+                              "PENDING",
+                              "WAITING_FOR_COLLECTION",
+                            ].includes(p.sampleStatus);
                             return (
                               <tr key={p.id}>
                                 <td>{p.fullName}</td>
-                                <td>{p.identityNumber || '—'}</td>
-                                <td>
-                                  <span className={`badge bg-${color}`}>{label}</span>
-                                </td>
+                                {booking.caseType !== "CIVIL" && (
+                                  <td>{p.identityNumber || "—"}</td>
+                                )}
+
                                 <td>
                                   {showInput ? (
                                     <input
                                       type="text"
                                       className="form-control form-control-sm"
-                                      value={kitInputs[p.id] || ''}
-                                      onChange={(e) => handleKitInput(p.id, e.target.value)}
+                                      value={kitInputs[p.id] || ""}
+                                      onChange={(e) =>
+                                        handleKitInput(p.id, e.target.value)
+                                      }
                                       placeholder="Nhập mã kit"
                                     />
                                   ) : (
@@ -211,8 +334,13 @@ export default function SampleCollection() {
                                   {showInput ? (
                                     <select
                                       className="form-select form-select-sm"
-                                      value={sampleTypes[p.id] || ''}
-                                      onChange={(e) => handleSampleTypeChange(p.id, e.target.value)}
+                                      value={sampleTypes[p.id] || ""}
+                                      onChange={(e) =>
+                                        handleSampleTypeChange(
+                                          p.id,
+                                          e.target.value
+                                        )
+                                      }
                                     >
                                       <option value="">--Chọn--</option>
                                       <option value="BLOOD">Máu</option>
@@ -223,24 +351,84 @@ export default function SampleCollection() {
                                     p.sampleType || <i>—</i>
                                   )}
                                 </td>
-                                {showFileInput || p.fingerprintLink ? (
+                                {booking.caseType === "ADMINISTRATIVE" && (
                                   <td>
                                     {showFileInput ? (
-                                      <input
-                                        type="file"
-                                        className="form-control form-control-sm"
-                                        accept="image/*"
-                                        onChange={(e) => handleFingerprintChange(p.id, e.target.files[0])}
-                                      />
-                                    ) : p.fingerprintLink ? (
-                                      <a href={p.fingerprintLink} target="_blank" rel="noopener noreferrer">
+                                      <>
+                                        <input
+                                          key={p.id}
+                                          type="file"
+                                          className="form-control form-control-sm"
+                                          accept="image/*"
+                                          onChange={(e) =>
+                                            handleFingerprintChange(
+                                              p.id,
+                                              e.target.files[0]
+                                            )
+                                          }
+                                        />
+                                        {previewFingerprintLinks[p.id] && (
+                                          <div className="mt-1 d-flex align-items-center gap-2">
+                                            <img
+                                              src={
+                                                previewFingerprintLinks[p.id]
+                                              }
+                                              alt="Preview"
+                                              style={{
+                                                width: 60,
+                                                height: 60,
+                                                objectFit: "cover",
+                                                borderRadius: 4,
+                                              }}
+                                            />
+                                            <button
+                                              className="btn btn-sm btn-outline-danger"
+                                              onClick={() => {
+                                                setFingerprintFiles((prev) => {
+                                                  const updated = { ...prev };
+                                                  delete updated[p.id];
+                                                  return updated;
+                                                });
+                                                setPreviewFingerprintLinks(
+                                                  (prev) => {
+                                                    URL.revokeObjectURL(
+                                                      prev[p.id]
+                                                    );
+                                                    const updated = { ...prev };
+                                                    delete updated[p.id];
+                                                    return updated;
+                                                  }
+                                                );
+                                              }}
+                                            >
+                                              ❌ Xóa
+                                            </button>
+                                          </div>
+                                        )}
+                                      </>
+                                    ) : previewFingerprintLinks[p.id] ||
+                                      persistedFingerprintLinks[p.id] ? (
+                                      <a
+                                        href={
+                                          p.fingerprintImageUrl ||
+                                          previewFingerprintLinks[p.id]
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                      >
                                         Xem ảnh
                                       </a>
                                     ) : (
                                       <i>—</i>
                                     )}
                                   </td>
-                                ) : null}
+                                )}
+
+                                <td>
+                                  <span className={`badge bg-${color}`}>
+                                    {label}
+                                  </span>
+                                </td>
 
                                 <td>
                                   {showButton && (
@@ -248,11 +436,11 @@ export default function SampleCollection() {
                                       className="btn btn-primary btn-sm"
                                       onClick={() => handleConfirm(booking, p)}
                                     >
-                                      {booking.collectionMethod === 'HOME'
-                                        ? p.sampleStatus === 'PENDING'
-                                          ? 'Gửi bộ kit'
-                                          : 'Xác nhận'
-                                        : 'Xác nhận'}
+                                      {booking.collectionMethod === "HOME"
+                                        ? p.sampleStatus === "PENDING"
+                                          ? "Gửi bộ kit"
+                                          : "Xác nhận"
+                                        : "Xác nhận"}
                                     </button>
                                   )}
                                 </td>
@@ -265,7 +453,7 @@ export default function SampleCollection() {
 
                     {allConfirmed && (
                       <div className="text-end mt-2">
-                        {booking.sampleCollectionStatus === 'SENT_TO_LAB' ? (
+                        {booking.sampleCollectionStatus === "SENT_TO_LAB" ? (
                           <span className="text-success fw-semibold">
                             ✅ Mẫu đã gửi tới phòng xét nghiệm
                           </span>
@@ -290,9 +478,12 @@ export default function SampleCollection() {
                   {Array.from({ length: totalPages }, (_, i) => (
                     <li
                       key={i}
-                      className={`page-item ${page === i + 1 ? 'active' : ''}`}
+                      className={`page-item ${page === i + 1 ? "active" : ""}`}
                     >
-                      <button className="page-link" onClick={() => setPage(i + 1)}>
+                      <button
+                        className="page-link"
+                        onClick={() => setPage(i + 1)}
+                      >
                         {i + 1}
                       </button>
                     </li>

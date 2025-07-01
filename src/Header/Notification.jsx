@@ -64,7 +64,7 @@ export default function Notification() {
     console.log("🔌 Kết nối WebSocket...");
     const socketFactory = () => new SockJS(`/ws`);
     const client = Stomp.over(socketFactory);
-    client.debug = () => {};
+    client.debug = () => { };
 
     client.connect(
       {},
@@ -76,7 +76,7 @@ export default function Notification() {
           setUnreadCount((prev) => prev + 1);
           setIsDropdownOpen(true);
           const audio = new Audio("/assets/notification.mp3");
-          audio.play().catch(() => {});
+          audio.play().catch(() => { });
           setTimeout(() => setIsDropdownOpen(false), 5000);
         });
       },
@@ -95,6 +95,46 @@ export default function Notification() {
     setIsDropdownOpen((prev) => !prev);
   };
 
+  // const handleNotificationClick = async (n) => {
+  //   try {
+  //     if (!n.read) {
+  //       await axiosClient.post(`/api/notifications/${n.id}/read`);
+  //       setNotifications((prev) =>
+  //         prev.map((item) => (item.id === n.id ? { ...item, read: true } : item))
+  //       );
+  //       setUnreadCount((prev) => Math.max(prev - 1, 0));
+  //     }
+
+  //     let rolePath = "customer";
+  //     switch (user?.role) {
+  //       case "RECORDER_STAFF":
+  //         rolePath = "recorder_staff";
+  //         break;
+  //       case "LAB_STAFF":
+  //         rolePath = "lab_staff";
+  //         break;
+  //       case "ADMIN":
+  //         rolePath = "admin";
+  //         break;
+  //       default:
+  //         rolePath = "customer";
+  //     }
+
+  //     if (n.bookingId) {
+  //       if (rolePath === "customer") {
+  //         navigate(`/test/list?bookingId=${n.bookingId}`);
+  //       }
+  //       else if (rolePath === "recorder_staff") {
+  //         navigate(`/staff/bookings?bookingId=${n.bookingId}`);
+  //       }
+  //       else if (rolePath === "admin") {
+  //       navigate(`/admin/bookings?bookingId=${n.bookingId}`);
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.error("❌ Lỗi khi xử lý thông báo:", err);
+  //   }
+  // };
   const handleNotificationClick = async (n) => {
     try {
       if (!n.read) {
@@ -105,11 +145,59 @@ export default function Notification() {
         setUnreadCount((prev) => Math.max(prev - 1, 0));
       }
 
-      const role = user?.role?.toLowerCase?.() || "customer";
-      if (n.bookingId) {
-        navigate(`/${role}/bookings/${n.bookingId}`);
-      } else {
-        navigate(`/${role}/dashboard`);
+      let rolePath = "customer";
+      switch (user?.role) {
+        case "RECORDER_STAFF":
+          rolePath = "recorder_staff";
+          break;
+        case "LAB_STAFF":
+          rolePath = "lab_staff";
+          break;
+        case "ADMIN":
+          rolePath = "admin";
+          break;
+        default:
+          rolePath = "customer";
+      }
+
+      // Lấy bookingId từ backend entity
+      const bookingId = n.booking?.id || n.bookingId;
+      setIsDropdownOpen(false);
+      if (bookingId) {
+        if (rolePath === "customer") {
+          navigate(`/test/list?bookingId=${bookingId}`);
+        }
+        else if (rolePath === "recorder_staff") {
+          // Phân loại thông báo dựa trên type hoặc message
+          if (
+            n.type === "NEW_BOOKING" ||
+            n.type === "BOOKING_CREATED" ||
+            n.message?.includes("vừa tạo đơn") ||
+            n.message?.includes("tạo đơn")
+          ) {
+            // Thông báo tạo đơn mới → StaffBookings
+            navigate(`/staff/bookings?bookingId=${bookingId}`);
+          }
+          else if (
+            n.type === "SAMPLE_COMPLETED" ||
+            n.type === "SAMPLE_READY" ||
+            n.message?.includes("hoàn tất thu mẫu") ||
+            n.message?.includes("Vui lòng kiểm tra và xử lý mẫu gửi đến")
+          ) {
+            // Thông báo hoàn tất thu mẫu → SampleCollection
+            navigate(`/staff/collection/?bookingId=${bookingId}`);
+          }
+          else {
+            // Thông báo khác → mặc định StaffBookings
+            navigate(`/staff/bookings?bookingId=${bookingId}`);
+          }
+        }
+        else if (rolePath === "lab_staff") {
+          navigate(`/lab/dashboard?tab=PENDING&bookingId=${bookingId}`);
+        }
+        else if (rolePath === "admin") {
+          navigate(`/admin/bookings?bookingId=${bookingId}`);
+        }
       }
     } catch (err) {
       console.error("❌ Lỗi khi xử lý thông báo:", err);
@@ -117,15 +205,25 @@ export default function Notification() {
   };
 
   const getNotificationMessage = (n) => {
+    // Ưu tiên hiển thị message từ backend
+    if (n.message) {
+      return n.message;
+    }
+
+    // Fallback theo type
     switch (n.type) {
+      case "NEW_BOOKING":
+      case "BOOKING_CREATED":
+        return "Có đơn đăng ký mới cần xác nhận";
       case "BOOKING_CONFIRMED":
         return "Đơn đăng ký đã được xác nhận";
       case "KIT_SENT":
         return "Bộ kit đã được gửi đến";
       case "SAMPLE_RECEIVED":
-        return "Mẫu đã được thu nhận";
+      case "SAMPLE_COMPLETED":
+        return "Mẫu đã được hoàn tất, vui lòng kiểm tra";
       default:
-        return n?.message || "Bạn có một thông báo mới";
+        return n?.title || "Bạn có một thông báo mới";
     }
   };
 
@@ -147,7 +245,19 @@ export default function Notification() {
               <div
                 key={n.id}
                 className={`notification-item ${!n.read ? "unread" : ""}`}
-                // onClick={() => handleNotificationClick(n)}
+                onMouseDown={(e) => {
+                  // Nếu đang bôi đen để copy thì không làm gì
+                  if (window.getSelection().toString()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }}
+                onClick={(e) => {
+                  // Chỉ chuyển trang nếu không có gì được bôi đen
+                  if (!window.getSelection().toString()) {
+                    handleNotificationClick(n);
+                  }
+                }}
               >
                 {!n.read && <span className="notification-dot" />}
                 {getNotificationMessage(n)}
