@@ -1,43 +1,51 @@
-import './App.css'
-import { AuthProvider } from './Context/AuthContext.jsx'
-import Home from './Home.jsx'
-import Login from './Login/Login.jsx'
-import Register from './Login/Register.jsx'
-import Service from './Components/Service/Service.jsx'
-import GoogleCallback from './Login/GoogleCallback.jsx';
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import "./App.css";
+import { AuthProvider } from "./Context/AuthContext.jsx";
+import Home from "./Home.jsx";
+import Login from "./Login/Login.jsx";
+import Register from "./Login/Register.jsx";
+import Service from "./Components/Service/Service.jsx";
+import GoogleCallback from "./Login/GoogleCallback.jsx";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import CompleteProfile from "./Login/CompleteProfile";
-import FormPage from './FormADN/BookingPage.jsx'
+import FormPage from "./FormADN/BookingPage.jsx";
 
-import AdminDashboard from './Admin/AdminDashboard.jsx'
-import StaffDashboard from './Staff/pages/StaffDashboard.jsx'
+import AdminDashboard from "./Admin/AdminDashboard.jsx";
+import StaffDashboard from "./Staff/pages/StaffDashboard.jsx";
 
-import PrivateRouter from './Context/PrivateRouter.jsx'
+import PrivateRouter from "./Context/PrivateRouter.jsx";
 
-import LabDashboard from "./Lab/LabDashboard.jsx"
+import LabDashboard from "./Lab/LabDashboard.jsx";
 
-import EnterResult from './Lab/EnterResult.jsx'
+import EnterResult from "./Lab/EnterResult.jsx";
 
-import StaffBookings from './Staff/pages/StaffBookings.jsx'
-import SampleCollection from './Staff/pages/SampleCollection.jsx'
-import CollectionHistory from './Staff/pages/CollectionHistory.jsx'
-import StaffProfile from './Staff/pages/StaffProfile.jsx'
+import StaffBookings from "./Staff/pages/StaffBookings.jsx";
+import SampleCollection from "./Staff/pages/SampleCollection.jsx";
+import CollectionHistory from "./Staff/pages/CollectionHistory.jsx";
+import StaffProfile from "./Staff/pages/StaffProfile.jsx";
 
-import EnterKitInfo from './FormADN/EnterKitInfo/EnterKitInfo.jsx';
+import EnterKitInfo from "./FormADN/EnterKitInfo/EnterKitInfo.jsx";
 
-import DanSuForm from './FormADN/Components/DanSuForm.jsx'
-import HanhChinhForm from './FormADN/Components/HanhChinhForm.jsx'
-import ListPage from './FormADN/ListPage.jsx'
-import PaymentResultPage from './FormADN/PaymentResult.jsx'
-import CustomerProfile from './Customer/CustomerProfile.jsx'
-import LookupResult from './Components/SearchResult/LookupResult.jsx'
+import DanSuForm from "./FormADN/Components/DanSuForm.jsx";
+import HanhChinhForm from "./FormADN/Components/HanhChinhForm.jsx";
+import ListPage from "./FormADN/ListPage.jsx";
+import PaymentResultPage from "./FormADN/PaymentResult.jsx";
+import CustomerProfile from "./Customer/CustomerProfile.jsx";
+import LookupResult from "./Components/SearchResult/LookupResult.jsx";
 
+import CreateAccount from "./Admin/CreateAccount.jsx";
+import AccountManage from "./Admin/AccountManage.jsx";
+import CustomerManage from "./Admin/CustomerManage.jsx";
+import ServiceManage from "./Admin/ServiceManage.jsx";
+import BlogManage from "./Admin/BlogManage.jsx";
+import BlogEdit from "./Admin/BlogEdit.jsx";
+import NewBlog from "./Admin/NewBlog.jsx";
+import BlogDetail from "./Knowledge/BlogDetail.jsx";
+import BlogList from "./Knowledge/BlogList.jsx";
 
 function App() {
   return (
     <GoogleOAuthProvider clientId="443615178916-5p9djk25jon368lljhovev11s40p19j1.apps.googleusercontent.com">
-
       <AuthProvider>
         <BrowserRouter>
           <Routes>
@@ -45,23 +53,89 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/service" element={<Service />} />
+            <Route path="/knowledge" element={<BlogList />} />
+            <Route path="/blog-list" element={<BlogList />} />
+            <Route path="/blogs/:id" element={<BlogDetail />} />
 
-
-            
             <Route path="/result" element={<LookupResult />} />
             <Route path="/oauth2/callback" element={<GoogleCallback />} />
             <Route path="/completeprofile" element={<CompleteProfile />} />
-            <Route path="/form" element={
-              <PrivateRouter allowedRole="CUSTOMER">
-                <FormPage />
-              </PrivateRouter>
-            } />
+            <Route
+              path="/form"
+              element={
+                <PrivateRouter allowedRole="CUSTOMER">
+                  <FormPage />
+                </PrivateRouter>
+              }
+            />
 
-            <Route path="/admin/dashboard" element={
-              <PrivateRouter allowedRole="ADMIN">
-                <AdminDashboard />
-              </PrivateRouter>
-            } />
+            {/* ADMIN */}
+            <Route
+              path="/create-account"
+              element={
+                <PrivateRouter allowedRole="ADMIN">
+                  <CreateAccount />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/account-manage"
+              element={
+                <PrivateRouter allowedRole="ADMIN">
+                  <AccountManage />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/customer-manage"
+              element={
+                <PrivateRouter allowedRole="ADMIN">
+                  <CustomerManage />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/service-manage"
+              element={
+                <PrivateRouter allowedRole="ADMIN">
+                  <ServiceManage />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/blog-manage"
+              element={
+                <PrivateRouter allowedRole="ADMIN">
+                  <BlogManage />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/blog-edit/:id"
+              element={
+                <PrivateRouter allowedRole="ADMIN">
+                  <BlogEdit />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/new-blog"
+              element={
+                <PrivateRouter allowedRole="ADMIN">
+                  <NewBlog />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <PrivateRouter allowedRole="ADMIN">
+                  <AdminDashboard />
+                </PrivateRouter>
+              }
+            />
+
+            {/* Dashboard */}
 
             <Route path="/lab/dashboard" element={<LabDashboard />} />
             <Route path="/lab/enter-result" element={<EnterResult />} />
@@ -72,74 +146,115 @@ function App() {
               </PrivateRouter>
             } /> */}
 
-
-            <Route path="/unauthorized" element={
-              <div style={{ padding: 40, textAlign: "center", color: "red", fontWeight: "bold" }}>
-                Bạn không có quyền truy cập trang này.
-              </div>
-            } />
+            <Route
+              path="/unauthorized"
+              element={
+                <div
+                  style={{
+                    padding: 40,
+                    textAlign: "center",
+                    color: "red",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Bạn không có quyền truy cập trang này.
+                </div>
+              }
+            />
 
             {/* CUSTOMER */}
-            <Route path="/customer/enter-kit-info" element={
-              <PrivateRouter allowedRole="CUSTOMER">
-                <EnterKitInfo />
-              </PrivateRouter>
-            } />
+            <Route
+              path="/customer/enter-kit-info"
+              element={
+                <PrivateRouter allowedRole="CUSTOMER">
+                  <EnterKitInfo />
+                </PrivateRouter>
+              }
+            />
             {/* Test routes for booking cus */}
             {/* <Route path="/test/Bookingpages" element={<FormPage />} /> */}
-            <Route path="/test/dansu" element={
-              <PrivateRouter allowedRole="CUSTOMER">
-                <DanSuForm />
-              </PrivateRouter>
-            } />
-            <Route path="/test/hanhchinh" element={
-              <PrivateRouter allowedRole="CUSTOMER">
-                <HanhChinhForm />
-              </PrivateRouter>
-            } />
-            <Route path="/test/list" element={
-              <PrivateRouter allowedRole="CUSTOMER">
-                <ListPage />
-              </PrivateRouter>
-            } />
-            <Route path="/payment-result" element={
-              <PrivateRouter allowedRole="CUSTOMER">
-                <PaymentResultPage />
-              </PrivateRouter>
-            } />
-            <Route path="/customer/profile" element={
-              <PrivateRouter allowedRole="CUSTOMER">
-                <CustomerProfile />
-              </PrivateRouter>
-            } />    
-
+            <Route
+              path="/test/dansu"
+              element={
+                <PrivateRouter allowedRole="CUSTOMER">
+                  <DanSuForm />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/test/hanhchinh"
+              element={
+                <PrivateRouter allowedRole="CUSTOMER">
+                  <HanhChinhForm />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/test/list"
+              element={
+                <PrivateRouter allowedRole="CUSTOMER">
+                  <ListPage />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/payment-result"
+              element={
+                <PrivateRouter allowedRole="CUSTOMER">
+                  <PaymentResultPage />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/customer/profile"
+              element={
+                <PrivateRouter allowedRole="CUSTOMER">
+                  <CustomerProfile />
+                </PrivateRouter>
+              }
+            />
 
             {/* STAFF */}
-            <Route path="/staff/dashboard" element={
-              <PrivateRouter allowedRole="RECORDER_STAFF">
-                <StaffDashboard />
-              </PrivateRouter>
-            } />
-            <Route path="/staff/bookings" element={
-              <PrivateRouter allowedRole="RECORDER_STAFF">
-                <StaffBookings />
-              </PrivateRouter>
-            } />
-            <Route path="/staff/collection" element={
-              <PrivateRouter allowedRole="RECORDER_STAFF">
-                <SampleCollection />
-              </PrivateRouter>
-            } />
-            <Route path="/staff/history" element={
-              <PrivateRouter allowedRole="RECORDER_STAFF">
-                <CollectionHistory />
-              </PrivateRouter>
-            } />
-            <Route path="/staff/profile" element={
-              <PrivateRouter allowedRole="RECORDER_STAFF">
-                <StaffProfile />
-              </PrivateRouter>
-            } />
+            <Route
+              path="/staff/dashboard"
+              element={
+                <PrivateRouter allowedRole="RECORDER_STAFF">
+                  <StaffDashboard />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/staff/bookings"
+              element={
+                <PrivateRouter allowedRole="RECORDER_STAFF">
+                  <StaffBookings />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/staff/collection"
+              element={
+                <PrivateRouter allowedRole="RECORDER_STAFF">
+                  <SampleCollection />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/staff/history"
+              element={
+                <PrivateRouter allowedRole="RECORDER_STAFF">
+                  <CollectionHistory />
+                </PrivateRouter>
+              }
+            />
+            <Route
+              path="/staff/profile"
+              element={
+                <PrivateRouter allowedRole="RECORDER_STAFF">
+                  <StaffProfile />
+                </PrivateRouter>
+              }
+            />
 
             {/* Test routes for booking cus */}
             {/* <Route path="/test/Bookingpages" element={<FormPage />} /> */}
@@ -151,6 +266,6 @@ function App() {
         </BrowserRouter>
       </AuthProvider>
     </GoogleOAuthProvider>
-  )
+  );
 }
-export default App
+export default App;
