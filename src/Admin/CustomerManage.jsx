@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosClient from "../config/AxiosClient";
+import "./index.css";
 
 const CustomerManage = () => {
   const navigate = useNavigate();

@@ -8,6 +8,7 @@ import {
   Legend,
 } from "chart.js";
 import axiosClient from "../config/AxiosClient";
+import "./index.css";
 
 
 ChartJS.register(ArcElement, Tooltip, Legend);

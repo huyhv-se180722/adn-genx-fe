@@ -14,6 +14,7 @@ import AdminDashboard from "./Admin/AdminDashboard.jsx";
 import StaffDashboard from "./Staff/pages/StaffDashboard.jsx";
 
 import PrivateRouter from "./Context/PrivateRouter.jsx";
+import AdminRoute from "./Context/AdminRoute.jsx";
 
 import LabDashboard from "./Lab/LabDashboard.jsx";
 
@@ -70,70 +71,14 @@ function App() {
             />
 
             {/* ADMIN */}
-            <Route
-              path="/create-account"
-              element={
-                <PrivateRouter allowedRole="ADMIN">
-                  <CreateAccount />
-                </PrivateRouter>
-              }
-            />
-            <Route
-              path="/account-manage"
-              element={
-                <PrivateRouter allowedRole="ADMIN">
-                  <AccountManage />
-                </PrivateRouter>
-              }
-            />
-            <Route
-              path="/customer-manage"
-              element={
-                <PrivateRouter allowedRole="ADMIN">
-                  <CustomerManage />
-                </PrivateRouter>
-              }
-            />
-            <Route
-              path="/service-manage"
-              element={
-                <PrivateRouter allowedRole="ADMIN">
-                  <ServiceManage />
-                </PrivateRouter>
-              }
-            />
-            <Route
-              path="/blog-manage"
-              element={
-                <PrivateRouter allowedRole="ADMIN">
-                  <BlogManage />
-                </PrivateRouter>
-              }
-            />
-            <Route
-              path="/blog-edit/:id"
-              element={
-                <PrivateRouter allowedRole="ADMIN">
-                  <BlogEdit />
-                </PrivateRouter>
-              }
-            />
-            <Route
-              path="/new-blog"
-              element={
-                <PrivateRouter allowedRole="ADMIN">
-                  <NewBlog />
-                </PrivateRouter>
-              }
-            />
-            <Route
-              path="/admin/dashboard"
-              element={
-                <PrivateRouter allowedRole="ADMIN">
-                  <AdminDashboard />
-                </PrivateRouter>
-              }
-            />
+            <Route path="/create-account" element={<AdminRoute><CreateAccount /></AdminRoute>} />
+            <Route path="/account-manage" element={<AdminRoute><AccountManage /></AdminRoute>} />
+            <Route path="/customer-manage" element={<AdminRoute><CustomerManage /></AdminRoute>} />
+            <Route path="/service-manage" element={<AdminRoute><ServiceManage /></AdminRoute>} />
+            <Route path="/blog-manage" element={<AdminRoute><BlogManage /></AdminRoute>} />
+            <Route path="/blog-edit/:id" element={<AdminRoute><BlogEdit /></AdminRoute>} />
+            <Route path="/new-blog" element={<AdminRoute><NewBlog /></AdminRoute>} />
+            <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
 
             {/* Dashboard */}
 
