@@ -1,13 +1,13 @@
-import "./App.css";
+import "./App.css"
 import { AuthProvider } from "./Context/AuthContext.jsx"
 import Home from "./Home.jsx"
 import Login from "./Login/Login.jsx"
 import Register from "./Login/Register.jsx"
 import Service from "./Components/Service/Service.jsx"
-import GoogleCallback from "./Login/GoogleCallback.jsx"
+import GoogleCallback from "./Login/GoogleCallback.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import { GoogleOAuthProvider } from "@react-oauth/google"
-import CompleteProfile from "./Login/CompleteProfile"
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import CompleteProfile from "./Login/CompleteProfile";
 import FormPage from "./FormADN/BookingPage.jsx"
 
 import AdminDashboard from "./Admin/AdminDashboard.jsx"
@@ -25,7 +25,7 @@ import SampleCollection from "./Staff/pages/SampleCollection.jsx"
 import CollectionHistory from "./Staff/pages/CollectionHistory.jsx"
 import StaffProfile from "./Staff/pages/StaffProfile.jsx"
 
-import EnterKitInfo from "./FormADN/EnterKitInfo/EnterKitInfo.jsx"
+import EnterKitInfo from "./FormADN/EnterKitInfo/EnterKitInfo.jsx";
 
 import DanSuForm from "./FormADN/Components/DanSuForm.jsx"
 import HanhChinhForm from "./FormADN/Components/HanhChinhForm.jsx"
