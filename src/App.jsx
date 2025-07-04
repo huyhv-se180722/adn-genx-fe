@@ -42,7 +42,7 @@ import BlogEdit from "./Admin/BlogEdit.jsx"
 import NewBlog from "./Admin/NewBlog.jsx"
 import BlogDetail from "./Knowledge/BlogDetail.jsx"
 import BlogList from "./Knowledge/BlogList.jsx"
-
+import AdminRoute from './Context/AdminRoute.jsx'
 
 function App() {
   return (

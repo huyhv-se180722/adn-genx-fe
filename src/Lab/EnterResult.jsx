@@ -16,6 +16,7 @@ export default function EnterResult() {
 
   const [participants, setParticipants] = useState([]);
   const [conclusion, setConclusion] = useState("");
+  const [conclusionType, setConclusionType] = useState(""); // "yes", "no", "custom"
   const [lociData, setLociData] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -53,42 +54,54 @@ export default function EnterResult() {
     }));
   };
 
+  // Xử lý thay đổi loại kết luận
+  const handleConclusionTypeChange = (type) => {
+    setConclusionType(type);
+    
+    if (type === "yes") {
+      setConclusion("Có quan hệ huyết thống");
+    } else if (type === "no") {
+      setConclusion("Không đủ bằng chứng xác nhận quan hệ huyết thống");
+    } else if (type === "custom") {
+      setConclusion(""); // Reset để user tự nhập
+    }
+  };
+
   const handleSave = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      axiosClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    // Validate conclusion
+    if (!conclusion.trim()) {
+      alert("Vui lòng nhập kết luận.");
+      return;
+    }
+
+    // Validate loci data (optional - có thể bỏ nếu không bắt buộc)
+    const hasAnyData = LOCUS_LIST.some(locus => 
+      participants.some(p => lociData[`${locus}_${p.kitCode}`]?.trim())
+    );
+    
+    if (!hasAnyData) {
+      const confirmProceed = window.confirm("Chưa có dữ liệu Locus nào được nhập. Bạn có muốn tiếp tục không?");
+      if (!confirmProceed) return;
     }
 
     const lociResults = {};
     LOCUS_LIST.forEach((locus) => {
       const values = participants.map((p) => lociData[`${locus}_${p.kitCode}`] || "");
-      if (values.every((v) => v.trim() !== "")) {
+      if (values.some((v) => v.trim() !== "")) { // Thay đổi từ every thành some
         lociResults[locus] = values.join(" - ");
       }
     });
 
     const body = {
       bookingId: Number(bookingId),
-      conclusion:
-        conclusion === "yes"
-          ? "Có quan hệ huyết thống"
-          : "Không đủ bằng chứng xác nhận quan hệ huyết thống",
+      conclusion: conclusion.trim(),
       lociResults,
     };
 
     try {
       await axiosClient.post("/api/adn-results", body);
-      await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/adn-results/complete-sample/${bookingId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          credentials: "include",
-        }
-      );
+      await axiosClient.post(`/api/adn-results/complete-sample/${bookingId}`);
+      
       alert("✅ Kết quả đã được lưu và trạng thái đơn đã cập nhật!");
       setIsSaved(true);
     } catch (err) {
@@ -97,7 +110,6 @@ export default function EnterResult() {
     }
   };
 
-  // ✅ HÀM GỬI LẠI MÃ TRA CỨU
   const handleResendTrackingInfo = async () => {
     try {
       await axiosClient.post(`/api/adn-results/resend-tracking-info/${bookingId}`);
@@ -170,6 +182,7 @@ export default function EnterResult() {
                             disabled={isSaved}
                             value={lociData[`${locus}_${p.kitCode}`] || ""}
                             onChange={(e) => handleLocusChange(locus, p.kitCode, e.target.value)}
+                            placeholder="Nhập giá trị"
                           />
                         </td>
                       ))}
@@ -179,43 +192,86 @@ export default function EnterResult() {
               </table>
             </div>
 
+            {/* KẾT LUẬN - ĐÃ SỬA */}
             <div className="mb-4">
               <label className="form-label fw-bold">Kết luận:</label>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="radio"
-                  name="conclusion"
-                  value="yes"
-                  id="yes"
-                  disabled={isSaved}
-                  onChange={(e) => setConclusion(e.target.value)}
-                />
-                <label className="form-check-label" htmlFor="yes">
-                  Có quan hệ huyết thống
-                </label>
+              
+              {/* Radio buttons */}
+              <div className="mb-3">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="conclusionType"
+                    value="yes"
+                    id="conclusionYes"
+                    disabled={isSaved}
+                    checked={conclusionType === "yes"}
+                    onChange={(e) => handleConclusionTypeChange(e.target.value)}
+                  />
+                  <label className="form-check-label" htmlFor="conclusionYes">
+                    Có quan hệ huyết thống
+                  </label>
+                </div>
+                
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="conclusionType"
+                    value="no"
+                    id="conclusionNo"
+                    disabled={isSaved}
+                    checked={conclusionType === "no"}
+                    onChange={(e) => handleConclusionTypeChange(e.target.value)}
+                  />
+                  <label className="form-check-label" htmlFor="conclusionNo">
+                    Không đủ bằng chứng xác nhận quan hệ huyết thống
+                  </label>
+                </div>
+                
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="conclusionType"
+                    value="custom"
+                    id="conclusionCustom"
+                    disabled={isSaved}
+                    checked={conclusionType === "custom"}
+                    onChange={(e) => handleConclusionTypeChange(e.target.value)}
+                  />
+                  <label className="form-check-label" htmlFor="conclusionCustom">
+                    Kết luận chi tiết (tự nhập)
+                  </label>
+                </div>
               </div>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="radio"
-                  name="conclusion"
-                  value="no"
-                  id="no"
-                  disabled={isSaved}
-                  onChange={(e) => setConclusion(e.target.value)}
-                />
-                <label className="form-check-label" htmlFor="no">
-                  Không đủ bằng chứng xác nhận quan hệ huyết thống
+
+              {/* Textarea for conclusion */}
+              <div className="mb-3">
+                <label className="form-label">
+                  {conclusionType === "custom" ? "Nhập kết luận chi tiết:" : "Kết luận:"}
                 </label>
+                <textarea
+                  className="form-control"
+                  rows={4}
+                  disabled={isSaved || (conclusionType !== "custom" && conclusionType !== "")}
+                  value={conclusion}
+                  onChange={(e) => setConclusion(e.target.value)}
+                  placeholder={
+                    conclusionType === "custom" 
+                      ? "VD: Người 1 và Người 2 có quan hệ huyết thống. Người 3 không có quan hệ với Người 1..."
+                      : "Kết luận sẽ hiển thị ở đây"
+                  }
+                />
               </div>
             </div>
 
-            {/* 🔄 ĐÃ SỬA: Thêm nút gửi lại mã tra cứu vào đây */}
+            {/* BUTTONS */}
             <div className="mb-4 d-flex gap-2 flex-wrap">
               <button
                 onClick={() => setShowConfirmModal(true)}
-                disabled={isSaved}
+                disabled={isSaved || !conclusion.trim()}
                 className={`btn ${isSaved ? "btn-secondary" : "btn-primary"}`}
               >
                 💾 {isSaved ? "Đã lưu" : "Lưu kết quả"}
@@ -223,6 +279,7 @@ export default function EnterResult() {
 
               <button
                 onClick={handleExport}
+                disabled={!isSaved}
                 className="btn btn-outline-primary"
               >
                 📄 Xuất PDF
@@ -240,6 +297,7 @@ export default function EnterResult() {
           </>
         )}
 
+        {/* CONFIRM MODAL */}
         {showConfirmModal && (
           <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
             <div className="modal-dialog modal-dialog-centered">
@@ -250,8 +308,9 @@ export default function EnterResult() {
                 <div className="modal-body">
                   <p>
                     ⚠️ Mọi thông tin sẽ được lưu và không thể thay đổi. <br />
-                    Bạn có chắc muốn tiếp tục?
+                    <strong>Kết luận:</strong> {conclusion}
                   </p>
+                  <p>Bạn có chắc muốn tiếp tục?</p>
                 </div>
                 <div className="modal-footer">
                   <button className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>

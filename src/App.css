@@ -284,18 +284,17 @@
 .adn-pricing-section {
   width: 100%;
   padding: 64px 20px;
-  background: url('assets/background-image.png') no-repeat center center/cover;
+  background: #0071bca6;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
 
-/* Đổi background-image thành file bạn vừa upload */
 .adn-pricing-title {
   font-size: 36px;
   font-weight: bold;
-  color: #111;
+  color: #1111119c;
   margin-bottom: 48px;
   text-transform: uppercase;
   letter-spacing: 1px;

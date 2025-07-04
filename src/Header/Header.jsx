@@ -8,7 +8,7 @@ import iconlogo from "../assets/icon-logo.png";
 import Notification from "./Notification";
 import './Header.css';
 
-const userDefaultAvatar = "https://i.pravatar.cc/32";
+const userDefaultAvatar = "";
 
 const Header = ({ children }) => {
   const navigate = useNavigate();
@@ -73,7 +73,8 @@ const Header = ({ children }) => {
             { path: "/pricing", label: "BẢNG GIÁ" },
             { path: "/guide", label: "HƯỚNG DẪN" },
             { path: "/knowledge", label: "KIẾN THỨC Y KHOA" },
-            { path: "/result", label: "TRA CỨU KẾT QUẢ" }
+            { path: "/result", label: "TRA CỨU KẾT QUẢ" },
+            { path: "/test/list", label: "LỊCH SỬ ĐƠN" },
           ].map(({ path, label }) => (
             <span
               key={path}
