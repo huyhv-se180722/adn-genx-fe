@@ -1,48 +1,48 @@
 import "./App.css";
-import { AuthProvider } from "./Context/AuthContext.jsx";
-import Home from "./Home.jsx";
-import Login from "./Login/Login.jsx";
-import Register from "./Login/Register.jsx";
-import Service from "./Components/Service/Service.jsx";
-import GoogleCallback from "./Login/GoogleCallback.jsx";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import CompleteProfile from "./Login/CompleteProfile";
-import FormPage from "./FormADN/BookingPage.jsx";
+import { AuthProvider } from "./Context/AuthContext.jsx"
+import Home from "./Home.jsx"
+import Login from "./Login/Login.jsx"
+import Register from "./Login/Register.jsx"
+import Service from "./Components/Service/Service.jsx"
+import GoogleCallback from "./Login/GoogleCallback.jsx"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { GoogleOAuthProvider } from "@react-oauth/google"
+import CompleteProfile from "./Login/CompleteProfile"
+import FormPage from "./FormADN/BookingPage.jsx"
 
-import AdminDashboard from "./Admin/AdminDashboard.jsx";
-import StaffDashboard from "./Staff/pages/StaffDashboard.jsx";
+import AdminDashboard from "./Admin/AdminDashboard.jsx"
+import StaffDashboard from "./Staff/pages/StaffDashboard.jsx"
 
-import PrivateRouter from "./Context/PrivateRouter.jsx";
-import AdminRoute from "./Context/AdminRoute.jsx";
+import PrivateRouter from "./Context/PrivateRouter.jsx"
+import AdminRoute from "./Context/AdminRoute.jsx"
 
-import LabDashboard from "./Lab/LabDashboard.jsx";
+import LabDashboard from "./Lab/LabDashboard.jsx"
 
-import EnterResult from "./Lab/EnterResult.jsx";
+import EnterResult from "./Lab/EnterResult.jsx"
 
-import StaffBookings from "./Staff/pages/StaffBookings.jsx";
-import SampleCollection from "./Staff/pages/SampleCollection.jsx";
-import CollectionHistory from "./Staff/pages/CollectionHistory.jsx";
-import StaffProfile from "./Staff/pages/StaffProfile.jsx";
+import StaffBookings from "./Staff/pages/StaffBookings.jsx"
+import SampleCollection from "./Staff/pages/SampleCollection.jsx"
+import CollectionHistory from "./Staff/pages/CollectionHistory.jsx"
+import StaffProfile from "./Staff/pages/StaffProfile.jsx"
 
-import EnterKitInfo from "./FormADN/EnterKitInfo/EnterKitInfo.jsx";
+import EnterKitInfo from "./FormADN/EnterKitInfo/EnterKitInfo.jsx"
 
-import DanSuForm from "./FormADN/Components/DanSuForm.jsx";
-import HanhChinhForm from "./FormADN/Components/HanhChinhForm.jsx";
-import ListPage from "./FormADN/ListPage.jsx";
-import PaymentResultPage from "./FormADN/PaymentResult.jsx";
-import CustomerProfile from "./Customer/CustomerProfile.jsx";
-import LookupResult from "./Components/SearchResult/LookupResult.jsx";
+import DanSuForm from "./FormADN/Components/DanSuForm.jsx"
+import HanhChinhForm from "./FormADN/Components/HanhChinhForm.jsx"
+import ListPage from "./FormADN/ListPage.jsx"
+import PaymentResultPage from "./FormADN/PaymentResult.jsx"
+import CustomerProfile from "./Customer/CustomerProfile.jsx"
+import LookupResult from "./Components/SearchResult/LookupResult.jsx"
 
-import CreateAccount from "./Admin/CreateAccount.jsx";
-import AccountManage from "./Admin/AccountManage.jsx";
-import CustomerManage from "./Admin/CustomerManage.jsx";
-import ServiceManage from "./Admin/ServiceManage.jsx";
-import BlogManage from "./Admin/BlogManage.jsx";
-import BlogEdit from "./Admin/BlogEdit.jsx";
-import NewBlog from "./Admin/NewBlog.jsx";
-import BlogDetail from "./Knowledge/BlogDetail.jsx";
-import BlogList from "./Knowledge/BlogList.jsx";
+import CreateAccount from "./Admin/CreateAccount.jsx"
+import AccountManage from "./Admin/AccountManage.jsx"
+import CustomerManage from "./Admin/CustomerManage.jsx"
+import ServiceManage from "./Admin/ServiceManage.jsx"
+import BlogManage from "./Admin/BlogManage.jsx"
+import BlogEdit from "./Admin/BlogEdit.jsx"
+import NewBlog from "./Admin/NewBlog.jsx"
+import BlogDetail from "./Knowledge/BlogDetail.jsx"
+import BlogList from "./Knowledge/BlogList.jsx"
 
 function App() {
   return (
