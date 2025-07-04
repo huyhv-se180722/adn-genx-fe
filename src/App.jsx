@@ -33,6 +33,16 @@ import PaymentResultPage from './FormADN/PaymentResult.jsx'
 import CustomerProfile from './Customer/CustomerProfile.jsx'
 import LookupResult from './Components/SearchResult/LookupResult.jsx'
 
+import CreateAccount from "./Admin/CreateAccount.jsx"
+import AccountManage from "./Admin/AccountManage.jsx"
+import CustomerManage from "./Admin/CustomerManage.jsx"
+import ServiceManage from "./Admin/ServiceManage.jsx"
+import BlogManage from "./Admin/BlogManage.jsx"
+import BlogEdit from "./Admin/BlogEdit.jsx"
+import NewBlog from "./Admin/NewBlog.jsx"
+import BlogDetail from "./Knowledge/BlogDetail.jsx"
+import BlogList from "./Knowledge/BlogList.jsx"
+
 
 function App() {
   return (
@@ -45,6 +55,9 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/service" element={<Service />} />
+            <Route path="/knowledge" element={<BlogList />} />
+            <Route path="/blog-list" element={<BlogList />} />
+            <Route path="/blogs/:id" element={<BlogDetail />} />
 
 
             
@@ -57,6 +70,15 @@ function App() {
               </PrivateRouter>
             } />
 
+
+            {/* ADMIN */}
+            <Route path="/create-account" element={<AdminRoute><CreateAccount /></AdminRoute>} />
+            <Route path="/account-manage" element={<AdminRoute><AccountManage /></AdminRoute>} />
+            <Route path="/customer-manage" element={<AdminRoute><CustomerManage /></AdminRoute>} />
+            <Route path="/service-manage" element={<AdminRoute><ServiceManage /></AdminRoute>} />
+            <Route path="/blog-manage" element={<AdminRoute><BlogManage /></AdminRoute>} />
+            <Route path="/blog-edit/:id" element={<AdminRoute><BlogEdit /></AdminRoute>} />
+            <Route path="/new-blog" element={<AdminRoute><NewBlog /></AdminRoute>} />
             <Route path="/admin/dashboard" element={
               <PrivateRouter allowedRole="ADMIN">
                 <AdminDashboard />
