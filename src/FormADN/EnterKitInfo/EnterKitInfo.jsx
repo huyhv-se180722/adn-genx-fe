@@ -52,7 +52,7 @@ export default function EnterKitInfo() {
         `/api/v1/customer/sample-collection/participants/${participantId}/kit-code`,
         {
           kitCode,
-          sampleType, // ✅ Thêm sampleType gửi lên
+          sampleType,
         },
         {
           headers: {
@@ -147,7 +147,7 @@ export default function EnterKitInfo() {
       {message.includes("✅") && (
         <button
           className="btn btn-outline-secondary mt-3"
-          onClick={() => navigate("/test/list")}
+          onClick={() => navigate("/customer/list")}
         >
           ← Quay lại danh sách đơn
         </button>

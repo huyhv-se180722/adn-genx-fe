@@ -95,46 +95,6 @@ export default function Notification() {
     setIsDropdownOpen((prev) => !prev);
   };
 
-  // const handleNotificationClick = async (n) => {
-  //   try {
-  //     if (!n.read) {
-  //       await axiosClient.post(`/api/notifications/${n.id}/read`);
-  //       setNotifications((prev) =>
-  //         prev.map((item) => (item.id === n.id ? { ...item, read: true } : item))
-  //       );
-  //       setUnreadCount((prev) => Math.max(prev - 1, 0));
-  //     }
-
-  //     let rolePath = "customer";
-  //     switch (user?.role) {
-  //       case "RECORDER_STAFF":
-  //         rolePath = "recorder_staff";
-  //         break;
-  //       case "LAB_STAFF":
-  //         rolePath = "lab_staff";
-  //         break;
-  //       case "ADMIN":
-  //         rolePath = "admin";
-  //         break;
-  //       default:
-  //         rolePath = "customer";
-  //     }
-
-  //     if (n.bookingId) {
-  //       if (rolePath === "customer") {
-  //         navigate(`/test/list?bookingId=${n.bookingId}`);
-  //       }
-  //       else if (rolePath === "recorder_staff") {
-  //         navigate(`/staff/bookings?bookingId=${n.bookingId}`);
-  //       }
-  //       else if (rolePath === "admin") {
-  //       navigate(`/admin/bookings?bookingId=${n.bookingId}`);
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error("❌ Lỗi khi xử lý thông báo:", err);
-  //   }
-  // };
   const handleNotificationClick = async (n) => {
     try {
       if (!n.read) {
@@ -165,7 +125,7 @@ export default function Notification() {
       setIsDropdownOpen(false);
       if (bookingId) {
         if (rolePath === "customer") {
-          navigate(`/test/list?bookingId=${bookingId}`);
+          navigate(`/customer/list?bookingId=${bookingId}`);
         }
         else if (rolePath === "recorder_staff") {
           // Phân loại thông báo dựa trên type hoặc message

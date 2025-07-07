@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 // import axios from "axios"; thay dong nay import axiosClient from "../config/AxiosClient";
 import axiosClient from "../config/AxiosClient";
 import { AuthContext } from "../Context/AuthContext"; // them dong nay no do thieu
-
+import logo from "../assets/logo.png"; // Đường dẫn đến logo của bạn
 export default function CompleteProfile() {
     const navigate = useNavigate();
     const { login } = useContext(AuthContext);
@@ -34,7 +34,7 @@ export default function CompleteProfile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if ( !formData.phoneNumber || !formData.email || !formData.fullName) {
+        if (!formData.phoneNumber || !formData.email || !formData.fullName) {
             alert("❌ Vui lòng điền đầy đủ thông tin!");
             return;
         }
@@ -53,24 +53,51 @@ export default function CompleteProfile() {
         }
     };
 
+
     return (
         <div className="auth-root">
-            <h2>Hoàn tất hồ sơ</h2>
-            <form className="auth-box" onSubmit={handleSubmit}>
-                {/* <label>Tên người dùng</label>
-                <input name="username" required value={formData.username} onChange={handleChange} className="auth-input" /> */}
+            <img src={logo} alt="GENEX MEDICAL CENTER" className="auth-logo" />
+            <div className="auth-box">
+                <h2 style={{ textAlign: "center", color: "#fff", marginBottom: "20px" }}>
+                    Hoàn tất hồ sơ
+                </h2>
 
-                <label>Họ và tên</label>
-                <input name="fullName" required value={formData.fullName} onChange={handleChange} className="auth-input" />
+                <form onSubmit={handleSubmit}>
+                    <label>Họ và tên</label>
+                    <input
+                        type="text"
+                        name="fullName"
+                        className="auth-input"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        required
+                    />
 
-                <label>Email</label>
-                <input name="email" required value={formData.email} disabled className="auth-input" />
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        className="auth-input"
+                        value={formData.email}
+                        disabled
+                        required
+                    />
 
-                <label>Số điện thoại</label>
-                <input name="phoneNumber" required value={formData.phoneNumber} onChange={handleChange} className="auth-input" />
+                    <label>Số điện thoại</label>
+                    <input
+                        type="tel"
+                        name="phoneNumber"
+                        className="auth-input"
+                        value={formData.phoneNumber}
+                        onChange={handleChange}
+                        required
+                    />
 
-                <button type="submit" className="auth-btn main">HOÀN TẤT</button>
-            </form>
+                    <button type="submit" className="auth-btn main">
+                        HOÀN TẤT
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }

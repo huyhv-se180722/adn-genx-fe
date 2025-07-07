@@ -5,7 +5,7 @@ import "../FormADN/FormADN.css";
 export default function BookingPage() {
   const [type, setType] = useState("");
   const [message, setMessage] = useState("");
-  const navigate = useNavigate(); // 👈 Thêm hook điều hướng
+  const navigate = useNavigate();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -26,42 +26,54 @@ export default function BookingPage() {
       return;
     }
     setMessage("");
-
-    if (type === "dan_su") {
-      navigate("/test/dansu"); // 👈 Chuyển sang trang dân sự
-    } else if (type === "hanh_chinh") {
-      navigate("/test/hanhchinh"); // 👈 Chuyển sang hành chính
+    if (type === "CIVIL") {
+      navigate("/customer/dansu?caseType=CIVIL");
+    } else if (type === "ADMINISTRATIVE") {
+      navigate("/customer/hanhchinh?caseType=ADMINISTRATIVE");
     }
   };
 
   return (
-    <div className="booking-container container py-4">
-      {message && (
-        <div
-          className={`alert ${
-            message.includes("thành công") ? "alert-success" : "alert-danger"
-          }`}
-        >
-          {message}
-        </div>
-      )}
+    <div className="gradient-background-blue">
+      <div className="booking-container container py-4">
+        {message && (
+          <div
+            className={`alert ${message.includes("thành công") ? "alert-success" : "alert-danger"
+              }`}
+          >
+            {message}
+          </div>
+        )}
 
-      <div className="card mb-4">
-        <div className="card-body">
-          <h4 className="card-title text-center mb-3 text-primary">Chọn loại yêu cầu</h4>
-          <div className="d-flex justify-content-center align-items-center">
-            <select
-              className="form-select me-2 w-50"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            >
-              <option value="">-- Chọn loại --</option>
-              <option value="dan_su">Dân sự</option>
-              <option value="hanh_chinh">Hành chính</option>
-            </select>
-            <button className="btn btn-primary" type="button" onClick={handleNext}>
-              Tiếp theo
-            </button>
+        <div className="card mb-4">
+          <div className="card-body">
+            <h4 className="card-title text-center mb-4 text-primary fw-bold">
+              Vui lòng xác nhận loại yêu cầu xét nghiệm
+            </h4>
+
+            <div className="option-cards d-flex justify-content-center gap-4 flex-wrap">
+              <div
+                className={`option-card dan-su ${type === "CIVIL" ? "selected" : ""}`}
+                onClick={() => setType("CIVIL")}
+              >
+                <h5 className="fw-bold mb-1">💼 Dân sự</h5>
+                <p className="small text-muted mb-0">Mục đích cá nhân, gia đình</p>
+              </div>
+
+              <div
+                className={`option-card hanh-chinh ${type === "ADMINISTRATIVE" ? "selected" : ""}`}
+                onClick={() => setType("ADMINISTRATIVE")}
+              >
+                <h5 className="fw-bold mb-1">📄 Hành chính</h5>
+                <p className="small text-muted mb-0">Phục vụ thủ tục pháp lý</p>
+              </div>
+            </div>
+
+            <div className="text-center mt-4">
+              <button className="btn btn-primary px-4 py-2 fw-bold" onClick={handleNext}>
+                Tiếp theo
+              </button>
+            </div>
           </div>
         </div>
       </div>

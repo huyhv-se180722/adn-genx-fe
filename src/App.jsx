@@ -107,19 +107,17 @@ function App() {
                 <EnterKitInfo />
               </PrivateRouter>
             } />
-            {/* Test routes for booking cus */}
-            {/* <Route path="/test/Bookingpages" element={<FormPage />} /> */}
-            <Route path="/test/dansu" element={
+            <Route path="/customer/dansu" element={
               <PrivateRouter allowedRole="CUSTOMER">
                 <DanSuForm />
               </PrivateRouter>
             } />
-            <Route path="/test/hanhchinh" element={
+            <Route path="/customer/hanhchinh" element={
               <PrivateRouter allowedRole="CUSTOMER">
                 <HanhChinhForm />
               </PrivateRouter>
             } />
-            <Route path="/test/list" element={
+            <Route path="/customer/list" element={
               <PrivateRouter allowedRole="CUSTOMER">
                 <ListPage />
               </PrivateRouter>
@@ -163,12 +161,6 @@ function App() {
               </PrivateRouter>
             } />
 
-            {/* Test routes for booking cus */}
-            {/* <Route path="/test/Bookingpages" element={<FormPage />} /> */}
-            {/* <Route path="/test/dansu" element={<DanSuForm />} />
-            <Route path="/test/hanhchinh" element={<HanhChinhForm />} />
-            <Route path="/test/list" element={<ListPage />} />
-            <Route path="/payment-result" element={<PaymentResultPage />} /> */}
           </Routes>
         </BrowserRouter>
       </AuthProvider>

@@ -60,19 +60,19 @@ export default function Register() {
 
     setLoading(true);
     try {
-    // Log dữ liệu gửi đi
-    const dataToSend = {
-      username: formData.username,
-      email: formData.email,
-      fullName: formData.fullName,
-      phoneNumber: formData.phoneNumber,
-      password: formData.password
-    };
-    console.log("Dữ liệu gửi lên backend:", dataToSend);
+      // Log dữ liệu gửi đi
+      const dataToSend = {
+        username: formData.username,
+        email: formData.email,
+        fullName: formData.fullName,
+        phoneNumber: formData.phoneNumber,
+        password: formData.password
+      };
+      console.log("Dữ liệu gửi lên backend:", dataToSend);
 
-    const response = await axiosClient.post("/api/v1/auth/register", dataToSend);
+      const response = await axiosClient.post("/api/v1/auth/register", dataToSend);
 
-      
+
       alert("Đăng ký thành công!");
       navigate("/login");
     } catch (err) {
@@ -83,102 +83,101 @@ export default function Register() {
   };
 
   return (
-  <div className="auth-root">
-    <img src={logo} alt="GENEX MEDICAL CENTER" className="auth-logo" />
-    <div className="auth-box">
-      {error && <div className="auth-error">{error}</div>}
+    <div className="auth-root">
+      <img src={logo} alt="GENEX MEDICAL CENTER" className="auth-logo" />
+      <div className="auth-box">
+        {error && <div className="auth-error">{error}</div>}
 
-      <form onSubmit={handleSubmit}>
-        <div className="form-columns">
-          <div className="form-col">
-            <label>
-              Tên đăng nhập <span className="auth-required">*</span>
-            </label>
-            <input
-              type="text"
-              name="username"
-              className="auth-input"
-              value={formData.username}
-              onChange={handleChange}
-              required
-            />
+        <form onSubmit={handleSubmit}>
+          <div className="form-columns">
+            <div className="form-col">
+              <label>
+                Tên đăng nhập <span className="auth-required">*</span>
+              </label>
+              <input
+                type="text"
+                name="username"
+                className="auth-input"
+                value={formData.username}
+                onChange={handleChange}
+                required
+              />
 
-            <label>Họ và tên</label>
-            <input
-              type="text"
-              name="fullName"
-              className="auth-input"
-              value={formData.fullName}
-              onChange={handleChange}
-            />
+              <label>Họ và tên</label>
+              <input
+                type="text"
+                name="fullName"
+                className="auth-input"
+                value={formData.fullName}
+                onChange={handleChange}
+              />
 
-            <label>
-              Mật khẩu <span className="auth-required">*</span>
-            </label>
-            <input
-              type="password"
-              name="password"
-              className="auth-input"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              minLength={6}
-            />
+              <label>
+                Mật khẩu <span className="auth-required">*</span>
+              </label>
+              <input
+                type="password"
+                name="password"
+                className="auth-input"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                minLength={6}
+              />
+            </div>
+
+            <div className="form-col">
+              <label>
+                Email <span className="auth-required">*</span>
+              </label>
+              <input
+                type="email"
+                name="email"
+                className="auth-input"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+
+              <label>Số điện thoại</label>
+              <input
+                type="tel"
+                name="phoneNumber"
+                className="auth-input"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+              />
+
+              <label>
+                Xác nhận mật khẩu <span className="auth-required">*</span>
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                className="auth-input"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
 
-          <div className="form-col">
-            <label>
-              Email <span className="auth-required">*</span>
-            </label>
-            <input
-              type="email"
-              name="email"
-              className="auth-input"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
+          <button
+            type="submit"
+            className="auth-btn main"
+            disabled={loading}
+          >
+            {loading ? "ĐANG XỬ LÝ..." : "ĐĂNG KÝ"}
+          </button>
+        </form>
 
-            <label>Số điện thoại</label>
-            <input
-              type="tel"
-              name="phoneNumber"
-              className="auth-input"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-            />
-
-            <label>
-              Xác nhận mật khẩu <span className="auth-required">*</span>
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              className="auth-input"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-            />
-          </div>
+        <div className="auth-bottom">
+          BẠN ĐÃ CÓ TÀI KHOẢN?{" "}
+          <a href="/login" className="auth-link">
+            ĐĂNG NHẬP
+          </a>
         </div>
-
-        <button
-          type="submit"
-          className="auth-btn main"
-          disabled={loading}
-        >
-          {loading ? "ĐANG XỬ LÝ..." : "ĐĂNG KÝ"}
-        </button>
-      </form>
-
-      <div className="auth-bottom">
-        BẠN ĐÃ CÓ TÀI KHOẢN?{" "}
-        <a href="/login" className="auth-link">
-          ĐĂNG NHẬP
-        </a>
       </div>
     </div>
-  </div>
-);
-
+  );
 }

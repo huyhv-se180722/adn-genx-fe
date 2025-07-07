@@ -1,298 +1,67 @@
-// import { useEffect, useState } from "react";
-// // import axios from "axios"; thay dong nay banng import axiosClient from "../../config/AxiosClient";
-// import axiosClient from "../../config/AxiosClient";
-// import { useAuth } from "../../Context/AuthContext";
-
-// export default function DanSuForm() {
-//   const today = new Date().toISOString().split("T")[0];
-//   const [loading, setLoading] = useState(false);
-//   const [message, setMessage] = useState("");
-//   const [fieldErrors, setFieldErrors] = useState({});
-
-//   const [formData, setFormData] = useState({
-//     fullName: "",
-//     phoneNumber: "",
-//     address: "",
-//     email: "",
-//     numberOfParticipants: 1,
-//     collectionMethod: "",
-//     appointmentDate: "",
-//     participants: [{ fullName: "", gender: "", yearOfBirth: "", relationship: "" }],
-//   });
-
-//   // Lấy accessToken từ AuthContext hoặc localStorage
-//   const { user } = useAuth();
-//   const token = user?.accessToken || localStorage.getItem("token");
-
-//   useEffect(() => {
-//     const num = parseInt(formData.numberOfParticipants);
-//     const updated = Array.from({ length: num }, (_, i) =>
-//       formData.participants[i] || {
-//         fullName: "",
-//         gender: "",
-//         yearOfBirth: "",
-//         relationship: "",
-//       }
-//     );
-//     setFormData((prev) => ({ ...prev, participants: updated }));
-//     // eslint-disable-next-line
-//   }, [formData.numberOfParticipants]);
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prev) => ({ ...prev, [name]: value }));
-//     setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
-//   };
-
-//   const handleParticipantChange = (index, field, value) => {
-//     const updated = [...formData.participants];
-//     updated[index][field] = value;
-//     setFormData((prev) => ({ ...prev, participants: updated }));
-//     setFieldErrors((prev) => ({
-//       ...prev,
-//       [`participant_${index}_${field}`]: undefined,
-//     }));
-//   };
-
-//   const validate = () => {
-//     let errors = {};
-//     if (!formData.fullName) errors.fullName = "Vui lòng nhập họ tên";
-//     if (!formData.phoneNumber) errors.phoneNumber = "Vui lòng nhập số điện thoại";
-//     if (!formData.address) errors.address = "Vui lòng nhập địa chỉ";
-//     if (!formData.email) errors.email = "Vui lòng nhập email";
-//     if (!formData.collectionMethod) errors.collectionMethod = "Vui lòng chọn hình thức lấy mẫu";
-//     if (
-//       formData.collectionMethod === "HOSPITAL" &&
-//       (!formData.appointmentDate || new Date(formData.appointmentDate) <= new Date(today))
-//     ) {
-//       errors.appointmentDate = "Ngày hẹn phải sau hôm nay";
-//     }
-//     formData.participants.forEach((p, i) => {
-//       if (!p.fullName) errors[`participant_${i}_fullName`] = "Nhập tên";
-//       if (!p.gender) errors[`participant_${i}_gender`] = "Chọn giới tính";
-//       if (!p.yearOfBirth) errors[`participant_${i}_yearOfBirth`] = "Nhập năm sinh";
-//       if (!p.relationship) errors[`participant_${i}_relationship`] = "Nhập quan hệ";
-//     });
-//     setFieldErrors(errors);
-//     return Object.keys(errors).length === 0;
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setMessage("");
-//     if (!validate()) {
-//       setMessage("Vui lòng kiểm tra lại thông tin!");
-//       return;
-//     }
-
-//     try {
-//       setLoading(true);
-//       const data = {
-//         fullName: formData.fullName,
-//         phoneNumber: formData.phoneNumber,
-//         address: formData.address,
-//         email: formData.email,
-//         collectionMethod: formData.collectionMethod,
-//         numberOfParticipants: parseInt(formData.numberOfParticipants),
-//         serviceId: 1,
-//         participants: formData.participants.map(p => ({
-//           fullName: p.fullName,
-//           gender: p.gender,
-//           yearOfBirth: Number(p.yearOfBirth),
-//           relationship: p.relationship
-//         }))
-//       };
-//       if (formData.collectionMethod === "HOSPITAL") {
-//         data.appointmentDate = formData.appointmentDate;
-//       }
-//       console.log("Token gửi đi:", token);
-
-//       // Gửi token cho cả 2 request
-//       const res = await axiosClient.post(
-//         "/api/registrations/register",
-//         data,
-//         // {
-//         //   headers: {
-//         //     Authorization: "Bearer " + token,
-//         //   }
-//         // }bo cai nay di vi da cau hinh trong axiosClient
-//       );
-//       const reg = res.data;
-
-//       // Gửi token cho create-payment
-//       const payRes = await axiosClient.post(
-//         "/api/vnpay/create-payment",
-//         { id: reg.id },
-//         // {
-//         //   headers: {
-//         //     Authorization: "Bearer " + token,
-//         //   }
-//         // } bo cai nay di vi da cau hinh trong axiosClient
-//       );
-//       const payData = payRes.data;
-
-//       if (!payData.paymentUrl) throw new Error("Không nhận được URL thanh toán");
-
-//       sessionStorage.setItem("registrationId", reg.id);
-//       sessionStorage.setItem("paymentUrl", payData.paymentUrl);
-//       setMessage("Đăng ký thành công! Đang chuyển hướng đến trang thanh toán...");
-//       setTimeout(() => {
-//         window.location.href = payData.paymentUrl;
-//       }, 1200);
-//     } catch (err) {
-//       console.error("❌ Đã xảy ra lỗi khi gửi đơn:", err);
-//       console.log("Status code:", err.response?.status);
-//       setMessage("Lỗi: " + (err.response?.data?.message || err.message));
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <form
-//       className="form-container"
-//       onSubmit={handleSubmit}
-//       style={{
-//         opacity: loading ? 0.7 : 1,
-//         pointerEvents: loading ? "none" : "auto",
-//       }}
-//     >
-//       {message && (
-//         <div
-//           style={{
-//             background: message.startsWith("Đăng ký thành công") ? "#e0f7fa" : "#ffebee",
-//             color: message.startsWith("Đăng ký thành công") ? "#00796b" : "#c62828",
-//             padding: "8px 12px",
-//             borderRadius: 6,
-//             marginBottom: 12,
-//             textAlign: "center",
-//           }}
-//         >
-//           {message}
-//         </div>
-//       )}
-
-//       <label>Họ và tên:</label>
-//       <input type="text" name="fullName" required value={formData.fullName} onChange={handleChange} />
-//       {fieldErrors.fullName && <div className="error">{fieldErrors.fullName}</div>}
-
-//       <label>SĐT:</label>
-//       <input type="text" name="phoneNumber" required value={formData.phoneNumber} onChange={handleChange} />
-//       {fieldErrors.phoneNumber && <div className="error">{fieldErrors.phoneNumber}</div>}
-
-//       <label>Địa chỉ:</label>
-//       <input type="text" name="address" required value={formData.address} onChange={handleChange} />
-//       {fieldErrors.address && <div className="error">{fieldErrors.address}</div>}
-
-//       <label>Email:</label>
-//       <input type="email" name="email" required value={formData.email} onChange={handleChange} />
-//       {fieldErrors.email && <div className="error">{fieldErrors.email}</div>}
-
-//       <label>Số người tham gia:</label>
-//       <input
-//         type="number"
-//         name="numberOfParticipants"
-//         min="1"
-//         required
-//         value={formData.numberOfParticipants}
-//         onChange={handleChange}
-//       />
-
-//       {formData.participants.map((p, i) => (
-//         <div className="participant" key={i}>
-//           <h4>Người {String.fromCharCode(65 + i)}</h4>
-//           <label>Họ tên:</label>
-//           <input type="text" value={p.fullName} onChange={(e) => handleParticipantChange(i, "fullName", e.target.value)} />
-//           {fieldErrors[`participant_${i}_fullName`] && <div className="error">{fieldErrors[`participant_${i}_fullName`]}</div>}
-
-//           <label>Giới tính:</label>
-//           <select value={p.gender} onChange={(e) => handleParticipantChange(i, "gender", e.target.value)}>
-//             <option value="">--Chọn--</option>
-//             <option value="NAM">Nam</option>
-//             <option value="NU">Nữ</option>
-//           </select>
-//           {fieldErrors[`participant_${i}_gender`] && <div className="error">{fieldErrors[`participant_${i}_gender`]}</div>}
-
-//           <label>Năm sinh:</label>
-//           <input
-//             type="number"
-//             min="1900"
-//             max={new Date().getFullYear()}
-//             value={p.yearOfBirth}
-//             onChange={(e) => handleParticipantChange(i, "yearOfBirth", e.target.value)}
-//           />
-//           {fieldErrors[`participant_${i}_yearOfBirth`] && <div className="error">{fieldErrors[`participant_${i}_yearOfBirth`]}</div>}
-
-//           <label>Quan hệ:</label>
-//           <input type="text" value={p.relationship} onChange={(e) => handleParticipantChange(i, "relationship", e.target.value)} />
-//           {fieldErrors[`participant_${i}_relationship`] && <div className="error">{fieldErrors[`participant_${i}_relationship`]}</div>}
-//         </div>
-//       ))}
-
-//       <label>Hình thức lấy mẫu:</label>
-//       <select
-//         name="collectionMethod"
-//         required
-//         value={formData.collectionMethod}
-//         onChange={handleChange}
-//       >
-//         <option value="">--Chọn--</option>
-//         <option value="HOME">Tại nhà</option>
-//         <option value="HOSPITAL">Tại bệnh viện</option>
-//       </select>
-//       {fieldErrors.collectionMethod && <div className="error">{fieldErrors.collectionMethod}</div>}
-
-//       {formData.collectionMethod === "HOSPITAL" && (
-//         <>
-//           <label>Ngày hẹn:</label>
-//           <input
-//             type="date"
-//             name="appointmentDate"
-//             min={today}
-//             required
-//             value={formData.appointmentDate}
-//             onChange={handleChange}
-//           />
-//           {fieldErrors.appointmentDate && <div className="error">{fieldErrors.appointmentDate}</div>}
-//         </>
-//       )}
-
-//       <button type="submit" disabled={loading}>
-//         {loading ? "Đang xử lý..." : "Nộp và thanh toán"}
-//       </button>
-//     </form>
-//   );
-// }
-
 import { useEffect, useState } from "react";
 import axiosClient from "../../config/AxiosClient";
 import { useAuth } from "../../Context/AuthContext";
 import formAdnImg from '../../assets/form-adn.png';
+import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export default function DanSuForm() {
   const today = new Date().toISOString().split("T")[0];
+  const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const caseType = searchParams.get("caseType");
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
+  const [services, setServices] = useState([]);
+  const [selectedServiceId, setSelectedServiceId] = useState(null);
+  const [selectedPrice, setSelectedPrice] = useState(0);
+  const navigate = useNavigate();
+  const redirectedRef = useRef(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
     phoneNumber: "",
     address: "",
     email: "",
-    numberOfParticipants: 1,
+    numberOfParticipants: 2,
     collectionMethod: "",
     appointmentDate: "",
     participants: [{ fullName: "", gender: "", yearOfBirth: "", relationship: "" }],
   });
 
-  const { user } = useAuth();
+  const numParticipants = Number(formData.numberOfParticipants || 0);
+  const fullPrice = selectedPrice;
+  const discountPrice = selectedPrice * 0.9;
+
+  const totalPrice = (() => {
+    if (numParticipants <= 0) return 0;
+    if (numParticipants === 1) return fullPrice;
+    if (numParticipants === 2) return fullPrice + fullPrice * 0.9;
+    return (fullPrice + fullPrice * 0.9) + (numParticipants - 2) * discountPrice;
+  })();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const res = await axiosClient.get('/api/v1/account/profile');
         const profile = res.data;
+
+        // Kiểm tra thiếu thông tin
+        const missingFields = [];
+        if (!profile.fullName) missingFields.push("Họ tên");
+        if (!profile.phoneNumber) missingFields.push("Số điện thoại");
+        if (!profile.email) missingFields.push("Email");
+        if (!profile.address) missingFields.push("Địa chỉ");
+
+        if (missingFields.length > 0 && !redirectedRef.current) {
+          redirectedRef.current = true;
+          alert(`Vui lòng cập nhật thông tin cá nhân trước khi đăng ký.\nThiếu: ${missingFields.join(", ")}`);
+          navigate("/customer/profile", { replace: true });
+          return;
+        }
         setFormData((prev) => ({
           ...prev,
           fullName: profile.fullName || '',
@@ -308,6 +77,7 @@ export default function DanSuForm() {
     fetchUserInfo();
   }, []);
 
+
   useEffect(() => {
     const num = parseInt(formData.numberOfParticipants);
     const updated = Array.from({ length: num }, (_, i) =>
@@ -320,6 +90,15 @@ export default function DanSuForm() {
     );
     setFormData((prev) => ({ ...prev, participants: updated }));
   }, [formData.numberOfParticipants]);
+
+  useEffect(() => {
+    if (!caseType) return;
+    axiosClient.get("/api/registrations/services", {
+      params: { caseType }
+    })
+      .then(res => setServices(res.data))
+      .catch(err => console.error("Lỗi lấy danh sách dịch vụ:", err));
+  }, [caseType]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -340,6 +119,14 @@ export default function DanSuForm() {
   const validate = () => {
     let errors = {};
     if (!formData.collectionMethod) errors.collectionMethod = "Vui lòng chọn hình thức lấy mẫu";
+    if (!selectedServiceId) errors.serviceId = "Vui lòng chọn dịch vụ";
+    if (!numParticipants || isNaN(numParticipants)) {
+      errors.numberOfParticipants = "Vui lòng nhập số người tham gia.";
+    } else if (numParticipants < 2) {
+      errors.numberOfParticipants = "Cần ít nhất 2 người tham gia để thực hiện xét nghiệm.";
+    } else if (numParticipants > 10) {
+      errors.numberOfParticipants = "Số người tham gia tối đa cho mỗi đơn là 10 người.";
+    }
     if (
       formData.collectionMethod === "HOSPITAL" &&
       (!formData.appointmentDate || new Date(formData.appointmentDate) <= new Date(today))
@@ -373,7 +160,7 @@ export default function DanSuForm() {
         email: formData.email,
         collectionMethod: formData.collectionMethod,
         numberOfParticipants: parseInt(formData.numberOfParticipants),
-        serviceId: 1,
+        serviceId: selectedServiceId,
         participants: formData.participants.map(p => ({
           fullName: p.fullName,
           gender: p.gender,
@@ -408,36 +195,27 @@ export default function DanSuForm() {
   };
 
   return (
-
+    <div className="gradient-background-blue">
+    
     <div className="container-fluid py-4">
-      <div
-        className="row align-items-stretch"
-        style={{ minHeight: "100vh", maxHeight: "100vh" }}
-      >
-        {/* Bên trái: ảnh */}
+      <div className="row align-items-stretch" style={{ minHeight: "100vh", maxHeight: "100vh" }}>
         <div className="col-md-6 d-flex p-0" style={{ maxHeight: "100vh" }}>
           <img
             src={formAdnImg}
             alt="Đăng ký xét nghiệm"
             className="img-fluid rounded shadow-sm w-100"
-            style={{
-              objectFit: "contain",
-              objectPosition: "top",
-              height: "100%",
-              maxHeight: "100vh"
-            }}
+            style={{ objectFit: "contain", objectPosition: "top", height: "100%" }}
           />
         </div>
-        {/* Bên phải: form */}
+
         <div className="col-md-6 d-flex align-items-center" style={{ maxHeight: "100vh" }}>
           <form
             onSubmit={handleSubmit}
-            className="p-4 bg-white shadow-sm rounded w-100"
+            className="p-4 bg-white bg-opacity-75 shadow-lg rounded-4 border border-white border-opacity-50 w-100 backdrop-blur"
             style={{
               opacity: loading ? 0.7 : 1,
               pointerEvents: loading ? "none" : "auto",
               height: "100%",
-              maxHeight: "100vh",
               overflow: "auto",
             }}
           >
@@ -446,7 +224,6 @@ export default function DanSuForm() {
             </h2>
 
             <div className="row g-3">
-              {/* Thông tin người đăng ký */}
               <div className="col-md-6">
                 <label className="form-label">Họ và tên:</label>
                 <input type="text" className="form-control bg-light" value={formData.fullName} readOnly />
@@ -461,7 +238,6 @@ export default function DanSuForm() {
                 <label className="form-label">Email:</label>
                 <input type="email" className="form-control bg-light" value={formData.email} readOnly />
               </div>
-
               <div className="col-md-6">
                 <label className="form-label">Địa chỉ:</label>
                 <input type="text" className="form-control bg-light" value={formData.address} readOnly />
@@ -473,11 +249,22 @@ export default function DanSuForm() {
                   type="number"
                   className="form-control bg-light"
                   name="numberOfParticipants"
-                  min="1"
                   value={formData.numberOfParticipants}
-                  onChange={handleChange}
-                  required
+                  onChange={(e) => {
+                    let value = parseInt(e.target.value || "0", 10);
+
+                    if (isNaN(value) || value < 1) value = 0;
+                    if (value > 99) value = 99;
+
+                    setFormData((prev) => ({ ...prev, numberOfParticipants: value }));
+                    setFieldErrors((prev) => ({ ...prev, numberOfParticipants: undefined }));
+                  }}
+
+                  max="99"
                 />
+                {fieldErrors.numberOfParticipants && (
+                  <div className="text-danger small">{fieldErrors.numberOfParticipants}</div>
+                )}
               </div>
 
               <div className="col-md-6">
@@ -487,7 +274,7 @@ export default function DanSuForm() {
                   name="collectionMethod"
                   value={formData.collectionMethod}
                   onChange={handleChange}
-                  required
+
                 >
                   <option value="">--Chọn--</option>
                   <option value="HOME">Tại nhà</option>
@@ -498,7 +285,6 @@ export default function DanSuForm() {
                 )}
               </div>
 
-              {/* Ngày hẹn nếu tại bệnh viện */}
               {formData.collectionMethod === "HOSPITAL" && (
                 <div className="col-md-12">
                   <label className="form-label">Ngày hẹn:</label>
@@ -509,20 +295,62 @@ export default function DanSuForm() {
                     value={formData.appointmentDate}
                     onChange={handleChange}
                     min={today}
-                    required
+
                   />
                   {fieldErrors.appointmentDate && (
                     <div className="text-danger small">{fieldErrors.appointmentDate}</div>
                   )}
                 </div>
               )}
+
+              {services.length > 0 && (
+                <div className="col-md-12">
+                  <label className="form-label">Chọn dịch vụ:</label>
+                  <select
+                    className="form-select bg-light"
+                    value={selectedServiceId || ""}
+                    onChange={(e) => {
+                      const selectedId = e.target.value;
+                      setSelectedServiceId(Number(selectedId));
+                      const selected = services.find(s => s.id === Number(selectedId));
+                      setSelectedPrice(selected?.price || 0);
+                      setFieldErrors(prev => ({ ...prev, serviceId: undefined }));
+                    }}
+                  >
+                    <option value="">--Chọn dịch vụ--</option>
+                    {services.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                  {fieldErrors.serviceId && (
+                    <div className="text-danger small">{fieldErrors.serviceId}</div>
+                  )}
+                </div>
+              )}
+
+              {selectedPrice > 0 && (
+                <div className="col-md-12 text-end text-muted">
+                  <small>
+                    Tổng giá dịch vụ:{" "}
+                    <span className="fw-bold text-primary">
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(totalPrice)}
+                    </span>
+                  </small>
+                </div>
+              )}
+
+
             </div>
 
             <hr className="my-4" />
 
-            {/* Người tham gia */}
             {formData.participants.map((p, i) => (
-              <div className="border p-3 mb-3 rounded" key={i}>
+              <div className="p-4 mb-4 bg-white bg-opacity-50 rounded-4 shadow-sm border border-white border-opacity-50 backdrop-blur" key={i}>
                 <h6 className="mb-3">Người tham gia {String.fromCharCode(65 + i)}</h6>
                 <div className="row g-3">
                   <div className="col-md-6">
@@ -592,6 +420,6 @@ export default function DanSuForm() {
         </div>
       </div>
     </div>
-
+    </div>
   );
 }

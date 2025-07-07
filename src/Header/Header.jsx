@@ -8,7 +8,7 @@ import iconlogo from "../assets/icon-logo.png";
 import Notification from "./Notification";
 import './Header.css';
 
-const userDefaultAvatar = "";
+const userDefaultAvatar = "https://i.pravatar.cc/32";
 
 const Header = ({ children }) => {
   const navigate = useNavigate();
@@ -74,7 +74,7 @@ const Header = ({ children }) => {
             { path: "/guide", label: "HƯỚNG DẪN" },
             { path: "/knowledge", label: "KIẾN THỨC Y KHOA" },
             { path: "/result", label: "TRA CỨU KẾT QUẢ" },
-            { path: "/test/list", label: "LỊCH SỬ ĐƠN" },
+            { path: "/customer/list", label: "LỊCH SỬ ĐƠN" },
           ].map(({ path, label }) => (
             <span
               key={path}
@@ -92,12 +92,22 @@ const Header = ({ children }) => {
         <div className="home-nav-actions">
           {isLoggedIn ? (
             <div className="home-user-menu">
-              <Notification/>
+              <Notification />
               <img
-                src={user?.avatar || userDefaultAvatar}
+                src={
+                  user?.avatar
+                    ? user.avatar
+                    : user?.fullName
+                      ? `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=0D8ABC&color=fff&size=128`
+                      : userDefaultAvatar
+                }
                 alt="avatar"
                 className="home-avatar"
                 onClick={handleProfile}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = userDefaultAvatar;
+                }}
               />
               <span className="home-user-name" onClick={handleProfile}>
                 {user?.fullName || user?.username}
