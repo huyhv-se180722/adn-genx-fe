@@ -22,12 +22,13 @@ const ServiceManage = () => {
 
   const fetchServices = async () => {
     try {
-      const res = await axiosClient.get("/api/admin/services");
+      const res = await axiosClient.get("/api/services");
       const formatted = res.data.map((s) => ({
         id: s.id,
         name: s.name || "Không tên",
         price: s.price || 0,
-        caseType: s.caseType || "ADMINISTRATIVE"
+        caseType: s.caseType || "ADMINISTRATIVE",
+        enabled: s.enabled !== undefined ? s.enabled : true
       }));
       setServices(formatted);
     } catch (err) {
@@ -65,7 +66,7 @@ const ServiceManage = () => {
         dto.id = res.data.id;
       }
       const updated = [...services];
-      updated[idx] = { ...dto, id: row.id || dto.id };
+      updated[idx] = { ...dto, id: row.id || dto.id, enabled: row.enabled };
       setServices(updated);
       setEditIdx(null);
       setEditRow({ name: "", price: 0, caseType: "ADMINISTRATIVE" });
@@ -75,7 +76,7 @@ const ServiceManage = () => {
   };
 
   const handleAdd = () => {
-    setServices([...services, { id: null, name: "", price: 0, caseType: "ADMINISTRATIVE" }]);
+    setServices([...services, { id: null, name: "", price: 0, caseType: "ADMINISTRATIVE", enabled: true }]);
     setEditIdx(services.length);
     setEditRow({ name: "", price: 0, caseType: "ADMINISTRATIVE" });
   };
@@ -90,7 +91,7 @@ const ServiceManage = () => {
     <div className="min-h-screen flex bg-white">
       {/* Sidebar */}
       <aside className="w-[260px] bg-[#2323a7] flex flex-col min-h-screen">
-        <div className="flex items-center justify-center py-8">
+<div className="flex items-center justify-center py-8">
           <img src="/src/assets/Admin/logo.png" alt="GeneX" className="w-[180px]" />
         </div>
         <nav className="flex-1">
@@ -103,10 +104,17 @@ const ServiceManage = () => {
               <img src="/src/assets/Admin/setting-thu-muc.png" alt="" className="w-5 h-5" />
               QUẢN LÝ TÀI KHOẢN
             </li>
-            <li className="flex items-center gap-2 py-3 px-3 rounded bg-[#1a1a7a] cursor-pointer" onClick={() => navigate("/service-manage")}>
+            <li>
+            <div className="flex items-center gap-2 py-3 px-3 rounded bg-[#1a1a7a] cursor-pointer" onClick={() => navigate("/service-manage")}>
               <img src="/src/assets/Admin/setting-thu-muc.png" alt="" className="w-5 h-5" />
               QUẢN LÝ DỊCH VỤ
+            </div>
+            <ul className="ml-8 mt-1 text-sm font-normal">
+                <li className="py-1 text-white cursor-pointer underline" onClick={() => navigate("/service-manage")}>Gói dịch vụ</li>
+                <li className="py-1 text-white cursor-pointer hover:underline" onClick={() => navigate("/kit-manage")}>Quản lý KIT</li>
+              </ul>
             </li>
+
             <li className="flex items-center gap-2 py-3 px-3 rounded hover:bg-[#1a1a7a] cursor-pointer" onClick={() => navigate("/blog-manage")}>
               <img src="/src/assets/Admin/setting-thu-muc.png" alt="" className="w-5 h-5" />
               QUẢN LÝ BLOG
@@ -115,6 +123,7 @@ const ServiceManage = () => {
         </nav>
       </aside>
 
+      {/* Main Content */}
       <div className="flex-1 flex flex-col">
         <header className="flex items-center bg-[#f3f3f3] px-8 py-4">
           <img src="/src/assets/Admin/avt-customer.png" alt="avatar" className="w-16 h-16 rounded-full border-2 border-[#2323a7]" />
@@ -126,22 +135,8 @@ const ServiceManage = () => {
           <button
             className="bg-[#009fe3] text-white flex items-center gap-2 px-6 py-2 rounded-full font-semibold shadow hover:bg-[#007bbd] transition"
             onClick={() => {
-              // Clear all user data from localStorage
-              localStorage.removeItem("user");
-              localStorage.removeItem("authToken");
-              localStorage.removeItem("refreshToken");
-              localStorage.removeItem("token");
-              localStorage.removeItem("accessToken");
-              localStorage.removeItem("userInfo");
-              localStorage.removeItem("userData");
-              // Also clear sessionStorage if used
-              sessionStorage.removeItem("user");
-              sessionStorage.removeItem("authToken");
-              sessionStorage.removeItem("refreshToken");
-              sessionStorage.removeItem("token");
-              sessionStorage.removeItem("accessToken");
+              localStorage.clear();
               sessionStorage.clear();
-              // Navigate to home page and force reload
               navigate("/");
               window.location.reload();
             }}
@@ -160,7 +155,7 @@ const ServiceManage = () => {
               placeholder="Tìm kiếm ..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-[400px] px-5 py-3 rounded-xl shadow text-black outline-none border border-gray-200"
+className="w-[400px] px-5 py-3 rounded-xl shadow text-black outline-none border border-gray-200"
             />
             <button
               className={`ml-2 rounded-full bg-[#009fe3] hover:bg-[#007bbd] text-white w-10 h-10 flex items-center justify-center text-2xl font-bold shadow transition ${!canAdd && "opacity-50 pointer-events-none"}`}
@@ -173,13 +168,14 @@ const ServiceManage = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-[700px] w-full border border-gray-400 bg-white">
+            <table className="min-w-[800px] w-full border border-gray-400 bg-white">
               <thead>
                 <tr className="bg-gray-100">
                   <th className="border border-gray-400 px-4 py-2 text-left">ID</th>
                   <th className="border border-gray-400 px-4 py-2 text-left">TÊN GÓI DỊCH VỤ</th>
                   <th className="border border-gray-400 px-4 py-2 text-left">GIÁ (VND)</th>
                   <th className="border border-gray-400 px-4 py-2 text-left">PHÂN LOẠI</th>
+                  <th className="border border-gray-400 px-4 py-2 text-left">TRẠNG THÁI</th>
                   <th className="border border-gray-400 px-4 py-2 text-left">THAO TÁC</th>
                 </tr>
               </thead>
@@ -210,16 +206,38 @@ const ServiceManage = () => {
                             <option value="CIVIL">Dân sự</option>
                           </select>
                         ) : (
-                          s.caseType === "ADMINISTRATIVE" ? "Hành chính" : "Dân sự"
+s.caseType === "ADMINISTRATIVE" ? "Hành chính" : "Dân sự"
                         )}
                       </td>
-                      <td className="border border-gray-400 px-4 py-2 flex gap-2">
+                      <td className="border border-gray-400 px-4 py-2">
+                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${s.enabled ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                          {s.enabled ? "Đang mở" : "Đã khóa"}
+                        </span>
+                      </td>
+                      <td className="border border-gray-400 px-4 py-2 flex gap-2 flex-wrap">
                         {isEditing ? (
                           <button className="bg-green-500 text-white px-4 py-1 rounded font-semibold" onClick={() => handleSave(idx)}>LƯU</button>
                         ) : (
                           <button className="bg-yellow-400 text-white px-4 py-1 rounded font-semibold" onClick={() => handleEdit(idx)}>SỬA</button>
                         )}
                         <button className="bg-red-500 text-white px-4 py-1 rounded font-semibold" onClick={() => handleDelete(s.id)}>XÓA</button>
+                        <button
+                          className={`${s.enabled ? "bg-gray-600" : "bg-blue-500"} text-white px-4 py-1 rounded font-semibold`}
+                          onClick={async () => {
+                            const action = s.enabled ? "khóa" : "mở";
+                            if (!window.confirm(`Bạn có chắc chắn muốn ${action} dịch vụ này không?`)) return;
+                            try {
+                              await axiosClient.put(`/api/admin/services/${s.id}/enabled?enabled=${!s.enabled}`);
+                              const updated = [...services];
+                              updated[idx].enabled = !s.enabled;
+                              setServices(updated);
+                            } catch (err) {
+                              console.error(`Lỗi khi ${action} dịch vụ:`, err);
+                            }
+                          }}
+                        >
+                          {s.enabled ? "Khóa" : "Mở"}
+                        </button>
                       </td>
                     </tr>
                   );

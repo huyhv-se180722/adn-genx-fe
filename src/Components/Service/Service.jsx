@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Service.css';
 import familyTest from '../../assets/Service/family-test.png';
 import Header from '../../Header/Header.jsx';
+import Footer from '../../Footer/Footer.jsx';
 
 import familyImage from '../../assets/Service/family-image.png';
 
@@ -145,9 +146,8 @@ const Service = () => {
           </div>
         </div>
 
-
-
     </div>
+      <Footer />
     </div>
     
   );
