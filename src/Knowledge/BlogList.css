@@ -2,6 +2,7 @@
 .bloglist-wrapper {
   min-height: 100vh;
   background-color: #f5f7fa;
+  font-family: system-ui, -apple-serif, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .bloglist-container {

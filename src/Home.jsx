@@ -21,6 +21,7 @@ import { useAuth } from "./Context/AuthContext";
 
 import { useNavigate } from "react-router-dom";
 import Header from './Header/Header.jsx';
+import Footer from './Footer/Footer.jsx';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -188,6 +189,9 @@ const Home = () => {
   </div>
 </div>
       </div>
+      
+      <Footer />
+      
     </>
   );
 };

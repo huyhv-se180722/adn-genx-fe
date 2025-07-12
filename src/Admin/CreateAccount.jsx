@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosClient from "../config/AxiosClient";
 
-// 👇 Hàm upload ảnh lên Cloudinary
+// Upload ảnh lên Cloudinary
 const uploadToCloudinary = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("upload_preset", "blog_unsigned"); // preset của bạn
-  formData.append("folder", "blog-thumbnails");       // folder trên Cloudinary
+  formData.append("upload_preset", "blog_unsigned");
+  formData.append("folder", "blog-thumbnails");
 
   try {
     const res = await fetch("https://api.cloudinary.com/v1_1/dbihuiif1/image/upload", {
@@ -16,11 +16,10 @@ const uploadToCloudinary = async (file) => {
     });
 
     if (!res.ok) throw new Error(`Upload thất bại với status ${res.status}`);
-
     const data = await res.json();
     return data.secure_url;
   } catch (err) {
-    console.error("❌ Upload ảnh thất bại:", err);
+    console.error("Upload ảnh thất bại:", err);
     return null;
   }
 };
@@ -28,7 +27,7 @@ const uploadToCloudinary = async (file) => {
 const CreateAccount = () => {
   const [form, setForm] = useState({
     username: "",
-    fullName: "", // ✅ Thêm fullName
+    fullName: "",
     password: "",
     confirm: "",
     email: "",
@@ -47,11 +46,16 @@ const CreateAccount = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const mappedRole =
-      form.role === "Nhân viên ghi nhận" ? "RECORDER_STAFF" : "LAB_STAFF";
+    // Validate form
+    if (form.password !== form.confirm) {
+      alert("Mật khẩu xác nhận không khớp!");
+      return;
+    }
 
+    const mappedRole = form.role === "Nhân viên ghi nhận" ? "RECORDER_STAFF" : "LAB_STAFF";
+
+    // Upload fingerprint if exists
     let fingerprintUrl = null;
-
     if (fingerprintFile) {
       fingerprintUrl = await uploadToCloudinary(fingerprintFile);
       if (!fingerprintUrl) {
@@ -61,9 +65,9 @@ const CreateAccount = () => {
     }
 
     try {
-      await axiosClient.post("/api/admin/staff", {
+      const response = await axiosClient.post("/api/admin/staff", {
         username: form.username,
-        fullName: form.fullName, // ✅ Gửi fullName
+        fullName: form.fullName,
         email: form.email,
         password: form.password,
         role: mappedRole,
@@ -72,10 +76,23 @@ const CreateAccount = () => {
         authProvider: "SYSTEM",
         fingerprintImageUrl: fingerprintUrl,
       });
+      
+      alert("Tạo tài khoản thành công!");
       navigate("/account-manage");
+      
     } catch (error) {
-      console.error("Failed to create account:", error);
-      alert("Tạo tài khoản thất bại. Vui lòng kiểm tra lại thông tin.");
+      console.error("Error creating account:", error);
+      
+      // Handle different error cases
+      if (error.response?.status === 409) {
+        alert("Tên đăng nhập hoặc email đã tồn tại!");
+      } else if (error.response?.status === 403) {
+        alert("Bạn không có quyền thực hiện hành động này!");
+      } else if (error.response?.status === 400) {
+        alert("Dữ liệu không hợp lệ!");
+      } else {
+        alert("Tạo tài khoản thất bại. Vui lòng thử lại!");
+      }
     }
   };
 
