@@ -38,7 +38,7 @@ function StaffBookings() {
   const rowsPerPage = 10;
   const [searchParams, setSearchParams] = useSearchParams();
   const [highlightedId, setHighlightedId] = useState(null);
-  
+
   // Tự động tìm và mở chi tiết đơn từ thông báo
   useEffect(() => {
     const bookingId = searchParams.get("bookingId");
@@ -79,7 +79,7 @@ function StaffBookings() {
         if (match) {
           setPage(currentPage + 1); // Chuyển đến đúng trang
           setHighlightedId(parseInt(bookingId)); // Highlight đơn
-          
+
           // Mở chi tiết đơn
           const detailResponse = await axiosClient.get(`/api/v1/staff/booking/${bookingId}`);
           setSelectedBooking(detailResponse.data);
@@ -113,6 +113,7 @@ function StaffBookings() {
         params: {
           status: statusFilter || undefined,
           bookingId: searchText || undefined,
+          paymentStatus: "PAID",
           page: page - 1,
           size: rowsPerPage,
         },
@@ -145,19 +146,19 @@ function StaffBookings() {
   const handleConfirm = async (bookingId) => {
     try {
       await axiosClient.put(`/api/v1/staff/booking/${bookingId}/confirm`);
-      
+
       // Cập nhật state bookings
       setBookings((prev) =>
         prev.map((b) =>
           b.id === bookingId ? { ...b, status: "CONFIRMED" } : b
         )
       );
-      
+
       // Cập nhật selectedBooking nếu đang mở dialog
       if (selectedBooking?.id === bookingId) {
         setSelectedBooking(prev => ({ ...prev, status: "CONFIRMED" }));
       }
-      
+
       alert("Xác nhận đơn thành công!");
     } catch (err) {
       alert("Lỗi khi xác nhận đơn");
@@ -208,79 +209,86 @@ function StaffBookings() {
               </div>
             </div>
 
-            <div className="table-responsive">
-              <table className="table table-hover table-borderless shadow-sm rounded bg-white">
-                <thead className="thead-light">
-                  <tr>
-                    <th>Mã đơn</th>
-                    <th>Người đăng ký</th>
-                    <th>Dịch vụ</th>
-                    <th>Loại Đơn</th>
-                    <th>Hình thức</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày tạo</th>
-                    <th>Hành động</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bookings.length > 0 ? (
-                    bookings.map((b) => (
-                      <tr 
-                        key={b.id} 
-                        className={highlightedId === b.id ? "table-info" : ""}
-                      >
-                        <td>{b.code}</td>
-                        <td>{b.customerName}</td>
-                        <td>{b.serviceTypeName}</td>
-                        <td>
-                          {b.caseType === "CIVIL"
-                            ? "Dân Sự"
-                            : b.caseType === "ADMINISTRATIVE"
-                            ? "Hành Chính"
-                            : "—"}
-                        </td>
-                        <td>
-                          {b.collectionMethod === "HOME"
-                            ? "Tự thu tại nhà"
-                            : b.collectionMethod === "HOSPITAL"
-                            ? "Tại bệnh viện"
-                            : "—"}
-                        </td>
-                        <td>
-                          <span className={statusClasses[b.status]}>
-                            {statusLabels[b.status]}
-                          </span>
-                        </td>
-                        <td>{new Date(b.createdAt).toLocaleDateString()}</td>
-                        <td>
-                          <button
-                            className="btn btn-outline-primary btn-sm me-2"
-                            onClick={() => handleOpenDetail(b)}
-                          >
-                            Chi tiết
-                          </button>
-                          {b.status === "PENDING" ? (
+            <div className="card bg-primary bg-opacity-25 border-0 rounded-4 shadow-sm">
+              <div className="card-header bg-primary bg-opacity-50 text-white fw-bold fs-5 rounded-top-4">
+                <i className="bi bi-journal-text me-2"></i>
+                Danh sách đơn đăng ký
+              </div>
+
+              <div className="table-responsive">
+                <table className="table table-hover table-borderless mb-0">
+                  <thead className="text-white">
+                    <tr>
+                      <th>Mã đơn</th>
+                      <th>Người đăng ký</th>
+                      <th>Dịch vụ</th>
+                      <th>Loại Đơn</th>
+                      <th>Hình thức</th>
+                      <th>Trạng thái</th>
+                      <th>Ngày tạo</th>
+                      <th>Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white">
+                    {bookings.length > 0 ? (
+                      bookings.map((b) => (
+                        <tr
+                          key={b.id}
+                          className={highlightedId === b.id ? "table-info rounded-3" : ""}
+                        >
+                          <td>{b.code}</td>
+                          <td>{b.customerName}</td>
+                          <td>{b.serviceTypeName}</td>
+                          <td>
+                            {b.caseType === "CIVIL"
+                              ? "Dân Sự"
+                              : b.caseType === "ADMINISTRATIVE"
+                                ? "Hành Chính"
+                                : "—"}
+                          </td>
+                          <td>
+                            {b.collectionMethod === "HOME"
+                              ? "Tự thu tại nhà"
+                              : b.collectionMethod === "HOSPITAL"
+                                ? "Tại bệnh viện"
+                                : "—"}
+                          </td>
+                          <td>
+                            <span className={statusClasses[b.status]}>
+                              {statusLabels[b.status]}
+                            </span>
+                          </td>
+                          <td>{new Date(b.createdAt).toLocaleDateString()}</td>
+                          <td>
                             <button
-                              className="btn btn-success btn-sm"
-                              onClick={() => handleConfirm(b.id)}
+                              className="btn btn-outline-primary btn-sm me-2"
+                              onClick={() => handleOpenDetail(b)}
                             >
-                              Xác nhận
+                              Chi tiết
                             </button>
-                          ) : (
-                            <span className="text-muted">&mdash;</span>
-                          )}
+                            {b.status === "PENDING" ? (
+                              <button
+                                className="btn btn-success btn-sm"
+                                onClick={() => handleConfirm(b.id)}
+                              >
+                                Xác nhận
+                              </button>
+                            ) : (
+                              <span className="text-muted">&mdash;</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="8" className="text-center text-muted">
+                          Không có đơn nào.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="8" className="text-center text-muted">
-                        Không có đơn nào.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {totalPages > 1 && (

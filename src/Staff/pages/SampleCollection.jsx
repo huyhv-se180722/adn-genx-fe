@@ -89,7 +89,7 @@ export default function SampleCollection() {
           setPage(currentPage + 1); // Chuyển đến đúng trang
           setHighlightedId(parseInt(bookingId)); // Highlight đơn
           found = true;
-// Xóa bookingId khỏi URL sau khi tìm thấy
+          // Xóa bookingId khỏi URL sau khi tìm thấy
           setSearchParams(prev => {
             const newParams = new URLSearchParams(prev);
             newParams.delete("bookingId");
@@ -184,7 +184,7 @@ export default function SampleCollection() {
         participant.sampleStatus === "PENDING"
       ) {
         await axiosClient.put(
-`/api/v1/staff/sample-collection/participants/${participant.id}/send-kit`
+          `/api/v1/staff/sample-collection/participants/${participant.id}/send-kit`
         );
       } else if (
         booking.collectionMethod === "HOME" &&
@@ -269,7 +269,7 @@ export default function SampleCollection() {
                     <p>
                       Trạng thái đơn:{" "}
                       <span className="badge bg-info">
-{booking.sampleCollectionStatus || "COLLECTING"}
+                        {booking.sampleCollectionStatus || "COLLECTING"}
                       </span>
                     </p>
 
@@ -324,7 +324,7 @@ export default function SampleCollection() {
                                       <option value="BLOOD">Máu</option>
                                       <option value="HAIR">Tóc</option>
                                       <option value="NAIL">Móng tay</option>
-</select>
+                                    </select>
                                   ) : (
                                     p.sampleType || <i>—</i>
                                   )}
@@ -375,7 +375,7 @@ export default function SampleCollection() {
                                               ❌ Xóa
                                             </button>
                                           </div>
-)}
+                                        )}
                                       </>
                                     ) : persistedFingerprintLinks[p.id] ? (
                                       <a
@@ -397,101 +397,101 @@ export default function SampleCollection() {
                                   </span>
                                 </td>
 
-                                <td className="d-flex gap-2 flex-wrap">
-                                  {/* CHUẨN BỊ KIT – dùng chung cho cả bệnh viện và tại nhà */}
-                                  {p.sampleStatus === "PENDING" && p.kitStatus !== "CREATED" && (
-                                    <button
-                                      className="btn btn-sm btn-outline-primary"
-                                      onClick={async () => {
-                                        try {
-                                          await axiosClient.post(
-                                            `/api/v1/staff/sample-collection/participants/${p.id}/prepare-kit`
-                                          );
-                                          await fetchBookings();
-                                        } catch (e) {
-                                          console.error("Lỗi khi chuẩn bị kit:", e);
-                                        }
-                                      }}
-                                    >
-                                      Chuẩn bị kit
-                                    </button>
-                                  )}
-
-                                  {/* DÙNG – CHỈ DÙNG CHO BỆNH VIỆN */}
-                                  {booking.collectionMethod === "HOSPITAL" &&
-                                    p.sampleStatus === "PENDING" &&
-                                    p.kitStatus === "CREATED" && (
+                                <td>
+                                  <div className="d-flex gap-2 flex-wrap">
+                                    {/* CHUẨN BỊ KIT – dùng chung cho cả bệnh viện và tại nhà */}
+                                    {p.sampleStatus === "PENDING" && p.kitStatus !== "CREATED" && (
                                       <button
-                                        className="btn btn-sm btn-success"
+                                        className="btn btn-sm btn-outline-primary"
                                         onClick={async () => {
                                           try {
-                                            await axiosClient.put(
-                                              `/api/v1/staff/sample-collection/participants/${p.id}/assign-kit`
-                                            );
-                                            await fetchBookings();
-} catch (e) {
-                                            console.error("Lỗi khi gán kit:", e);
-                                          }
-                                        }}
-                                      >
-                                        Dùng
-                                      </button>
-                                    )}
-
-                                  {/* GỬI KIT – CHỈ DÙNG CHO TẠI NHÀ */}
-                                  {booking.collectionMethod === "HOME" &&
-                                    p.sampleStatus === "PENDING" &&
-                                    p.kitStatus === "CREATED" && (
-                                      <button
-                                        className="btn btn-sm btn-success"
-                                        onClick={async () => {
-                                          try {
-                                            await axiosClient.put(
-                                              `/api/v1/staff/sample-collection/participants/${p.id}/send-kit`
+                                            await axiosClient.post(
+                                              `/api/v1/staff/sample-collection/participants/${p.id}/prepare-kit`
                                             );
                                             await fetchBookings();
                                           } catch (e) {
-                                            console.error("Lỗi khi gửi kit:", e);
+                                            console.error("Lỗi khi chuẩn bị kit:", e);
                                           }
                                         }}
                                       >
-                                        Gửi kit cho khách hàng
+                                        Chuẩn bị kit
                                       </button>
                                     )}
 
-                                  {/* HỦY KIT – nếu kit đã tạo mà chưa gửi hoặc chưa dùng */}
-                                  {p.kitStatus === "CREATED" &&
-                                    p.sampleStatus === "PENDING" && (
-                                      <button
-                                        className="btn btn-sm btn-outline-danger"
-                                        onClick={async () => {
-                                          try {
-                                            await axiosClient.delete(
-                                              `/api/v1/staff/sample-collection/participants/${p.id}/cancel-kit`
-                                            );
-                                            await fetchBookings();
-                                          } catch (e) {
-                                            console.error("Lỗi khi hủy kit:", e);
-                                          }
-                                        }}
-                                      >
-                                        Hủy
-                                      </button>
-                                    )}
+                                    {/* DÙNG – CHỈ DÙNG CHO BỆNH VIỆN */}
+                                    {booking.collectionMethod === "HOSPITAL" &&
+                                      p.sampleStatus === "PENDING" &&
+                                      p.kitStatus === "CREATED" && (
+                                        <button
+                                          className="btn btn-sm btn-success"
+                                          onClick={async () => {
+                                            try {
+                                              await axiosClient.put(
+                                                `/api/v1/staff/sample-collection/participants/${p.id}/assign-kit`
+                                              );
+                                              await fetchBookings();
+                                            } catch (e) {
+                                              console.error("Lỗi khi gán kit:", e);
+                                            }
+                                          }}
+                                        >
+                                          Dùng
+                                        </button>
+                                      )}
 
-                                  {/* XÁC NHẬN – cả bệnh viện và tại nhà (sau khi đã gán kit) */}
-                                  {(p.sampleStatus === "WAITING_FOR_COLLECTION" &&
-p.kitStatus === "ASSIGNED") && (
-                                      <button
-                                        className="btn btn-sm btn-primary"
-                                        onClick={() => handleConfirm(booking, p)}
-                                      >
-                                        Xác nhận
-                                      </button>
-                                    )}
+                                    {/* GỬI KIT – CHỈ DÙNG CHO TẠI NHÀ */}
+                                    {booking.collectionMethod === "HOME" &&
+                                      p.sampleStatus === "PENDING" &&
+                                      p.kitStatus === "CREATED" && (
+                                        <button
+                                          className="btn btn-sm btn-success"
+                                          onClick={async () => {
+                                            try {
+                                              await axiosClient.put(
+                                                `/api/v1/staff/sample-collection/participants/${p.id}/send-kit`
+                                              );
+                                              await fetchBookings();
+                                            } catch (e) {
+                                              console.error("Lỗi khi gửi kit:", e);
+                                            }
+                                          }}
+                                        >
+                                          Gửi kit cho khách hàng
+                                        </button>
+                                      )}
+
+                                    {/* HỦY KIT – nếu kit đã tạo mà chưa gửi hoặc chưa dùng */}
+                                    {p.kitStatus === "CREATED" &&
+                                      p.sampleStatus === "PENDING" && (
+                                        <button
+                                          className="btn btn-sm btn-outline-danger"
+                                          onClick={async () => {
+                                            try {
+                                              await axiosClient.delete(
+                                                `/api/v1/staff/sample-collection/participants/${p.id}/cancel-kit`
+                                              );
+                                              await fetchBookings();
+                                            } catch (e) {
+                                              console.error("Lỗi khi hủy kit:", e);
+                                            }
+                                          }}
+                                        >
+                                          Hủy
+                                        </button>
+                                      )}
+
+                                    {/* XÁC NHẬN – cả bệnh viện và tại nhà (sau khi đã gán kit) */}
+                                    {(p.sampleStatus === "WAITING_FOR_COLLECTION" &&
+                                      p.kitStatus === "ASSIGNED") && (
+                                        <button
+                                          className="btn btn-sm btn-primary"
+                                          onClick={() => handleConfirm(booking, p)}
+                                        >
+                                          Xác nhận
+                                        </button>
+                                      )}
+                                  </div>
                                 </td>
-
-
                               </tr>
                             );
                           })}

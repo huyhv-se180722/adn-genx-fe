@@ -7,6 +7,7 @@ import iconPhone from "../assets/icon-phone.png";
 import iconlogo from "../assets/icon-logo.png";
 import Notification from "./Notification";
 import './Header.css';
+import ChatComponent from "../Chat/ChatComponent";
 
 const userDefaultAvatar = "https://i.pravatar.cc/32";
 
@@ -132,6 +133,11 @@ const Header = ({ children }) => {
       <div className="main-content">
         {children}
       </div>
+      {isLoggedIn && user?.role === 'CUSTOMER' && (
+        <div style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 1000 }}>
+          <ChatComponent userRole={user.role} />
+        </div>
+      )}
     </>
   );
 };

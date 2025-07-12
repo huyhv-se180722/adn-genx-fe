@@ -58,7 +58,7 @@ function App() {
             <Route path="/knowledge" element={<BlogList />} />
             <Route path="/blog-list" element={<BlogList />} />
             <Route path="/blogs/:id" element={<BlogDetail />} />
-
+            
 
             
             <Route path="/result" element={<LookupResult />} />

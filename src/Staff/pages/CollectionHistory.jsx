@@ -98,52 +98,58 @@ export default function CollectionHistory() {
               </div>
             </div>
 
-            <div className="table-responsive">
-              <table className="table table-hover table-borderless shadow-sm rounded bg-white">
-                <thead className="thead-light">
-                  <tr>
-                    <th style={{ minWidth: 90 }}>Mã đơn</th>
-                    <th style={{ minWidth: 160 }}>Khách hàng</th>
-                    <th>Hình thức</th>
-                    <th>Người thu mẫu</th>
-                    <th>Thời gian</th>
-                    <th>Trạng thái</th>
-                    <th>Số mẫu</th>
-                    <th className="text-center" style={{ minWidth: 120 }}>Hành động</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredBookings.length > 0 ? filteredBookings.map((booking) => (
-                    <tr key={booking.collectionId} className="align-middle">
-                      <td className="fw-semibold">{booking.bookingCode}</td>
-                      <td>{booking.customerName}</td>
-                      <td>{collectionMethodLabels[booking.collectionOption] || booking.collectionOption}</td>
-                      <td>{booking.collectedByName}</td>
-                      <td>{booking.collectedAt}</td>
-                      <td>
-                        <span className={`staff-status-badge ${collectionStatusColors[booking.status]}`}>
-                          {collectionStatusLabels[booking.status]}
-                        </span>
-                      </td>
-                      <td>{booking.participants.length}</td>
-                      <td className="text-center">
-                        <button
-                          className="btn btn-outline-primary btn-sm"
-                          onClick={() => setSelectedBooking(booking)}
-                        >
-                          <i className="bi bi-eye me-1"></i>Chi tiết
-                        </button>
-                      </td>
-                    </tr>
-                  )) : (
+            <div className="card bg-primary bg-opacity-25 border-0 rounded-4 shadow-sm">
+              <div className="card-header bg-primary bg-opacity-50 text-white fw-semibold fs-5 rounded-top-4">
+                <i className="bi bi-clipboard-data me-2"></i>
+                Lịch sử thu mẫu
+              </div>
+              <div className="table-responsive">
+                <table className="table table-hover table-borderless mb-0">
+                  <thead className="text-white">
                     <tr>
-                      <td colSpan="8" className="text-center py-3 text-muted">
-                        Không tìm thấy lịch sử thu mẫu.
-                      </td>
+                      <th style={{ minWidth: 90 }}>Mã đơn</th>
+                      <th style={{ minWidth: 160 }}>Khách hàng</th>
+                      <th>Hình thức</th>
+                      <th>Người thu mẫu</th>
+                      <th>Thời gian</th>
+                      <th>Trạng thái</th>
+                      <th>Số mẫu</th>
+                      <th className="text-center" style={{ minWidth: 120 }}>Hành động</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="bg-white rounded-bottom-4">
+                    {filteredBookings.length > 0 ? filteredBookings.map((booking) => (
+                      <tr key={booking.collectionId} className="align-middle">
+                        <td className="fw-semibold">{booking.bookingCode}</td>
+                        <td>{booking.customerName}</td>
+                        <td>{collectionMethodLabels[booking.collectionOption] || booking.collectionOption}</td>
+                        <td>{booking.collectedByName}</td>
+                        <td>{booking.collectedAt}</td>
+                        <td>
+                          <span className={`badge ${collectionStatusColors[booking.status]}`}>
+                            {collectionStatusLabels[booking.status]}
+                          </span>
+                        </td>
+                        <td>{booking.participants.length}</td>
+                        <td className="text-center">
+                          <button
+                            className="btn btn-outline-primary btn-sm"
+                            onClick={() => setSelectedBooking(booking)}
+                          >
+                            <i className="bi bi-eye me-1"></i>Chi tiết
+                          </button>
+                        </td>
+                      </tr>
+                    )) : (
+                      <tr>
+                        <td colSpan="8" className="text-center py-3 text-muted">
+                          Không tìm thấy lịch sử thu mẫu.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {selectedBooking && (

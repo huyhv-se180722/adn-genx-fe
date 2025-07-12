@@ -6,6 +6,8 @@ import { useAuth } from "../../Context/AuthContext";
 import axiosClient from "../../config/AxiosClient";
 import "../StaffDashboard.css";
 import StaffSidebarNav from "../../Staff/StaffSidebarNav";
+import ChatComponent from "../../Chat/ChatComponent";
+import CustomerChatList from "../../Chat/CustomerChatList";
 
 export default function StaffDashboard() {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ export default function StaffDashboard() {
     totalCustomers: 0,
     latestBookings: [],
   });
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const handleLogout = async () => {
     await logout();
@@ -45,6 +48,8 @@ export default function StaffDashboard() {
 
           {/* Main Content */}
           <main className="col-md-10 ms-sm-auto px-4 py-4">
+            <CustomerChatList onSelectCustomer={setSelectedCustomer} />
+
             {/* Stat Cards */}
             <div className="row g-3 mb-4">
               <div className="col-md-4">
@@ -91,8 +96,8 @@ export default function StaffDashboard() {
             </div>
 
             {/* Latest Bookings */}
-            <div className="staff-card">
-              <div className="card-header bg-white fw-bold fs-5">
+            <div className="card bg-primary bg-opacity-25 text-dark border-0 rounded-4 shadow-sm mb-4">
+              <div className="card-header bg-primary bg-opacity-50 text-white fw-bold fs-5 rounded-top-4">
                 <i className="bi bi-clock-history me-2"></i>
                 Các đơn mới nhất
               </div>
@@ -106,9 +111,9 @@ export default function StaffDashboard() {
                       <img
                         src={b.avatar || "/default-avatar.png"}
                         alt={b.customerName}
-                        className="rounded-circle me-3"
-                        width={40}
-                        height={40}
+                        className="rounded-circle me-3 border"
+                        width={48}
+                        height={48}
                       />
                       <div>
                         <div className="fw-semibold">{b.customerName}</div>
@@ -118,7 +123,7 @@ export default function StaffDashboard() {
                       </div>
                     </div>
                     <div>
-                      <span className="badge bg-secondary">
+                      <span className="badge bg-secondary text-capitalize">
                         {b.status.replaceAll("_", " ")}
                       </span>
                     </div>
@@ -127,6 +132,16 @@ export default function StaffDashboard() {
               </ul>
             </div>
           </main>
+          {selectedCustomer && (
+            <div className="chat-container-fixed">
+              <ChatComponent
+                userRole="STAFF"
+                targetUserId={selectedCustomer.customerId}
+                targetUserName={selectedCustomer.customerName}
+                roomId={selectedCustomer.roomId}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
