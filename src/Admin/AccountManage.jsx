@@ -4,38 +4,64 @@ import axiosClient from "../config/AxiosClient";
 import "./index.css";
 
 const AccountManage = () => {
-  const [accounts, setAccounts] = useState([]);
+  const [allAccounts, setAllAccounts] = useState([]); // Lưu tất cả data
+  const [accounts, setAccounts] = useState([]); // Data hiển thị trên page hiện tại
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
+  const itemsPerPage = 5; // Thay đổi từ 10 xuống 5
 
+  // Fetch tất cả data một lần
   useEffect(() => {
-  axiosClient
-    .get(`/api/admin/users/filter?page=${page}&size=10`)
-    .then((res) => {
-      const filtered = (res.data.content || []).filter(
-        (acc) => acc.role !== "CUSTOMER"
-      );
-      setAccounts(filtered);
-      setTotalPages(res.data.totalPages || 1);
-    })
-    .catch(() => setAccounts([]));
-}, [page]);
+    const fetchAllAccounts = async () => {
+      try {
+        // Lấy tất cả data với size lớn
+        const response = await axiosClient.get(`/api/admin/users/filter?page=0&size=1000`);
+        const filtered = (response.data.content || []).filter(
+          (acc) => acc.role !== "CUSTOMER"
+        );
+        setAllAccounts(filtered);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách tài khoản:", error);
+        setAllAccounts([]);
+      }
+    };
+
+    fetchAllAccounts();
+  }, []);
+
+  // Xử lý pagination và search
+  useEffect(() => {
+    // Filter theo search
+    const searchFiltered = allAccounts.filter((u) =>
+      u.username?.toLowerCase().includes(search.toLowerCase())
+    );
+
+    // Tính toán pagination với 5 items per page
+    const startIndex = page * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedData = searchFiltered.slice(startIndex, endIndex);
+
+    setAccounts(paginatedData);
+    setTotalPages(Math.ceil(searchFiltered.length / itemsPerPage));
+  }, [allAccounts, page, search]);
+
+  // Reset về trang 0 khi search
+  useEffect(() => {
+    setPage(0);
+  }, [search]);
 
   const handleDelete = async (id) => {
     try {
       await axiosClient.delete(`/api/admin/users/${id}`);
-      const updated = accounts.filter((acc) => acc.id !== id);
-      setAccounts(updated);
+      // Cập nhật allAccounts thay vì accounts
+      const updated = allAccounts.filter((acc) => acc.id !== id);
+      setAllAccounts(updated);
     } catch (err) {
       console.error("Xoá thất bại:", err);
     }
   };
-
-  const filteredAccounts = accounts.filter((u) =>
-    u.username?.toLowerCase().includes(search.toLowerCase())
-  );
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const fullName = user.fullName || user.username || "ADMIN";
@@ -140,8 +166,8 @@ const AccountManage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredAccounts.map((u, idx) => (
-                  <tr key={idx} className="border-b border-gray-300">
+                {accounts.map((u, idx) => (
+                  <tr key={u.id || idx} className="border-b border-gray-300">
                     <td className="border border-gray-400 px-4 py-2">{u.username}</td>
                     <td className="border border-gray-400 px-4 py-2 font-bold">{u.email}</td>
                     <td className="border border-gray-400 px-4 py-2">

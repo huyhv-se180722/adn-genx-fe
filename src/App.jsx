@@ -4,6 +4,8 @@ import Home from './Home.jsx'
 import Login from './Login/Login.jsx'
 import Register from './Login/Register.jsx'
 import Service from './Components/Service/Service.jsx'
+import Guide from './Components/Guide/Guide.jsx'
+import Pricing from './Components/Pricing/Pricing.jsx'
 import GoogleCallback from './Login/GoogleCallback.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -42,7 +44,9 @@ import BlogEdit from "./Admin/BlogEdit.jsx"
 import NewBlog from "./Admin/NewBlog.jsx"
 import BlogDetail from "./Knowledge/BlogDetail.jsx"
 import BlogList from "./Knowledge/BlogList.jsx"
+import KitManage from './Admin/KitManage';
 import AdminRoute from './Context/AdminRoute.jsx'
+
 
 function App() {
   return (
@@ -58,6 +62,8 @@ function App() {
             <Route path="/knowledge" element={<BlogList />} />
             <Route path="/blog-list" element={<BlogList />} />
             <Route path="/blogs/:id" element={<BlogDetail />} />
+            <Route path="/guide" element={<Guide/>} />
+            <Route path="/pricing" element={<Pricing/>} />
 
 
             
@@ -79,6 +85,7 @@ function App() {
             <Route path="/blog-manage" element={<AdminRoute><BlogManage /></AdminRoute>} />
             <Route path="/blog-edit/:id" element={<AdminRoute><BlogEdit /></AdminRoute>} />
             <Route path="/new-blog" element={<AdminRoute><NewBlog /></AdminRoute>} />
+            <Route path="/kit-manage" element={<KitManage />} />
             <Route path="/admin/dashboard" element={
               <PrivateRouter allowedRole="ADMIN">
                 <AdminDashboard />
