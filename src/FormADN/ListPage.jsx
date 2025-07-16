@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axiosClient from "../config/AxiosClient";
 import Header from "../Header/Header";
+import Footer from "../Footer/Footer";
 import { useSearchParams } from "react-router-dom";
 
 export default function ListPage() {
@@ -554,6 +555,7 @@ export default function ListPage() {
           </div>
         )}
       </div>
+      <Footer />
     </Header>
   );
 }

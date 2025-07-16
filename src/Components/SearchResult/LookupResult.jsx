@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axiosClient from "../../config/AxiosClient";
 import Header from "../../Header/Header";
+import Footer from "../../Footer/Footer";
 
 export default function LookupResult() {
   const [trackingCode, setTrackingCode] = useState("");
@@ -206,6 +207,7 @@ export default function LookupResult() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

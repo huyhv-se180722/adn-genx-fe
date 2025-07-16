@@ -56,11 +56,10 @@ const Footer = () => {
         {/* Các cột menu */}
         <div className="footer-menu-section">
           <div className="footer-column">
-            <h4>Về ADN GenX</h4>
+            <h4>Về ADN GeneX</h4>
             <ul>
               <li><a href="/">Trang chủ</a></li>
-              <li><a href="/about">Giới thiệu</a></li>
-              <li><a href="/services">Dịch vụ</a></li>
+              <li><a href="/service">Dịch vụ</a></li>
               <li><a href="/contact">Liên hệ</a></li>
             </ul>
           </div>
@@ -68,12 +67,11 @@ const Footer = () => {
           <div className="footer-column">
             <h4>Dịch vụ xét nghiệm</h4>
             <ul>
-              <li><a href="/services/paternity">Xét nghiệm ADN cha - con</a></li>
-              <li><a href="/services/maternity">Xét nghiệm ADN mẹ - con</a></li>
-              <li><a href="/services/sibling">Xét nghiệm ADN anh/chị - em</a></li>
-              <li><a href="/services/grandparent">Xét nghiệm ADN ông/bà - cháu</a></li>
-              <li><a href="/services/family">Xét nghiệm ADN họ hàng</a></li>
-              <li><a href="/services/fetal">Xét nghiệm ADN thai nhi</a></li>
+              <li><a href="/service">Xét nghiệm ADN cha - con</a></li>
+              <li><a href="/service">Xét nghiệm ADN mẹ - con</a></li>
+              <li><a href="/service">Xét nghiệm ADN anh/chị - em</a></li>
+              <li><a href="/service">Xét nghiệm hành chính cấp giấy khai sinh</a></li>
+              <li><a href="/service">Xét nghiệm phục vụ di trú</a></li>
             </ul>
           </div>
 
@@ -82,8 +80,8 @@ const Footer = () => {
             <ul>
               <li><a href="/pricing">Bảng giá xét nghiệm</a></li>
               <li><a href="/guide">Hướng dẫn</a></li>
-              <li><a href="/faq">Tra cứu kết quả</a></li>
-              <li><a href="/history">Lịch sử đơn</a></li>
+              <li><a href="/result">Tra cứu kết quả</a></li>
+              <li><a href="/customer/list">Lịch sử đơn</a></li>
             </ul>
           </div>
         </div>

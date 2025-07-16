@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosClient from "../config/AxiosClient";
 import Header from "../Header/Header";
+import Footer from "../Footer/Footer";
 import "./BlogList.css"; 
 
 const BlogList = () => {
@@ -48,7 +49,7 @@ const BlogList = () => {
                   />
                   <div className="bloglist-content">
                     <span className="bloglist-category">Kiến Thức Y Khoa</span>
-                    <h3 className="bloglist-item-title" onClick={() => navigate(`/blogs/${blog.blogId}`)}>
+                    <h3 className="bloglist-item-title" onClick={() => navigate(`/blogs/${blog.id}`)}>
                       {blog.title}
                     </h3>
                     <div
@@ -96,6 +97,7 @@ const BlogList = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </Header>
   );
 };

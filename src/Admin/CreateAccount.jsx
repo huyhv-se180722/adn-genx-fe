@@ -34,23 +34,65 @@ const CreateAccount = () => {
     phoneNumber: "",
     gender: "Nam",
     role: "Nhân viên xét nghiệm",
+    authProvider: "SYSTEM", // ✅ thêm dòng này
   });
 
   const [fingerprintFile, setFingerprintFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Thêm function retry
+  const retryCreateAccount = async (payload, maxRetries = 3) => {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const response = await axiosClient.post("/api/admin/staff", payload);
+        return response;
+      } catch (error) {
+        // Nếu đã hết lần thử, throw error
+        if (i === maxRetries - 1) {
+          throw error;
+        }
+        
+        // Nếu là lỗi concurrency, đợi rồi thử lại
+        if (error.response?.status === 400 && 
+            error.response?.data?.message?.includes("Row was updated or deleted by another transaction")) {
+          const waitTime = 1000 * (i + 1); // Đợi 1s, 2s, 3s
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue;
+        }
+        
+        // Lỗi khác thì không retry
+        throw error;
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Ngăn không cho submit nhiều lần
+    if (isLoading) return;
 
     // Validate form
     if (form.password !== form.confirm) {
       alert("Mật khẩu xác nhận không khớp!");
       return;
     }
+    // ✅ Thêm validation cho số điện thoại
+  if (form.phoneNumber && form.phoneNumber.trim() !== "") {
+    // Check định dạng số điện thoại Việt Nam
+    const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+    if (!phoneRegex.test(form.phoneNumber)) {
+      alert("Số điện thoại không hợp lệ! Vui lòng nhập số điện thoại Việt Nam (10 số, bắt đầu bằng 03, 05, 07, 08, 09)");
+      return;
+    }
+  }
+
+    setIsLoading(true); // Bắt đầu loading
 
     const mappedRole = form.role === "Nhân viên ghi nhận" ? "RECORDER_STAFF" : "LAB_STAFF";
 
@@ -60,39 +102,57 @@ const CreateAccount = () => {
       fingerprintUrl = await uploadToCloudinary(fingerprintFile);
       if (!fingerprintUrl) {
         alert("Tải ảnh vân tay thất bại. Vui lòng thử lại.");
+        setIsLoading(false);
         return;
       }
     }
 
+    // Tạo payload
+    const payload = {
+      username: form.username,
+      fullName: form.fullName,
+      email: form.email,
+      password: form.password,
+      role: mappedRole,
+      phoneNumber: form.phoneNumber,
+      gender: form.gender,
+      authProvider: form.authProvider,
+      fingerprintImageUrl: fingerprintUrl,
+    };
+
     try {
-      const response = await axiosClient.post("/api/admin/staff", {
-        username: form.username,
-        fullName: form.fullName,
-        email: form.email,
-        password: form.password,
-        role: mappedRole,
-        phoneNumber: form.phoneNumber,
-        gender: form.gender,
-        authProvider: "SYSTEM",
-        fingerprintImageUrl: fingerprintUrl,
-      });
+      // Sử dụng retry mechanism
+      const response = await retryCreateAccount(payload);
       
       alert("Tạo tài khoản thành công!");
       navigate("/account-manage");
       
     } catch (error) {
-      console.error("Error creating account:", error);
-      
-      // Handle different error cases
-      if (error.response?.status === 409) {
+      console.error("❌ Lỗi khi tạo tài khoản:", error);
+
+      if (error.response?.status === 400) {
+        const errorMessage = error.response.data?.message || "Dữ liệu không hợp lệ!";
+        console.log("🔍 Error message từ backend:", errorMessage);
+
+        if (
+          errorMessage.includes("for key 'user.phone_number'") ||
+          errorMessage.includes("for key 'user.UK4bgmpi98dylab6qdvf9xyaxu4'")
+        ) {
+          alert("Số điện thoại đã tồn tại!");
+        } else {
+          alert(`Lỗi: ${errorMessage}`);
+        }
+      } else if (error.response?.status === 409) {
         alert("Tên đăng nhập hoặc email đã tồn tại!");
       } else if (error.response?.status === 403) {
         alert("Bạn không có quyền thực hiện hành động này!");
-      } else if (error.response?.status === 400) {
-        alert("Dữ liệu không hợp lệ!");
+      } else if (error.response?.status === 422) {
+        alert("Dữ liệu không hợp lệ. Vui lòng kiểm tra lại!");
       } else {
         alert("Tạo tài khoản thất bại. Vui lòng thử lại!");
-      }
+      } 
+    } finally {
+      setIsLoading(false); // Tắt loading
     }
   };
 
@@ -232,17 +292,27 @@ const CreateAccount = () => {
               />
             </div>
 
-            {/* Submit */}
+            {/* Submit buttons với loading state */}
             <div className="flex justify-center gap-4">
               <button
                 type="submit"
-                className="bg-[#009fe3] text-white px-8 py-2 rounded-full font-semibold shadow hover:bg-[#007bbd] transition"
+                disabled={isLoading}
+                className={`px-8 py-2 rounded-full font-semibold shadow transition ${
+                  isLoading
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    : "bg-[#009fe3] text-white hover:bg-[#007bbd]"
+                }`}
               >
-                TẠO TÀI KHOẢN
+                {isLoading ? "ĐANG TẠO..." : "TẠO TÀI KHOẢN"}
               </button>
               <button
                 type="button"
-                className="bg-gray-300 text-[#2323a7] px-8 py-2 rounded-full font-semibold shadow hover:bg-gray-400 transition"
+                disabled={isLoading}
+                className={`px-8 py-2 rounded-full font-semibold shadow transition ${
+                  isLoading
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-300 text-[#2323a7] hover:bg-gray-400"
+                }`}
                 onClick={() => navigate("/account-manage")}
               >
                 HỦY BỎ

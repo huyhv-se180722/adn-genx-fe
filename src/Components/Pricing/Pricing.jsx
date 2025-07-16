@@ -62,12 +62,6 @@ const Pricing = () => {
     service.caseType === 'ADMINISTRATIVE' && service.enabled
   );
 
-  // Lọc riêng dịch vụ thai nhi
-  const prenatalServices = services.filter(service => 
-    service.enabled && 
-    service.name.toLowerCase().includes('thai nhi')
-  );
-
   return (
     <div className="pricing-page">
       <Header />
@@ -106,11 +100,6 @@ const Pricing = () => {
                       <li>
                         <a href="#bang-gia-phuc-vu-phap-ly" onClick={() => scrollToSection('bang-gia-phuc-vu-phap-ly')}>
                           Bảng giá xét nghiệm ADN phục vụ pháp lý
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#bang-gia-thai-nhi" onClick={() => scrollToSection('bang-gia-thai-nhi')}>
-                          Bảng giá xét nghiệm ADN thai nhi (không xâm lấn)
                         </a>
                       </li>
                     </ol>
@@ -295,62 +284,6 @@ const Pricing = () => {
               <div className="pricing-note">
                 <span className="note-icon">⚠️</span>
                 <em>Giá dịch vụ pháp lý đã bao gồm phí thủ tục và chứng thực.</em>
-              </div>
-            </div>
-
-            {/* Bảng giá thai nhi */}
-            <div id="bang-gia-thai-nhi" className="sub-section">
-              <h3>2.3 Bảng giá xét nghiệm ADN thai nhi (không xâm lấn)</h3>
-              <p>
-                Đây là phương pháp xét nghiệm ADN cha - con từ 7 tuần thai thứ 7 trở đi, 
-                <strong> không xâm lấn</strong> (chỉ cần lấy máu mẹ).
-              </p>
-              
-              {loading ? (
-                <div className="loading-container">
-                  <div className="loading-spinner"></div>
-                  <p>Đang tải dữ liệu...</p>
-                </div>
-              ) : error ? (
-                <div className="error-container">
-                  <p className="error-message">{error}</p>
-                </div>
-              ) : (
-                <div className="pricing-table-container">
-                  <table className="pricing-table">
-                    <thead>
-                      <tr>
-                        <th>Loại mẫu</th>
-                        <th>Giá xét nghiệm</th>
-                        <th>Ghi chú</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {prenatalServices.length > 0 ? (
-                        prenatalServices.map((service) => (
-                          <tr key={service.id}>
-                            <td>{service.name}</td>
-                            <td className="price">{service.price.toLocaleString('vi-VN')} VNĐ</td>
-                            <td>
-                              Công nghệ phân tích gen tế bào tự do (cfDNA), độ chính xác hơn 99.9%
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="3" className="no-data">
-                            Không có dữ liệu dịch vụ thai nhi
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-              
-              <div className="pricing-note">
-                <span className="note-icon">⚠️</span>
-                <em>Giá cao hơn do công nghệ hiện đại và phức tạp hơn xét nghiệm thông thường.</em>
               </div>
             </div>
           </div>
