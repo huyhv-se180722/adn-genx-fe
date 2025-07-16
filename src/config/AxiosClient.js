@@ -162,6 +162,8 @@ axiosClient.interceptors.response.use(
       } catch (refreshErr) {
         console.error('Token refresh failed on 401:', refreshErr);
         
+        alert("Phiên đăng nhập session của bạn đã hết. Vui lòng đăng nhập lại.");
+
         // Clear auth data và redirect
         localStorage.removeItem('accessToken');
         localStorage.removeItem('user');
@@ -172,7 +174,6 @@ axiosClient.interceptors.response.use(
           localStorage.setItem('redirectUrl', currentPath);
         }
         
-        alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
         window.location.href = "/login";
         return Promise.reject(refreshErr);
       }

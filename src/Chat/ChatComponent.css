@@ -157,9 +157,9 @@
 }
 
 .chat-toggle-btn {
-  position: fixed;
+  /* position: fixed;
   bottom: 20px;
-  right: 20px;
+  right: 20px; */
   width: 60px;
   height: 60px;
   background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);

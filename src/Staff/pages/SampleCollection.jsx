@@ -22,6 +22,12 @@ const sampleStatusColors = {
   NEED_RECOLLECT: "info",
 };
 
+const sampleTypeLabels = {
+  BLOOD: "Máu",
+  HAIR: "Tóc",
+  NAIL: "Móng tay",
+};
+
 export default function SampleCollection() {
   const [bookings, setBookings] = useState([]);
   const [kitInputs, setKitInputs] = useState({});
@@ -326,7 +332,7 @@ export default function SampleCollection() {
                                       <option value="NAIL">Móng tay</option>
                                     </select>
                                   ) : (
-                                    p.sampleType || <i>—</i>
+                                    sampleTypeLabels[p.sampleType] || <i>—</i>
                                   )}
                                 </td>
 

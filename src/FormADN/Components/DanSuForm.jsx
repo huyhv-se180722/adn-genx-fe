@@ -59,7 +59,7 @@ export default function DanSuForm() {
         if (missingFields.length > 0 && !redirectedRef.current) {
           redirectedRef.current = true;
           alert(`Vui lòng cập nhật thông tin cá nhân trước khi đăng ký.\nThiếu: ${missingFields.join(", ")}`);
-          navigate("/customer/profile", { replace: true });
+          navigate("/customer/profile?redirectTo=/customer/dansu", { replace: true });
           return;
         }
         setFormData((prev) => ({

@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 
 export default function PrivateRouter({ children, allowedRole }) {
-  const { isLoggedIn, loading, role } = useAuth();
+  const { isLoggedIn, loading, role, checkTokenExpiry } = useAuth();
 
   // Wait for auth check to complete
   if (loading) {
@@ -10,7 +10,7 @@ export default function PrivateRouter({ children, allowedRole }) {
   }
 
   // Check auth status and redirect if not logged in
-  if (!isLoggedIn) {
+  if (!isLoggedIn || !checkTokenExpiry()) {
     localStorage.setItem("redirectUrl", window.location.pathname);
     return <Navigate to="/login" replace />;
   }

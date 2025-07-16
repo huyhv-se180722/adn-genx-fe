@@ -52,7 +52,7 @@ export default function HanhChinhForm() {
         if (missing.length > 0 && !redirectedRef.current) {
           redirectedRef.current = true;
           alert(`Vui lòng cập nhật thông tin cá nhân trước khi đăng ký.\nThiếu: ${missing.join(", ")}`);
-          navigate("/customer/profile", { replace: true });
+          navigate("/customer/profile?redirectTo=/customer/hanhchinh", { replace: true });
           return;
         }
 

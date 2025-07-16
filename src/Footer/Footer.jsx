@@ -1,5 +1,7 @@
 import React from 'react';
 import './Footer.css';
+import { useAuth } from "../Context/AuthContext";
+import ChatComponent from "../Chat/ChatComponent";
 
 const Footer = () => {
   const handleZaloContact = () => {
@@ -14,6 +16,7 @@ const Footer = () => {
     window.location.href = 'tel:0834052356';
   };
 
+  const { isLoggedIn, user, logout } = useAuth();
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -34,7 +37,7 @@ const Footer = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Bản đồ */}
           <div className="footer-map">
             <iframe
@@ -87,27 +90,32 @@ const Footer = () => {
 
         {/* Các nút liên hệ nhanh */}
         <div className="footer-quick-contact">
-          <button 
+          <button
             className="contact-btn zalo-btn"
             onClick={handleZaloContact}
             title="Liên hệ qua Zalo"
           >
             <img src="/src/assets/zalo.webp" alt="Zalo" />
           </button>
-          <button 
+          <button
             className="contact-btn email-btn"
             onClick={handleEmailContact}
             title="Gửi email"
           >
             <img src="/src/assets/icon-mail.png" alt="Email" />
           </button>
-          <button 
+          <button
             className="contact-btn phone-btn"
             onClick={handlePhoneCall}
             title="Gọi điện thoại"
           >
             <img src="/src/assets/icon-phone.png" alt="Phone" />
           </button>
+          {isLoggedIn && user?.role === 'CUSTOMER' && (
+            <div className="chat-btn-wrapper">
+              <ChatComponent userRole={user.role} />
+            </div>
+          )}
         </div>
       </div>
 

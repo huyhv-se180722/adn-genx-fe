@@ -34,46 +34,67 @@ export default function BookingPage() {
   };
 
   return (
-    <div className="gradient-background-blue">
-      <div className="booking-container container py-4">
+    <div
+      className={`booking-theme-container ${type === "CIVIL"
+          ? "theme-civil"
+          : type === "ADMINISTRATIVE"
+            ? "theme-administrative"
+            : ""
+        }`}
+    >
+      <div className="booking-wrapper">
         {message && (
           <div
-            className={`alert ${message.includes("thành công") ? "alert-success" : "alert-danger"
+            className={`booking-alert ${message.includes("thành công") ? "alert-success" : "alert-danger"
               }`}
           >
             {message}
           </div>
         )}
 
-        <div className="card mb-4">
-          <div className="card-body">
-            <h4 className="card-title text-center mb-4 text-primary fw-bold">
-              Vui lòng xác nhận loại yêu cầu xét nghiệm
-            </h4>
+        <div className="booking-tabs">
+          <button
+            className={`booking-tab-button ${type === "CIVIL" ? "selected" : ""
+              }`}
+            onClick={() => setType("CIVIL")}
+          >
+            💼 Dân sự
+          </button>
+          <button
+            className={`booking-tab-button ${type === "ADMINISTRATIVE" ? "selected" : ""
+              }`}
+            onClick={() => setType("ADMINISTRATIVE")}
+          >
+            📄 Hành chính
+          </button>
+        </div>
 
-            <div className="option-cards d-flex justify-content-center gap-4 flex-wrap">
-              <div
-                className={`option-card dan-su ${type === "CIVIL" ? "selected" : ""}`}
-                onClick={() => setType("CIVIL")}
-              >
-                <h5 className="fw-bold mb-1">💼 Dân sự</h5>
-                <p className="small text-muted mb-0">Mục đích cá nhân, gia đình</p>
+        <div className="booking-content">
+          <div className="booking-icon-display">
+            <i className="bi bi-people-fill"></i>
+          </div>
+          <div className="booking-details">
+            <h1 className="booking-title">Xét nghiệm ADN</h1>
+
+            <p className="booking-instruction">
+              Vui lòng chọn loại yêu cầu để tiếp tục quy trình đặt lịch xét nghiệm.
+            </p>
+
+            {type === "CIVIL" && (
+              <div className="booking-type-description">
+                <strong>Dân sự:</strong> Phục vụ mục đích cá nhân, gia đình. Ví dụ: xác định huyết thống trong nội bộ gia đình.
               </div>
+            )}
 
-              <div
-                className={`option-card hanh-chinh ${type === "ADMINISTRATIVE" ? "selected" : ""}`}
-                onClick={() => setType("ADMINISTRATIVE")}
-              >
-                <h5 className="fw-bold mb-1">📄 Hành chính</h5>
-                <p className="small text-muted mb-0">Phục vụ thủ tục pháp lý</p>
+            {type === "ADMINISTRATIVE" && (
+              <div className="booking-type-description">
+                <strong>Hành chính:</strong> Phục vụ thủ tục pháp lý, hành chính. Ví dụ: phục vụ hồ sơ pháp lý, khai sinh, tòa án.
               </div>
-            </div>
+            )}
 
-            <div className="text-center mt-4">
-              <button className="btn btn-primary px-4 py-2 fw-bold" onClick={handleNext}>
-                Tiếp theo
-              </button>
-            </div>
+            <button className="booking-next-button" onClick={handleNext}>
+              Tiếp theo
+            </button>
           </div>
         </div>
       </div>

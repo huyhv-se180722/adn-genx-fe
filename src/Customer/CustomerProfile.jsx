@@ -3,6 +3,7 @@ import axiosClient from '../config/AxiosClient';
 import { useAuth } from '../Context/AuthContext';
 import Header from '../Header/Header';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 const CustomerProfile = () => {
   const { user, refreshUserData } = useAuth();
@@ -18,9 +19,14 @@ const CustomerProfile = () => {
   });
 
   const [avatarPreview, setAvatarPreview] = useState('');
+
   const [newAvatar, setNewAvatar] = useState(null);
+
   const [isUploading, setIsUploading] = useState(false);
 
+  const [searchParams] = useSearchParams();
+
+  const navigate = useNavigate();
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -135,7 +141,12 @@ const CustomerProfile = () => {
       }
 
       alert('Cập nhật thông tin thành công');
-      await fetchProfile();
+      const redirectTo = searchParams.get('redirectTo');
+      if (redirectTo) {
+        navigate(redirectTo, { replace: true });
+      } else {
+        await fetchProfile();
+      }
     } catch (err) {
       console.error('Update profile error:', err);
       alert('Cập nhật thất bại: ' + (err.response?.data?.message || 'Không xác định'));

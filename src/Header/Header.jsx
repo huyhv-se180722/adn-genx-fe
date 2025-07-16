@@ -7,9 +7,8 @@ import iconPhone from "../assets/icon-phone.png";
 import iconlogo from "../assets/icon-logo.png";
 import Notification from "./Notification";
 import './Header.css';
-import ChatComponent from "../Chat/ChatComponent";
 
-const userDefaultAvatar = "https://i.pravatar.cc/32";
+
 
 const Header = ({ children }) => {
   const navigate = useNavigate();
@@ -100,14 +99,14 @@ const Header = ({ children }) => {
                     ? user.avatar
                     : user?.fullName
                       ? `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=0D8ABC&color=fff&size=128`
-                      : userDefaultAvatar
+                      : ''
                 }
                 alt="avatar"
                 className="home-avatar"
                 onClick={handleProfile}
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = userDefaultAvatar;
+                  e.target.src = `https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff&size=128`;
                 }}
               />
               <span className="home-user-name" onClick={handleProfile}>
@@ -133,11 +132,6 @@ const Header = ({ children }) => {
       <div className="main-content">
         {children}
       </div>
-      {isLoggedIn && user?.role === 'CUSTOMER' && (
-        <div style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 1000 }}>
-          <ChatComponent userRole={user.role} />
-        </div>
-      )}
     </>
   );
 };

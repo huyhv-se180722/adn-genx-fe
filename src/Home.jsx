@@ -22,10 +22,11 @@ import { useAuth } from "./Context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Header from './Header/Header.jsx';
 import Footer from './Footer/Footer.jsx';
+import { useEffect } from "react";
 
 const Home = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, loading } = useAuth();
+  const { isLoggedIn, loading, role, user } = useAuth();
   const [btnLoading, setBtnLoading] = useState(false); // Now useState is properly imported
 
 
@@ -40,6 +41,25 @@ const Home = () => {
     navigate("/service");
   };
 
+  useEffect(() => {
+    if (isLoggedIn && user && !loading) {
+      switch (user.role) {
+        case 'ADMIN':
+          navigate('/admin/dashboard');
+          break;
+        case 'RECORDER_STAFF':
+          navigate('/staff/dashboard');
+          break;
+        case 'LAB_STAFF':
+          navigate('/lab/dashboard');
+          break;
+        case 'CUSTOMER':
+          break;
+        default:
+          break;
+      }
+    }
+  }, [isLoggedIn, loading, user, navigate]);
   //xử lý đăng ký form
   const handleRegisterClick = async () => {
     // Don't process if still checking auth status
@@ -142,8 +162,7 @@ const Home = () => {
   <div className="adn-pricing-list">
     {/* Gói dân sự */}
     <div className="adn-pricing-box basic">
-      <div className="adn-pricing-price blue">1.500.000đ</div>
-      <div className="adn-pricing-old">1.990.000đ/người</div>
+      <div className="adn-pricing-price blue">DÂN SỰ</div>
       <div className="adn-pricing-type pink">GÓI XÉT NGHIỆM ADN DÂN SỰ</div>
       <div className="adn-pricing-desc">
         Là xét nghiệm tự nguyện giúp xác định mối quan hệ giữa các cá nhân.
@@ -166,8 +185,7 @@ const Home = () => {
     {/* Gói hành chính */}
     <div className="adn-pricing-box highlight">
       
-      <div className="adn-pricing-price red">2.000.000đ</div>
-      <div className="adn-pricing-old">2.490.000đ/người</div>
+      <div className="adn-pricing-price red">HÀNH CHÍNH</div>
       <div className="adn-pricing-type yellow">GÓI XÉT NGHIỆM ADN HÀNH CHÍNH</div>
       <div className="adn-pricing-desc">
         Dùng cho thủ tục hành chính: nhận cha con, khai sinh, visa,...
