@@ -130,7 +130,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex flex-col items-center py-10 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -154,244 +154,264 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Header */}
-      <div className="w-full max-w-7xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 mb-8 relative z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
+      {/* Sidebar Navigation */}
+      <div className="w-80 bg-gradient-to-b from-purple-900 to-blue-900 border-r border-white/20 p-6 relative z-10 flex flex-col">
+        {/* Logo/Brand */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">GeneX</h1>
+          <div className="w-16 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full"></div>
+        </div>
+
+        {/* User Info */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-white/20">
+          <div className="flex items-center gap-4 mb-4">
             <div className="relative">
-              <div className="w-20 h-20 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center shadow-lg">
-                <img src="/src/assets/Admin/avt-customer.png" alt="avatar" className="w-16 h-16 rounded-full border-2 border-white/30" />
+              <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center shadow-lg">
+                <img src="/src/assets/Admin/avt-customer.png" alt="avatar" className="w-10 h-10 rounded-full border-2 border-white/30" />
               </div>
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
             </div>
             <div>
-              <div className="bg-gradient-to-r from-cyan-400 to-purple-400 text-white px-4 py-1 rounded-full text-sm font-bold w-fit mb-2 shadow-lg">
+              <div className="bg-gradient-to-r from-cyan-400 to-purple-400 text-white px-3 py-1 rounded-full text-xs font-bold w-fit mb-1">
                 ADMIN
               </div>
-              <h1 className="text-2xl font-bold text-white mb-1">{fullName}</h1>
-              <p className="text-white/70 text-sm">Bảng điều khiển quản trị</p>
+              <h2 className="text-lg font-bold text-white">{fullName}</h2>
             </div>
           </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-white/80 text-sm">Hoạt động</span>
-            </div>
-            <button
-              className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
-              onClick={handleLogout}
-            >
-              <i className="bi bi-box-arrow-right"></i>
-              Đăng xuất
-            </button>
-          </div>
+          <button
+            className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white px-4 py-2 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2 w-full justify-center"
+            onClick={handleLogout}
+          >
+            <i className="bi bi-box-arrow-right"></i>
+            Đăng xuất
+          </button>
         </div>
-      </div>
 
-      {/* Navigation */}
-      <div className="w-full max-w-7xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 mb-8 relative z-10">
-        <div className="flex items-center justify-center gap-6">
-          <button
-            onClick={() => navigate("/admin/dashboard")}
-            className="flex items-center gap-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg"
-          >
-            <i className="bi bi-house-door"></i>
-            Trang chủ
-          </button>
-          
-          <div className="relative group">
+        {/* Navigation Menu */}
+        <div className="flex-1">
+          <nav className="space-y-3">
             <button
-              className="flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
+              onClick={() => navigate("/admin/dashboard")}
+              className="w-full flex items-center gap-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-4 py-3 rounded-lg font-semibold shadow-lg"
             >
-              <i className="bi bi-people"></i>
-              Quản lý tài khoản
+              <i className="bi bi-house-door"></i>
+              TRANG CHỦ
             </button>
-            <div className="absolute bottom-full left-0 mb-2 bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl p-4 min-w-[200px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            
+            <div className="relative group">
               <button
-                onClick={() => navigate("/account-manage")}
-                className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
+                className="w-full flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
               >
-                Nhân viên
+                <i className="bi bi-people"></i>
+                QUẢN LÝ TÀI KHOẢN
+                <i className="bi bi-chevron-down ml-auto group-hover:rotate-180 transition-transform duration-300"></i>
               </button>
-              <button
-                onClick={() => navigate("/customer-manage")}
-                className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
-              >
-                Khách hàng
-              </button>
+              <div className="w-full bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-300 ease-in-out">
+                <div className="p-3">
+                  <button
+                    onClick={() => navigate("/account-manage")}
+                    className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
+                  >
+                    Nhân viên
+                  </button>
+                  <button
+                    onClick={() => navigate("/customer-manage")}
+                    className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
+                  >
+                    Khách hàng
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-          
-          <div className="relative group">
+            
+            <div className="relative group">
+              <button
+                className="w-full flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
+              >
+                <i className="bi bi-gear"></i>
+                QUẢN LÝ DỊCH VỤ
+                <i className="bi bi-chevron-down ml-auto group-hover:rotate-180 transition-transform duration-300"></i>
+              </button>
+              <div className="w-full bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-300 ease-in-out">
+                <div className="p-3">
+                  <button
+                    onClick={() => navigate("/service-manage")}
+                    className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
+                  >
+                    Gói dịch vụ
+                  </button>
+                  <button
+                    onClick={() => navigate("/kit-manage")}
+                    className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
+                  >
+                    Quản lý KIT
+                  </button>
+                </div>
+              </div>
+            </div>
+            
             <button
-              className="flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
+              onClick={() => navigate("/blog-manage")}
+              className="w-full flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
             >
-              <i className="bi bi-gear"></i>
-              Quản lý dịch vụ
+              <i className="bi bi-journal-text"></i>
+              QUẢN LÝ BLOG
             </button>
-            <div className="absolute bottom-full left-0 mb-2 bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl p-4 min-w-[200px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <button
-                onClick={() => navigate("/service-manage")}
-                className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
-              >
-                Gói dịch vụ
-              </button>
-              <button
-                onClick={() => navigate("/kit-manage")}
-                className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
-              >
-                Quản lý KIT
-              </button>
-            </div>
-          </div>
-          
-          <button
-            onClick={() => navigate("/blog-manage")}
-            className="flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-          >
-            <i className="bi bi-journal-text"></i>
-            Quản lý blog
-          </button>
+          </nav>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="w-full max-w-7xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 relative z-10">
-        {/* Title */}
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
-            ✨ Bảng điều khiển Admin ✨
-          </h2>
-          <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full mx-auto"></div>
+      <div className="flex-1 p-8 overflow-y-auto">
+        {/* Header */}
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 mb-8 relative z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">TRANG CHỦ</h1>
+              <p className="text-white/70">Bảng điều khiển quản trị</p>
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-white/80 text-sm">Hoạt động</span>
+            </div>
+          </div>
         </div>
 
-        {/* Stats Cards */}
-        {dashboard && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="bg-blue-500/20 p-4 rounded-full mr-4">
-                  <i className="bi bi-people text-blue-400 text-3xl"></i>
+        {/* Stats Cards Container */}
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 relative z-10 mb-8">
+          {/* Title */}
+          <div className="text-center mb-8">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+              ✨ Bảng điều khiển Admin ✨
+            </h2>
+            <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full mx-auto"></div>
+          </div>
+
+          {/* Main Stats Cards - 4 columns */}
+          {dashboard && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="bg-blue-400/20 backdrop-blur-sm rounded-2xl border border-blue-400/30 p-6 hover:bg-blue-400/30 transition-all duration-300">
+                <div className="text-center">
+                  <div className="bg-blue-500/30 p-4 rounded-full mb-4 mx-auto w-fit">
+                    <i className="bi bi-cart text-blue-200 text-3xl"></i>
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">{dashboard.totalPayments}</div>
+                  <div className="text-blue-200 font-semibold">Đặt hàng</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">{dashboard.totalUsers}</div>
-                  <div className="text-blue-400 font-semibold">Tổng người dùng</div>
+              </div>
+              <div className="bg-green-400/20 backdrop-blur-sm rounded-2xl border border-green-400/30 p-6 hover:bg-green-400/30 transition-all duration-300">
+                <div className="text-center">
+                  <div className="bg-green-500/30 p-4 rounded-full mb-4 mx-auto w-fit">
+                    <i className="bi bi-person-badge text-green-200 text-3xl"></i>
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">{dashboard.totalStaff}</div>
+                  <div className="text-green-200 font-semibold">Nhân viên</div>
+                </div>
+              </div>
+              <div className="bg-orange-400/20 backdrop-blur-sm rounded-2xl border border-orange-400/30 p-6 hover:bg-orange-400/30 transition-all duration-300">
+                <div className="text-center">
+                  <div className="bg-orange-500/30 p-4 rounded-full mb-4 mx-auto w-fit">
+                    <i className="bi bi-person-heart text-orange-200 text-3xl"></i>
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">{dashboard.totalCustomers}</div>
+                  <div className="text-orange-200 font-semibold">Khách hàng</div>
+                </div>
+              </div>
+              <div className="bg-red-400/20 backdrop-blur-sm rounded-2xl border border-red-400/30 p-6 hover:bg-red-400/30 transition-all duration-300">
+                <div className="text-center">
+                  <div className="bg-red-500/30 p-4 rounded-full mb-4 mx-auto w-fit">
+                    <i className="bi bi-journal-text text-red-200 text-3xl"></i>
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">{dashboard.totalBlogs}</div>
+                  <div className="text-red-200 font-semibold">Blog</div>
                 </div>
               </div>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="bg-green-500/20 p-4 rounded-full mr-4">
-                  <i className="bi bi-person-badge text-green-400 text-3xl"></i>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">{dashboard.totalStaff}</div>
-                  <div className="text-green-400 font-semibold">Nhân viên</div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="bg-yellow-500/20 p-4 rounded-full mr-4">
-                  <i className="bi bi-person-heart text-yellow-400 text-3xl"></i>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">{dashboard.totalCustomers}</div>
-                  <div className="text-yellow-400 font-semibold">Khách hàng</div>
+          )}
+
+          {/* Additional Stats Cards */}
+          {dashboard && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
+                <div className="flex items-center">
+                  <div className="bg-blue-500/20 p-4 rounded-full mr-4">
+                    <i className="bi bi-people text-blue-400 text-3xl"></i>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{dashboard.totalUsers}</div>
+                    <div className="text-blue-400 font-semibold">Tổng người dùng</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="bg-cyan-500/20 p-4 rounded-full mr-4">
-                  <i className="bi bi-gear text-cyan-400 text-3xl"></i>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">{dashboard.totalServices}</div>
-                  <div className="text-cyan-400 font-semibold">Tổng dịch vụ</div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="bg-red-500/20 p-4 rounded-full mr-4">
-                  <i className="bi bi-journal-text text-red-400 text-3xl"></i>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">{dashboard.totalBlogs}</div>
-                  <div className="text-red-400 font-semibold">Tổng blog</div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
+                <div className="flex items-center">
+                  <div className="bg-cyan-500/20 p-4 rounded-full mr-4">
+                    <i className="bi bi-gear text-cyan-400 text-3xl"></i>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{dashboard.totalServices}</div>
+                    <div className="text-cyan-400 font-semibold">Tổng dịch vụ</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="bg-green-500/20 p-4 rounded-full mr-4">
-                  <i className="bi bi-check-circle text-green-400 text-3xl"></i>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">{dashboard.totalPayments}</div>
-                  <div className="text-green-400 font-semibold">Đơn đã thanh toán</div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="bg-blue-500/20 p-4 rounded-full mr-4">
-                  <i className="bi bi-calendar-day text-blue-400 text-3xl"></i>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">{formatCurrency(dashboard.todayRevenue)}</div>
-                  <div className="text-blue-400 font-semibold">Doanh thu hôm nay</div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
+                <div className="flex items-center">
+                  <div className="bg-blue-500/20 p-4 rounded-full mr-4">
+                    <i className="bi bi-calendar-day text-blue-400 text-3xl"></i>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{dashboard.todayRevenue ? formatCurrency(dashboard.todayRevenue) : '0 ₫'}</div>
+                    <div className="text-blue-400 font-semibold">Doanh thu hôm nay</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="bg-yellow-500/20 p-4 rounded-full mr-4">
-                  <i className="bi bi-calendar-month text-yellow-400 text-3xl"></i>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">{formatCurrency(monthlyRevenue ?? 0)}</div>
-                  <div className="text-yellow-400 font-semibold">
-                    Doanh thu tháng
-                    <div className="flex gap-1 mt-1">
-                      <select 
-                        value={selectedMonth} 
-                        onChange={(e) => setSelectedMonth(Number(e.target.value))} 
-                        className="px-2 py-1 bg-white/10 border border-white/20 rounded text-sm text-white backdrop-blur-sm"
-                      >
-                        {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                          <option key={m} value={m} className="bg-gray-800 text-white">{`Tháng ${m}`}</option>
-                        ))}
-                      </select>
-                      <select 
-                        value={selectedYear} 
-                        onChange={(e) => setSelectedYear(Number(e.target.value))} 
-                        className="px-2 py-1 bg-white/10 border border-white/20 rounded text-sm text-white backdrop-blur-sm"
-                      >
-                        {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map((y) => (
-                          <option key={y} value={y} className="bg-gray-800 text-white">{y}</option>
-                        ))}
-                      </select>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
+                <div className="flex items-center">
+                  <div className="bg-yellow-500/20 p-4 rounded-full mr-4">
+                    <i className="bi bi-calendar-month text-yellow-400 text-3xl"></i>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{formatCurrency(monthlyRevenue ?? 0)}</div>
+                    <div className="text-yellow-400 font-semibold">
+                      Doanh thu tháng
+                      <div className="flex gap-1 mt-1">
+                        <select 
+                          value={selectedMonth} 
+                          onChange={(e) => setSelectedMonth(Number(e.target.value))} 
+                          className="px-2 py-1 bg-white/10 border border-white/20 rounded text-sm text-white backdrop-blur-sm"
+                        >
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                            <option key={m} value={m} className="bg-gray-800 text-white">{`Tháng ${m}`}</option>
+                          ))}
+                        </select>
+                        <select 
+                          value={selectedYear} 
+                          onChange={(e) => setSelectedYear(Number(e.target.value))} 
+                          className="px-2 py-1 bg-white/10 border border-white/20 rounded text-sm text-white backdrop-blur-sm"
+                        >
+                          {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map((y) => (
+                            <option key={y} value={y} className="bg-gray-800 text-white">{y}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="bg-green-500/20 p-4 rounded-full mr-4">
-                  <i className="bi bi-currency-dollar text-green-400 text-3xl"></i>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">{formatCurrency(dashboard.totalRevenue)}</div>
-                  <div className="text-green-400 font-semibold">Tổng doanh thu</div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6 hover:bg-white/20 transition-all duration-300">
+                <div className="flex items-center">
+                  <div className="bg-green-500/20 p-4 rounded-full mr-4">
+                    <i className="bi bi-currency-dollar text-green-400 text-3xl"></i>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{dashboard.totalRevenue ? formatCurrency(dashboard.totalRevenue) : '0 ₫'}</div>
+                    <div className="text-green-400 font-semibold">Tổng doanh thu</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Pie Chart */}
         {pieData && (
@@ -428,7 +448,6 @@ const AdminDashboard = () => {
 
       {/* Decorative Elements */}
       <div className="absolute top-10 right-10 w-20 h-20 border-2 border-cyan-400/30 rounded-full animate-spin" style={{animationDuration: '20s'}}></div>
-      <div className="absolute bottom-10 left-10 w-16 h-16 border-2 border-purple-400/30 rounded-full animate-spin" style={{animationDuration: '15s'}}></div>
     </div>
   );
 };
