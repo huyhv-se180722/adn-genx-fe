@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosClient from "../config/AxiosClient";
+import AdminSidebar from "./components/AdminSidebar";
 import "./index.css";
 
 const ServiceManage = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const fullName = user.fullName || user.username || "Admin";
-
+  
   const [services, setServices] = useState([]);
   const [search, setSearch] = useState("");
   const [editIdx, setEditIdx] = useState(null);
@@ -81,24 +80,6 @@ const ServiceManage = () => {
     setEditRow({ name: "", price: 0, caseType: "ADMINISTRATIVE" });
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userInfo");
-    localStorage.removeItem("userData");
-    sessionStorage.removeItem("user");
-    sessionStorage.removeItem("authToken");
-    sessionStorage.removeItem("refreshToken");
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("accessToken");
-    sessionStorage.clear();
-    navigate("/");
-    window.location.reload();
-  };
-
   const filteredServices = services.filter((s) =>
     removeDiacritics(s.name).includes(removeDiacritics(search))
   );
@@ -131,111 +112,7 @@ const ServiceManage = () => {
       </div>
 
       {/* Sidebar */}
-      <div className="w-80 bg-gradient-to-b from-purple-900 to-blue-900 border-r border-white/20 p-6 relative z-10 flex flex-col">
-        {/* Logo */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">GeneX</h1>
-          <div className="w-16 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full"></div>
-        </div>
-
-        {/* User Profile */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-white/20">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center shadow-lg">
-                <img src="/src/assets/Admin/avt-customer.png" alt="avatar" className="w-10 h-10 rounded-full border-2 border-white/30" />
-              </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
-            </div>
-            <div>
-              <div className="bg-gradient-to-r from-cyan-400 to-purple-400 text-white px-3 py-1 rounded-full text-xs font-bold w-fit mb-1">
-                ADMIN
-              </div>
-              <h2 className="text-lg font-bold text-white">{fullName}</h2>
-            </div>
-          </div>
-          <button
-            className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white px-4 py-2 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2 w-full justify-center"
-            onClick={handleLogout}
-          >
-            <i className="bi bi-box-arrow-right"></i>
-            Đăng xuất
-          </button>
-        </div>
-
-        {/* Navigation Menu */}
-        <div className="flex-1">
-          <nav className="space-y-3">
-            <button
-              onClick={() => navigate("/admin/dashboard")}
-              className="w-full flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-            >
-              <i className="bi bi-house-door"></i>
-              TRANG CHỦ
-            </button>
-            
-            <div className="relative group">
-              <button
-                className="w-full flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-              >
-                <i className="bi bi-people"></i>
-                QUẢN LÝ TÀI KHOẢN
-                <i className="bi bi-chevron-down ml-auto group-hover:rotate-180 transition-transform duration-300"></i>
-              </button>
-              <div className="w-full bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-300 ease-in-out">
-                <div className="p-3">
-                  <button
-                    onClick={() => navigate("/account-manage")}
-                    className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
-                  >
-                    Nhân viên
-                  </button>
-                  <button
-                    onClick={() => navigate("/customer-manage")}
-                    className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
-                  >
-                    Khách hàng
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="relative group">
-              <button
-                className="w-full flex items-center gap-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-4 py-3 rounded-lg font-semibold shadow-lg"
-              >
-                <i className="bi bi-gear"></i>
-                QUẢN LÝ DỊCH VỤ
-                <i className="bi bi-chevron-down ml-auto group-hover:rotate-180 transition-transform duration-300"></i>
-              </button>
-              <div className="w-full bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-300 ease-in-out">
-                <div className="p-3">
-                  <button
-                    onClick={() => navigate("/service-manage")}
-                    className="w-full text-left text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20 underline"
-                  >
-                    Gói dịch vụ
-                  </button>
-                  <button
-                    onClick={() => navigate("/kit-manage")}
-                    className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
-                  >
-                    Quản lý KIT
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <button
-              onClick={() => navigate("/blog-manage")}
-              className="w-full flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-            >
-              <i className="bi bi-journal-text"></i>
-              QUẢN LÝ BLOG
-            </button>
-          </nav>
-        </div>
-      </div>
+      <AdminSidebar activeMenu="service" />
 
       {/* Main Content */}
       <div className="flex-1 p-8 overflow-y-auto">
@@ -337,8 +214,8 @@ const ServiceManage = () => {
                               value={editRow.caseType}
                               onChange={e => setEditRow({ ...editRow, caseType: e.target.value })}
                             >
-                              <option value="ADMINISTRATIVE">Hành chính</option>
-                              <option value="CIVIL">Dân sự</option>
+                              <option value="ADMINISTRATIVE" className="bg-gray-800 text-white">Hành chính</option>
+                              <option value="CIVIL" className="bg-gray-800 text-white">Dân sự</option>
                             </select>
                           ) : (
                             <span className="text-white/90">
