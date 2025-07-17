@@ -1,25 +1,24 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./AdminSidebar.css";
+import { useAuth } from "../../Context/AuthContext";
 
 const AdminSidebar = ({ activeMenu = "" }) => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const fullName = user.fullName || user.username || "Admin";
-
+  const { logout } = useAuth();
+  
   const handleLogout = async () => {
-    try {
-      await fetch("/api/v1/auth/logout", {
-        method: "POST",
-        credentials: "include", // Đảm bảo gửi cookie lên backend
-      });
-    } catch (err) {
-      console.error("Logout API error:", err);
-    }
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = "/";
-  };
+  try {
+    await logout(); // Xoá accessToken, setUser(null)
+    setTimeout(() => {
+      navigate("/Login"); // Điều hướng sau 1 nhịp, tránh race-condition
+    }, 10);
+  } catch (err) {
+    console.error("Logout error:", err);
+  }
+};
 
   return (
     <div className="admin-sidebar">

@@ -39,127 +39,90 @@ const AdminDashboard = () => {
   const currentYear = new Date().getFullYear();
 
   const fetchStats = async () => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const res = await axiosClient.get("/api/admin/dashboard", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setDashboard(res.data);
-
-      if (selectedMonth === currentMonth && selectedYear === currentYear) {
-        setMonthlyRevenue(res.data.monthlyRevenue);
-      }
-    } catch (err) {
-      console.error("Lỗi lấy thống kê:", err);
-    }
-  };
-
-  // Hàm fetch doanh thu hàng ngày - CHỈ GỌI API
-  const fetchDailyRevenue = async () => {
   try {
     const token = localStorage.getItem("authToken");
-    const res = await axiosClient.get(
-      `/api/admin/dashboard/revenue?month=${selectedMonth}&year=${selectedYear}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    console.log("➡️ Daily revenue response:", res.data); // THÊM DÒNG NÀY
-
-    if (res.data && res.data.dailyRevenue) {
-      setDailyRevenue(res.data.dailyRevenue);
-    } else {
-      setDailyRevenue([]);
-    }
+    const res = await axiosClient.get("/api/admin/dashboard", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setDashboard(res.data); // res.data cần có .monthlyRevenue
   } catch (err) {
-    console.error("Lỗi lấy doanh thu hàng ngày:", err);
-    setDailyRevenue([]);
+    console.error("Lỗi lấy dashboard:", err);
   }
 };
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
 
   useEffect(() => {
-    if (!dashboard) return;
+  fetchStats(); // Gọi khi component mount
+}, []);
 
-    if (selectedMonth === currentMonth && selectedYear === currentYear) {
-      setMonthlyRevenue(dashboard.monthlyRevenue);
-    } else {
-      const fetchSingleMonthRevenue = async () => {
-        try {
-          const token = localStorage.getItem("authToken");
-          const res = await axiosClient.get(
-            `/api/admin/dashboard/revenue?month=${selectedMonth}&year=${selectedYear}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          setMonthlyRevenue(res.data.monthlyRevenue);
-        } catch (err) {
-          console.error("Lỗi lấy doanh thu tháng:", err);
-          setMonthlyRevenue(0);
-        }
-      };
-      fetchSingleMonthRevenue();
+useEffect(() => {
+  const fetchMonthlyRevenue = async () => {
+    const token = localStorage.getItem("authToken");
+    try {
+      
+
+      // Nếu đang xem tháng hiện tại và dashboard đã sẵn sàng, dùng dữ liệu từ dashboard
+      if (
+        selectedMonth === currentMonth &&
+        selectedYear === currentYear &&
+        dashboard && dashboard.monthlyRevenue !== undefined
+      ) {
+        setMonthlyRevenue(dashboard.monthlyRevenue);
+      } else {
+        // Ngược lại, gọi API lấy dữ liệu riêng cho tháng đó
+        const res = await axiosClient.get(
+          `/api/admin/dashboard/revenue?month=${selectedMonth}&year=${selectedYear}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const revenue =
+          typeof res.data === "object"
+            ? res.data.monthlyRevenue ?? 0
+            : Number(res.data);
+        setMonthlyRevenue(revenue);
+      }
+    } catch (err) {
+      console.error("Lỗi lấy doanh thu tháng:", err);
+      setMonthlyRevenue(0);
     }
+  };
 
-    // Fetch doanh thu hàng tháng trong năm cho biểu đồ
-    const fetchMonthlyRevenue = async () => {
+  fetchMonthlyRevenue();
+}, [selectedMonth, selectedYear, dashboard]);
+
+
+  useEffect(() => {
+    const fetchDailyRevenue = async () => {
       try {
         const token = localStorage.getItem("authToken");
-        const monthlyData = [];
-        
-        // Gọi API cho 12 tháng trong năm
-        for (let month = 1; month <= 12; month++) {
-          try {
-            const res = await axiosClient.get(
-              `/api/admin/dashboard/revenue?month=${month}&year=${selectedYear}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            
-            monthlyData.push({
-              month: month,
-              revenue: res.data.monthlyRevenue || 0
-            });
-          } catch (monthError) {
-            console.error(`Lỗi lấy doanh thu tháng ${month}:`, monthError);
-            monthlyData.push({
-              month: month,
-              revenue: 0
-            });
-          }
+        const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
+        const dailyData = [];
+        for (let day = 1; day <= daysInMonth; day++) {
+          const res = await axiosClient.get(
+            `/api/admin/dashboard/revenue?day=${day}&month=${selectedMonth}&year=${selectedYear}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          dailyData.push({ day, revenue: res.data || 0 });
         }
-        
-        console.log("➡️ Monthly revenue data:", monthlyData);
-        setDailyRevenue(monthlyData); // Sử dụng lại state dailyRevenue
-    
+        setDailyRevenue(dailyData);
       } catch (err) {
-        console.error("Lỗi lấy doanh thu hàng tháng:", err);
         setDailyRevenue([]);
       }
     };
-    fetchMonthlyRevenue();
-  }, [selectedYear, dashboard]); // Chỉ phụ thuộc vào selectedYear
+    fetchDailyRevenue();
+  }, [selectedMonth, selectedYear]);
 
   // Chuẩn bị data cho biểu đồ đường
   const lineData = {
-    labels: dailyRevenue.map(item => `Tháng ${item.month}`),
+    labels: dailyRevenue.map(item => `Ngày ${item.day}`),
     datasets: [
       {
-        label: `Doanh thu năm ${selectedYear}`,
+        label: `Doanh thu từng ngày tháng ${selectedMonth}/${selectedYear}`,
         data: dailyRevenue.map(item => item.revenue),
         borderColor: 'rgb(34, 211, 238)',
         backgroundColor: 'rgba(34, 211, 238, 0.1)',
@@ -479,7 +442,7 @@ const AdminDashboard = () => {
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-white mb-2">
                 <i className="bi bi-graph-up mr-2"></i>
-                Biểu đồ doanh thu năm {selectedYear}
+                Biểu đồ doanh thu tháng {selectedMonth}/{selectedYear}
               </h3>
               <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full mx-auto"></div>
             </div>
@@ -492,7 +455,7 @@ const AdminDashboard = () => {
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-white mb-2">
                 <i className="bi bi-graph-up mr-2"></i>
-                Biểu đồ doanh thu năm {selectedYear}
+                Biểu đồ doanh thu tháng {selectedMonth}/{selectedYear}
               </h3>
               <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full mx-auto"></div>
             </div>
@@ -500,10 +463,11 @@ const AdminDashboard = () => {
               <div className="text-center">
                 <i className="bi bi-exclamation-circle text-white/50 text-6xl mb-4"></i>
                 <div className="text-white/70 text-xl">
-                  Không có dữ liệu doanh thu cho năm {selectedYear}
+                  Không có dữ liệu doanh thu cho tháng {selectedMonth} năm{" "}
+                  {selectedYear}
                 </div>
                 <div className="text-white/50 text-sm mt-2">
-                  Vui lòng kiểm tra lại API hoặc chọn năm khác
+                  Vui lòng kiểm tra lại API hoặc chọn tháng/năm khác
                 </div>
               </div>
             </div>
