@@ -5,6 +5,8 @@ import MDEditor from "@uiw/react-md-editor";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import { uploadToCloudinary } from "../config/cloudinaryUpload";
+import AdminSidebar from "./components/AdminSidebar";
+import "./index.css";
 
 const NewBlog = () => {
   const [blog, setBlog] = useState({ title: "", content: "", thumbnailUrl: "" });
@@ -55,7 +57,7 @@ const NewBlog = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex flex-col items-center py-10 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex relative overflow-hidden">
       {/* Custom CSS for Word-like icons */}
       <style jsx>{`
         .w-md-editor {
@@ -113,14 +115,6 @@ const NewBlog = () => {
         
         .w-md-editor-toolbar ul > li button[aria-label*="Strikethrough"] {
           text-decoration: line-through !important;
-        }
-        
-        .w-md-editor-toolbar ul > li button[aria-label*="Unordered List"] {
-          position: relative !important;
-        }
-        
-        .w-md-editor-toolbar ul > li button[aria-label*="Ordered List"] {
-          position: relative !important;
         }
         
         .w-md-editor-toolbar ul > li button[aria-label*="Link"] {
@@ -312,136 +306,156 @@ const NewBlog = () => {
         ))}
       </div>
 
+      {/* Sidebar */}
+      <AdminSidebar activeMenu="blog" />
+
       {/* Main Content */}
-      <div className="w-full max-w-6xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 relative z-10 transform hover:scale-[1.01] transition-all duration-700">
+      <div className="flex-1 p-8 overflow-y-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-2 animate-pulse">
-            ✨ Viết Blog Mới ✨
-          </h2>
-          <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full mx-auto animate-pulse"></div>
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 mb-8 relative z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">VIẾT BLOG MỚI</h1>
+              <p className="text-white/70">Tạo bài viết blog mới</p>
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-white/80 text-sm">Hoạt động</span>
+            </div>
+          </div>
         </div>
 
-        {/* Image Upload Section */}
-        <div className="mb-8 flex flex-col items-center">
-          <div className="relative group">
-            {blog.thumbnailUrl && (
-              <div className="relative overflow-hidden rounded-2xl mb-4 group-hover:scale-105 transition-transform duration-500">
-                <img
-                  src={blog.thumbnailUrl}
-                  alt="Ảnh Blog"
-                  className="w-48 h-32 object-cover border-2 border-white/30 shadow-xl"
+        {/* Form Container */}
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 relative z-10">
+          {/* Title */}
+          <div className="text-center mb-8">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+              ✨ Viết Blog Mới ✨
+            </h2>
+            <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full mx-auto"></div>
+          </div>
+
+          {/* Image Upload Section */}
+          <div className="mb-8 flex flex-col items-center">
+            <div className="relative group">
+              {blog.thumbnailUrl && (
+                <div className="relative overflow-hidden rounded-2xl mb-4 group-hover:scale-105 transition-transform duration-500">
+                  <img
+                    src={blog.thumbnailUrl}
+                    alt="Ảnh Blog"
+                    className="w-64 h-40 object-cover border-2 border-white/30 shadow-xl"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                </div>
+              )}
+              
+              <label className="relative cursor-pointer">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+                  <i className="bi bi-cloud-upload text-xl"></i>
+                  {uploading ? "Đang tải..." : "Tải ảnh lên"}
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImage}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              </label>
+            </div>
+            
+            {uploading && (
+              <div className="flex items-center gap-2 mt-2">
+                <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-white/80 text-sm">Đang tải ảnh lên...</p>
               </div>
             )}
-            
-            <label className="relative cursor-pointer">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
-                <i className="bi bi-cloud-upload text-xl"></i>
-                {uploading ? "Đang tải..." : "Tải ảnh lên"}
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImage}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-            </label>
           </div>
-          
-          {uploading && (
-            <div className="flex items-center gap-2 mt-2">
-              <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-white/80 text-sm">Đang tải ảnh lên...</p>
+
+          {/* Title Input */}
+          <div className="mb-8 relative">
+            <input
+              type="text"
+              name="title"
+              value={blog.title}
+              onChange={handleChange}
+              placeholder="💎 Tiêu đề bài viết..."
+              className="w-full text-2xl font-bold px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl outline-none text-white placeholder-white/60 focus:border-cyan-400 focus:bg-white/20 transition-all duration-500 shadow-lg"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+          </div>
+
+          {/* Content Editor - WORD-STYLE */}
+          <div className="mb-8 relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
+            <div className="relative bg-slate-900/90 backdrop-blur-2xl rounded-2xl p-6 border border-white/10 shadow-2xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse delay-100"></div>
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse delay-200"></div>
+                </div>
+                <div className="flex-1 text-center">
+                  <span className="text-white/80 text-sm font-medium">Editor</span>
+                </div>
+                <div className="flex gap-2">
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-ping delay-300"></div>
+                </div>
+              </div>
+              
+              <div className="relative">
+                <MDEditor
+                  value={blog.content}
+                  onChange={(val) => setBlog({ ...blog, content: val || "" })}
+                  height={400}
+                  data-color-mode="dark"
+                  preview="edit"
+                  style={{
+                    backgroundColor: 'transparent',
+                  }}
+                />
+                
+                {/* Overlay hiệu ứng */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-center gap-6">
+            <button
+              className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-8 py-4 rounded-2xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2 relative overflow-hidden group"
+              onClick={() => navigate("/blog-manage")}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <i className="bi bi-arrow-left"></i>
+              Quay lại
+            </button>
+            
+            <button
+              className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2 relative overflow-hidden group"
+              onClick={handleSubmit}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+              <i className="bi bi-send"></i>
+              Đăng bài
+            </button>
+          </div>
+
+          {/* Success Message */}
+          {success && (
+            <div className="mt-8 p-6 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 rounded-2xl backdrop-blur-sm animate-pulse">
+              <div className="flex items-center justify-center gap-3">
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center animate-bounce">
+                  <i className="bi bi-check-lg text-white"></i>
+                </div>
+                <p className="text-green-400 font-semibold text-lg">
+                  ✅ Đăng bài viết thành công!
+                </p>
+              </div>
             </div>
           )}
         </div>
-
-        {/* Title Input */}
-        <div className="mb-8 relative">
-          <input
-            type="text"
-            name="title"
-            value={blog.title}
-            onChange={handleChange}
-            placeholder="💎 Tiêu đề bài viết..."
-            className="w-full text-2xl font-bold px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl outline-none text-white placeholder-white/60 focus:border-cyan-400 focus:bg-white/20 transition-all duration-500 shadow-lg"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-        </div>
-
-        {/* Content Editor - WORD-STYLE */}
-        <div className="mb-8 relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
-          <div className="relative bg-slate-900/90 backdrop-blur-2xl rounded-2xl p-6 border border-white/10 shadow-2xl">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse delay-100"></div>
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse delay-200"></div>
-              </div>
-              <div className="flex-1 text-center">
-                {/* Đã xóa text "Microsoft Word Editor Pro" */}
-              </div>
-              <div className="flex gap-2">
-                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
-                <div className="w-2 h-2 bg-purple-400 rounded-full animate-ping delay-300"></div>
-              </div>
-            </div>
-            
-            <div className="relative">
-              <MDEditor
-                value={blog.content}
-                onChange={(val) => setBlog({ ...blog, content: val || "" })}
-                height={400}
-                data-color-mode="dark"
-                preview="edit"
-                style={{
-                  backgroundColor: 'transparent',
-                }}
-              />
-              
-              {/* Overlay hiệu ứng */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-4">
-          <button
-            className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2 relative overflow-hidden group"
-            onClick={() => navigate("/blog-manage")}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-            <i className="bi bi-arrow-left"></i>
-            Quay lại
-          </button>
-          
-          <button
-            className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2 relative overflow-hidden group"
-            onClick={handleSubmit}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-            <i className="bi bi-send"></i>
-            Đăng bài
-          </button>
-        </div>
-
-        {/* Success Message */}
-        {success && (
-          <div className="mt-6 p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 rounded-2xl backdrop-blur-sm animate-pulse">
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center animate-bounce">
-                <i className="bi bi-check-lg text-white"></i>
-              </div>
-              <p className="text-green-400 font-semibold text-lg">
-                ✅ Đăng bài viết thành công!
-              </p>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Decorative Elements */}

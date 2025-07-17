@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosClient from "../config/AxiosClient";
 import { uploadToCloudinary } from "../config/cloudinaryUpload";
+import AdminSidebar from "./components/AdminSidebar";
 import "./index.css";
 
 const BlogEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const fullName = user.fullName || user.username || "Admin";
-  
+
   const [blog, setBlog] = useState({
     title: "",
     shortDescription: "",
@@ -19,7 +18,6 @@ const BlogEdit = () => {
   const [imageFile, setImageFile] = useState(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showAccountDropdown, setShowAccountDropdown] = useState(false);
 
   // Lấy dữ liệu blog theo id
   useEffect(() => {
@@ -97,26 +95,8 @@ const BlogEdit = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userInfo");
-    localStorage.removeItem("userData");
-    sessionStorage.removeItem("user");
-    sessionStorage.removeItem("authToken");
-    sessionStorage.removeItem("refreshToken");
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("accessToken");
-    sessionStorage.clear();
-    navigate("/");
-    window.location.reload();
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex flex-col items-center py-10 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -140,248 +120,173 @@ const BlogEdit = () => {
         ))}
       </div>
 
-      {/* Header */}
-      <div className="w-full max-w-7xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 mb-8 relative z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              <div className="w-20 h-20 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center shadow-lg">
-                <img src="/src/assets/Admin/avt-customer.png" alt="avatar" className="w-16 h-16 rounded-full border-2 border-white/30" />
-              </div>
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
-            </div>
+      {/* Sidebar */}
+      <AdminSidebar activeMenu="blog" />
+
+      {/* Main Content */}
+      <div className="flex-1 p-8 overflow-y-auto">
+        {/* Header */}
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 mb-8 relative z-10">
+          <div className="flex items-center justify-between">
             <div>
-              <div className="bg-gradient-to-r from-cyan-400 to-purple-400 text-white px-4 py-1 rounded-full text-sm font-bold w-fit mb-2 shadow-lg">
-                ADMIN
-              </div>
-              <h1 className="text-2xl font-bold text-white mb-1">{fullName}</h1>
-              <p className="text-white/70 text-sm">Chỉnh sửa blog</p>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                CHỈNH SỬA BLOG
+              </h1>
+              <p className="text-white/70">Cập nhật nội dung blog</p>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
               <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
               <span className="text-white/80 text-sm">Hoạt động</span>
             </div>
-            <button
-              className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
-              onClick={handleLogout}
-            >
-              <i className="bi bi-box-arrow-right"></i>
-              Đăng xuất
-            </button>
           </div>
         </div>
-      </div>
 
-      {/* Navigation */}
-      <div className="w-full max-w-7xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 mb-8 relative z-10">
-        <div className="flex items-center justify-center gap-6">
-          <button
-            onClick={() => navigate("/admin/dashboard")}
-            className="flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-          >
-            <i className="bi bi-house-door"></i>
-            Trang chủ
-          </button>
-          
-          <div className="relative group">
-            <button
-              className="flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-              onClick={() => setShowAccountDropdown(!showAccountDropdown)}
-            >
-              <i className="bi bi-people"></i>
-              Quản lý tài khoản
-            </button>
-            <div className="absolute bottom-full left-0 mb-2 bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl p-4 min-w-[200px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <button
-                onClick={() => navigate("/account-manage")}
-                className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
-              >
-                Nhân viên
-              </button>
-              <button
-                onClick={() => navigate("/customer-manage")}
-                className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
-              >
-                Khách hàng
-              </button>
-            </div>
-          </div>
-          
-          <div className="relative group">
-            <button
-              className="flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-            >
-              <i className="bi bi-gear"></i>
-              Quản lý dịch vụ
-            </button>
-            <div className="absolute bottom-full left-0 mb-2 bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl p-4 min-w-[200px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <button
-                onClick={() => navigate("/service-manage")}
-                className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
-              >
-                Gói dịch vụ
-              </button>
-              <button
-                onClick={() => navigate("/kit-manage")}
-                className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
-              >
-                Quản lý KIT
-              </button>
-            </div>
-          </div>
-          
-          <button
-            onClick={() => navigate("/blog-manage")}
-            className="flex items-center gap-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg"
-          >
-            <i className="bi bi-journal-text"></i>
-            Quản lý blog
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="w-full max-w-7xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 relative z-10">
-        {/* Title */}
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
-            ✨ Chỉnh sửa blog ✨
-          </h2>
-          <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full mx-auto"></div>
-        </div>
-
-        {/* Form */}
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Title Input */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-            <label className="block text-white font-semibold mb-3 text-lg">
-              <i className="bi bi-fonts mr-2"></i>
-              Tiêu đề blog
-            </label>
-            <input
-              type="text"
-              name="title"
-              value={blog.title || ""}
-              onChange={handleChange}
-              placeholder="Nhập tiêu đề blog..."
-              className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl outline-none text-white placeholder-white/60 focus:border-cyan-400 focus:bg-white/20 transition-all duration-300"
-            />
+        {/* Form Container */}
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 relative z-10">
+          {/* Title */}
+          <div className="text-center mb-8">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+              ✨ Chỉnh sửa blog ✨
+            </h2>
+            <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full mx-auto"></div>
           </div>
 
-          {/* Short Description Input */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-            <label className="block text-white font-semibold mb-3 text-lg">
-              <i className="bi bi-text-paragraph mr-2"></i>
-              Mô tả ngắn
-            </label>
-            <input
-              type="text"
-              name="shortDescription"
-              value={blog.shortDescription || ""}
-              onChange={handleChange}
-              placeholder="Nhập mô tả ngắn..."
-              className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl outline-none text-white placeholder-white/60 focus:border-cyan-400 focus:bg-white/20 transition-all duration-300"
-            />
-          </div>
-
-          {/* Image Upload */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-            <label className="block text-white font-semibold mb-3 text-lg">
-              <i className="bi bi-image mr-2"></i>
-              Ảnh thumbnail
-            </label>
-            <div className="space-y-4">
+          {/* Form */}
+          <div className="max-w-4xl mx-auto space-y-8">
+            {/* Title Input */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+              <label className="block text-white font-semibold mb-3 text-lg">
+                <i className="bi bi-fonts mr-2"></i>
+                Tiêu đề blog
+              </label>
               <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl outline-none text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-500 file:text-white hover:file:bg-cyan-600 transition-all duration-300"
+                type="text"
+                name="title"
+                value={blog.title || ""}
+                onChange={handleChange}
+                placeholder="Nhập tiêu đề blog..."
+                className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl outline-none text-white placeholder-white/60 focus:border-cyan-400 focus:bg-white/20 transition-all duration-300"
               />
-              {blog.thumbnailUrl && (
-                <div className="relative">
-                  <img
-                    src={blog.thumbnailUrl}
-                    alt="Preview"
-                    className="max-h-64 w-full object-cover rounded-2xl border border-white/20 shadow-lg"
-                  />
-                  <div className="absolute top-2 right-2 bg-white/10 backdrop-blur-sm rounded-full p-2">
-                    <i className="bi bi-image text-white"></i>
+            </div>
+
+            {/* Short Description Input */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+              <label className="block text-white font-semibold mb-3 text-lg">
+                <i className="bi bi-text-paragraph mr-2"></i>
+                Mô tả ngắn
+              </label>
+              <input
+                type="text"
+                name="shortDescription"
+                value={blog.shortDescription || ""}
+                onChange={handleChange}
+                placeholder="Nhập mô tả ngắn..."
+                className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl outline-none text-white placeholder-white/60 focus:border-cyan-400 focus:bg-white/20 transition-all duration-300"
+              />
+            </div>
+
+            {/* Image Upload */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+              <label className="block text-white font-semibold mb-3 text-lg">
+                <i className="bi bi-image mr-2"></i>
+                Ảnh thumbnail
+              </label>
+              <div className="space-y-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl outline-none text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-500 file:text-white hover:file:bg-cyan-600 transition-all duration-300"
+                />
+                {blog.thumbnailUrl && (
+                  <div className="relative">
+                    <img
+                      src={blog.thumbnailUrl}
+                      alt="Preview"
+                      className="max-h-64 w-full object-cover rounded-2xl border border-white/20 shadow-lg"
+                    />
+                    <div className="absolute top-2 right-2 bg-white/10 backdrop-blur-sm rounded-full p-2">
+                      <i className="bi bi-image text-white"></i>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Content Textarea */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-            <label className="block text-white font-semibold mb-3 text-lg">
-              <i className="bi bi-file-text mr-2"></i>
-              Nội dung blog
-            </label>
-            <textarea
-              name="content"
-              value={blog.content || ""}
-              onChange={handleChange}
-              rows="12"
-              placeholder="Nhập nội dung blog..."
-              className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl outline-none text-white placeholder-white/60 focus:border-cyan-400 focus:bg-white/20 transition-all duration-300 resize-none"
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-center gap-6">
-            <button
-              onClick={() => navigate("/blog-manage")}
-              className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-8 py-4 rounded-2xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
-            >
-              <i className="bi bi-arrow-left"></i>
-              Quay lại
-            </button>
-            
-            <button
-              onClick={handleSave}
-              disabled={loading}
-              className={`${
-                loading
-                  ? "bg-gradient-to-r from-gray-400 to-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
-              } text-white px-8 py-4 rounded-2xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2`}
-            >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  Đang lưu...
-                </>
-              ) : (
-                <>
-                  <i className="bi bi-check-circle"></i>
-                  Lưu thay đổi
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Success Message */}
-          {success && (
-            <div className="bg-green-500/20 backdrop-blur-sm border border-green-500/30 rounded-2xl p-6 text-center">
-              <div className="text-green-400 text-2xl mb-2">
-                <i className="bi bi-check-circle-fill"></i>
+                )}
               </div>
-              <p className="text-green-400 font-semibold text-lg">
-                ✔ Đã cập nhật blog thành công!
-              </p>
-              <p className="text-white/70 mt-2">Đang chuyển hướng...</p>
             </div>
-          )}
+
+            {/* Content Textarea */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+              <label className="block text-white font-semibold mb-3 text-lg">
+                <i className="bi bi-file-text mr-2"></i>
+                Nội dung blog
+              </label>
+              <textarea
+                name="content"
+                value={blog.content || ""}
+                onChange={handleChange}
+                rows="12"
+                placeholder="Nhập nội dung blog..."
+                className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl outline-none text-white placeholder-white/60 focus:border-cyan-400 focus:bg-white/20 transition-all duration-300 resize-none"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-center gap-6">
+              <button
+                onClick={() => navigate("/blog-manage")}
+                className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-8 py-4 rounded-2xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
+              >
+                <i className="bi bi-arrow-left"></i>
+                Quay lại
+              </button>
+
+              <button
+                onClick={handleSave}
+                disabled={loading}
+                className={`${
+                  loading
+                    ? "bg-gradient-to-r from-gray-400 to-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                } text-white px-8 py-4 rounded-2xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2`}
+              >
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    Đang lưu...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-check-circle"></i>
+                    Lưu thay đổi
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Success Message */}
+            {success && (
+              <div className="bg-green-500/20 backdrop-blur-sm border border-green-500/30 rounded-2xl p-6 text-center">
+                <div className="text-green-400 text-2xl mb-2">
+                  <i className="bi bi-check-circle-fill"></i>
+                </div>
+                <p className="text-green-400 font-semibold text-lg">
+                  ✔ Đã cập nhật blog thành công!
+                </p>
+                <p className="text-white/70 mt-2">Đang chuyển hướng...</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute top-10 right-10 w-20 h-20 border-2 border-cyan-400/30 rounded-full animate-spin" style={{animationDuration: '20s'}}></div>
-      <div className="absolute bottom-10 left-10 w-16 h-16 border-2 border-purple-400/30 rounded-full animate-spin" style={{animationDuration: '15s'}}></div>
+      <div
+        className="absolute top-10 right-10 w-20 h-20 border-2 border-cyan-400/30 rounded-full animate-spin"
+        style={{ animationDuration: "20s" }}
+      ></div>
+      <div
+        className="absolute bottom-10 left-10 w-16 h-16 border-2 border-purple-400/30 rounded-full animate-spin"
+        style={{ animationDuration: "15s" }}
+      ></div>
     </div>
   );
 };

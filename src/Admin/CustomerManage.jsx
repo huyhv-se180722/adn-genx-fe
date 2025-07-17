@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosClient from "../config/AxiosClient";
+import AdminSidebar from "./components/AdminSidebar";
 import "./index.css";
 
 const CustomerManage = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const fullName = user.fullName || user.username || "Admin";
-
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [showAccountDropdown, setShowAccountDropdown] = useState(false);
 
   useEffect(() => {
     fetchCustomers(page);
@@ -54,33 +51,13 @@ const CustomerManage = () => {
 
       setCustomers((prev) =>
         prev.map((u) =>
-          u.id === user.id
-            ? { ...u, accountNonLocked: !u.accountNonLocked }
-            : u
+          u.id === user.id ? { ...u, accountNonLocked: !u.accountNonLocked } : u
         )
       );
     } catch (err) {
       console.error("Lỗi khi cập nhật trạng thái khóa:", err);
       alert("Không thể thay đổi trạng thái tài khoản.");
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userInfo");
-    localStorage.removeItem("userData");
-    sessionStorage.removeItem("user");
-    sessionStorage.removeItem("authToken");
-    sessionStorage.removeItem("refreshToken");
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("accessToken");
-    sessionStorage.clear();
-    navigate("/");
-    window.location.reload();
   };
 
   const filteredCustomers = customers.filter((u) =>
@@ -113,111 +90,7 @@ const CustomerManage = () => {
       </div>
 
       {/* Sidebar */}
-      <div className="w-80 bg-gradient-to-b from-purple-900 to-blue-900 border-r border-white/20 p-6 relative z-10 flex flex-col">
-        {/* Logo */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">GeneX</h1>
-          <div className="w-16 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full"></div>
-        </div>
-
-        {/* User Profile */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-white/20">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center shadow-lg">
-                <img src="/src/assets/Admin/avt-customer.png" alt="avatar" className="w-10 h-10 rounded-full border-2 border-white/30" />
-              </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
-            </div>
-            <div>
-              <div className="bg-gradient-to-r from-cyan-400 to-purple-400 text-white px-3 py-1 rounded-full text-xs font-bold w-fit mb-1">
-                ADMIN
-              </div>
-              <h2 className="text-lg font-bold text-white">{fullName}</h2>
-            </div>
-          </div>
-          <button
-            className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white px-4 py-2 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2 w-full justify-center"
-            onClick={handleLogout}
-          >
-            <i className="bi bi-box-arrow-right"></i>
-            Đăng xuất
-          </button>
-        </div>
-
-        {/* Navigation Menu */}
-        <div className="flex-1">
-          <nav className="space-y-3">
-            <button
-              onClick={() => navigate("/admin/dashboard")}
-              className="w-full flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-            >
-              <i className="bi bi-house-door"></i>
-              TRANG CHỦ
-            </button>
-            
-            <div className="relative group">
-              <button
-                className="w-full flex items-center gap-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-4 py-3 rounded-lg font-semibold shadow-lg"
-              >
-                <i className="bi bi-people"></i>
-                QUẢN LÝ TÀI KHOẢN
-                <i className="bi bi-chevron-down ml-auto group-hover:rotate-180 transition-transform duration-300"></i>
-              </button>
-              <div className="w-full bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-300 ease-in-out">
-                <div className="p-3">
-                  <button
-                    onClick={() => navigate("/account-manage")}
-                    className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
-                  >
-                    Nhân viên
-                  </button>
-                  <button
-                    onClick={() => navigate("/customer-manage")}
-                    className="w-full text-left text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium underline"
-                  >
-                    Khách hàng
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="relative group">
-              <button
-                className="w-full flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-              >
-                <i className="bi bi-gear"></i>
-                QUẢN LÝ DỊCH VỤ
-                <i className="bi bi-chevron-down ml-auto group-hover:rotate-180 transition-transform duration-300"></i>
-              </button>
-              <div className="w-full bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-300 ease-in-out">
-                <div className="p-3">
-                  <button
-                    onClick={() => navigate("/service-manage")}
-                    className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
-                  >
-                    Gói dịch vụ
-                  </button>
-                  <button
-                    onClick={() => navigate("/kit-manage")}
-                    className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
-                  >
-                    Quản lý KIT
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <button
-              onClick={() => navigate("/blog-manage")}
-              className="w-full flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-            >
-              <i className="bi bi-journal-text"></i>
-              QUẢN LÝ BLOG
-            </button>
-          </nav>
-        </div>
-      </div>
+      <AdminSidebar activeMenu="account" />
 
       {/* Main Content */}
       <div className="flex-1 p-8 overflow-y-auto">
@@ -225,8 +98,12 @@ const CustomerManage = () => {
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 mb-8 relative z-10">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">QUẢN LÝ TÀI KHOẢN - KHÁCH HÀNG</h1>
-              <p className="text-white/70">Quản lý tài khoản khách hàng hệ thống</p>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                QUẢN LÝ TÀI KHOẢN - KHÁCH HÀNG
+              </h1>
+              <p className="text-white/70">
+                Quản lý tài khoản khách hàng hệ thống
+              </p>
             </div>
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
               <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -267,17 +144,30 @@ const CustomerManage = () => {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-b border-white/10">
-                    <th className="px-6 py-4 text-left text-white font-semibold">HỌ VÀ TÊN</th>
-                    <th className="px-6 py-4 text-left text-white font-semibold">EMAIL</th>
-                    <th className="px-6 py-4 text-left text-white font-semibold">VAI TRÒ</th>
-                    <th className="px-6 py-4 text-left text-white font-semibold">TRẠNG THÁI</th>
+                    <th className="px-6 py-4 text-left text-white font-semibold">
+                      HỌ VÀ TÊN
+                    </th>
+                    <th className="px-6 py-4 text-left text-white font-semibold">
+                      EMAIL
+                    </th>
+                    <th className="px-6 py-4 text-left text-white font-semibold">
+                      VAI TRÒ
+                    </th>
+                    <th className="px-6 py-4 text-left text-white font-semibold">
+                      TRẠNG THÁI
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredCustomers.map((u, idx) => (
-                    <tr key={u.id || idx} className="border-b border-white/10 hover:bg-white/5 transition-colors duration-200">
+                    <tr
+                      key={u.id || idx}
+                      className="border-b border-white/10 hover:bg-white/5 transition-colors duration-200"
+                    >
                       <td className="px-6 py-4 text-white">{u.fullName}</td>
-                      <td className="px-6 py-4 text-white/90 font-medium">{u.email}</td>
+                      <td className="px-6 py-4 text-white/90 font-medium">
+                        {u.email}
+                      </td>
                       <td className="px-6 py-4">
                         <span className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
                           {u.role}
@@ -296,7 +186,9 @@ const CustomerManage = () => {
                           </span>
                           <button
                             onClick={() => {
-                              const action = u.accountNonLocked ? "khóa" : "mở khóa";
+                              const action = u.accountNonLocked
+                                ? "khóa"
+                                : "mở khóa";
                               const confirmMsg = `Bạn có muốn ${action} người dùng này không?`;
                               if (window.confirm(confirmMsg)) {
                                 handleToggleLock(u);
@@ -326,7 +218,9 @@ const CustomerManage = () => {
                 <i className="bi bi-people text-white/60 text-3xl"></i>
               </div>
               <p className="text-white/70 text-lg">
-                {search ? "Không tìm thấy khách hàng nào" : "Chưa có khách hàng nào"}
+                {search
+                  ? "Không tìm thấy khách hàng nào"
+                  : "Chưa có khách hàng nào"}
               </p>
             </div>
           )}
@@ -341,13 +235,13 @@ const CustomerManage = () => {
               <i className="bi bi-chevron-left"></i>
               Trang trước
             </button>
-            
+
             <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
               <span className="text-white font-semibold">
                 Trang {page + 1} / {totalPages}
               </span>
             </div>
-            
+
             <button
               disabled={page >= totalPages - 1}
               onClick={() => setPage((prev) => prev + 1)}
@@ -363,11 +257,13 @@ const CustomerManage = () => {
             <div className="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-cyan-400 font-semibold">Tổng dịch vụ</p>
-                  <p className="text-3xl font-bold text-white">{customers.length}</p>
+                  <p className="text-cyan-400 font-semibold">Tổng khách hàng</p>
+                  <p className="text-3xl font-bold text-white">
+                    {customers.length}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-cyan-500/30 rounded-full flex items-center justify-center">
-                  <i className="bi bi-list text-cyan-400 text-xl"></i>
+                  <i className="bi bi-people text-cyan-400 text-xl"></i>
                 </div>
               </div>
             </div>
@@ -375,7 +271,9 @@ const CustomerManage = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-green-400 font-semibold">Đang hoạt động</p>
-                  <p className="text-3xl font-bold text-white">{customers.filter(c => c.accountNonLocked).length}</p>
+                  <p className="text-3xl font-bold text-white">
+                    {customers.filter((c) => c.accountNonLocked).length}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-green-500/30 rounded-full flex items-center justify-center">
                   <i className="bi bi-check-circle text-green-400 text-xl"></i>
@@ -386,7 +284,9 @@ const CustomerManage = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-purple-400 font-semibold">Đã khóa</p>
-                  <p className="text-3xl font-bold text-white">{customers.filter(c => !c.accountNonLocked).length}</p>
+                  <p className="text-3xl font-bold text-white">
+                    {customers.filter((c) => !c.accountNonLocked).length}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-purple-500/30 rounded-full flex items-center justify-center">
                   <i className="bi bi-x-circle text-purple-400 text-xl"></i>
@@ -398,7 +298,10 @@ const CustomerManage = () => {
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute top-10 right-10 w-20 h-20 border-2 border-cyan-400/30 rounded-full animate-spin" style={{animationDuration: '20s'}}></div>
+      <div
+        className="absolute top-10 right-10 w-20 h-20 border-2 border-cyan-400/30 rounded-full animate-spin"
+        style={{ animationDuration: "20s" }}
+      ></div>
     </div>
   );
 };
