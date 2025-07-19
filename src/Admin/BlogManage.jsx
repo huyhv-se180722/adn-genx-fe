@@ -224,7 +224,7 @@ const BlogManage = () => {
                     </div>
                     <div className="flex flex-col items-end">
                       <button
-                        onClick={() => navigate(`/edit-blog/${b.id}`)}
+                        onClick={() => navigate(`/blog-edit/${b.id}`)}
                         className="mb-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full font-semibold shadow-md hover:scale-105 transition-all duration-300 flex items-center gap-2"
                       >
                         <i className="bi bi-pencil-fill"></i>
