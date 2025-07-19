@@ -1,21 +1,28 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 
-export default function PrivateRouter({ children }) {
-  const { isLoggedIn, loading } = useAuth();
+export default function PrivateRouter({ children, allowedRole }) {
+  const { isLoggedIn, loading, isRefreshing, role } = useAuth();
 
-  // Wait for auth check to complete
-  if (loading) {
-    return <div className="loading">Loading...</div>; // Or your loading spinner
+  // 1. Đợi AuthContext xử lý xong token và role
+  if (loading || isRefreshing) {
+    return <div className="loading">🔄 Đang kiểm tra quyền truy cập...</div>;
   }
 
-  // Check auth status and redirect if not logged in
+  // 2. Nếu chưa đăng nhập → điều hướng về login
   if (!isLoggedIn) {
-    // Save current path for redirect after login
+    console.log('🚫 PrivateRouter: Chưa đăng nhập hoặc token hết hạn');
     localStorage.setItem("redirectUrl", window.location.pathname);
     return <Navigate to="/login" replace />;
   }
 
-  // User is authenticated, render protected content
+  // 3. Kiểm tra quyền truy cập (nếu có yêu cầu allowedRole)
+  if (allowedRole && role !== allowedRole) {
+    console.log(`🚫 PrivateRouter: Không đủ quyền. Yêu cầu: ${allowedRole}, hiện tại: ${role}`);
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  // 4. Truy cập hợp lệ
+  console.log('✅ PrivateRouter: Truy cập hợp lệ');
   return children;
 }

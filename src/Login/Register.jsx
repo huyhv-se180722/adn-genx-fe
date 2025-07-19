@@ -1,21 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosClient from "../config/AxiosClient";
 import logo from "../assets/logo.png";
 import "./Auth.css";
-
-const API_BASE_URL = "https://2642-2405-4802-8033-c420-6d55-f41-2cf0-d4b0.ngrok-free.app";
-const GOOGLE_REDIRECT_URI = "http://localhost:3000/oauth2/callback";
 
 export default function Register() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     fullName: "",
-    phone: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: ""
   });
@@ -26,51 +23,38 @@ export default function Register() {
       ...prev,
       [name]: value
     }));
-    setError("");
+    setErrors({});
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { username, email, fullName, phone, password, confirmPassword } = formData;
-    // Kiểm tra các trường bắt buộc
-    if (!username || !email || !fullName || !phone || !password || !confirmPassword) {
-      setError("Vui lòng điền đầy đủ thông tin!");
-      return;
-    }
 
-    // Kiểm tra mật khẩu khớp
-    if (password !== confirmPassword) {
-      setError("Mật khẩu không khớp!");
-      return;
-    }
-
-    // Kiểm tra độ dài mật khẩu
-    if (password.length < 6) {
-      setError("Mật khẩu phải có ít nhất 6 ký tự!");
-      return;
-    }
-
-    // Kiểm tra định dạng số điện thoại
-    const phoneRegex = /^[0-9]{9,11}$/;
-    if (!phoneRegex.test(phone)) {
-      setError("Số điện thoại không hợp lệ!");
+    if (formData.password !== formData.confirmPassword) {
+      setErrors({ confirmPassword: "Mật khẩu không khớp!" });
       return;
     }
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/v1/auth/register`, {
+      const dataToSend = {
         username: formData.username,
         email: formData.email,
         fullName: formData.fullName,
-        phone: formData.phone,
+        phoneNumber: formData.phoneNumber,
         password: formData.password
-      });
+      };
 
+      await axiosClient.post("/api/v1/auth/register", dataToSend);
       alert("Đăng ký thành công!");
       navigate("/login");
+
     } catch (err) {
-      setError(err.response?.data?.message || "Đăng ký thất bại!");
+      const res = err.response?.data;
+      if (res?.code === 1002 && typeof res.result === "object") {
+        setErrors(res.result);
+      } else {
+        setErrors({ general: res?.message || "Đăng ký thất bại!" });
+      }
     } finally {
       setLoading(false);
     }
@@ -80,79 +64,86 @@ export default function Register() {
     <div className="auth-root">
       <img src={logo} alt="GENEX MEDICAL CENTER" className="auth-logo" />
       <div className="auth-box">
-        {error && <div className="auth-error">{error}</div>}
+        {errors.general && <div className="auth-error">{errors.general}</div>}
 
         <form onSubmit={handleSubmit}>
-          <label>
-            Tên đăng nhập <span className="auth-required">*</span>
-          </label>
-          <input
-            type="text"
-            name="username"
-            className="auth-input"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
+          <div className="form-columns">
+            <div className="form-col">
+              <label>
+                Tên đăng nhập <span className="auth-required">*</span>
+              </label>
+              <input
+                type="text"
+                name="username"
+                className="auth-input"
+                value={formData.username}
+                onChange={handleChange}
+                required
+              />
+              {errors.username && <div className="auth-error">{errors.username}</div>}
 
-          <label>
-            Email <span className="auth-required">*</span>
-          </label>
-          <input
-            type="email"
-            name="email"
-            className="auth-input"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+              <label>Họ và tên</label>
+              <input
+                type="text"
+                name="fullName"
+                className="auth-input"
+                value={formData.fullName}
+                onChange={handleChange}
+              />
+              {errors.fullName && <div className="auth-error">{errors.fullName}</div>}
 
-          <label>
-            Họ và tên
-          </label>
-          <input
-            type="text"
-            name="fullName"
-            className="auth-input"
-            value={formData.fullName}
-            onChange={handleChange}
-          />
+              <label>
+                Mật khẩu <span className="auth-required">*</span>
+              </label>
+              <input
+                type="password"
+                name="password"
+                className="auth-input"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+              {errors.password && <div className="auth-error">{errors.password}</div>}
+            </div>
 
-          <label>
-            Số điện thoại
-          </label>
-          <input
-            type="tel"
-            name="phone"
-            className="auth-input"
-            value={formData.phone}
-            onChange={handleChange}
-          />
+            <div className="form-col">
+              <label>
+                Email <span className="auth-required">*</span>
+              </label>
+              <input
+                type="email"
+                name="email"
+                className="auth-input"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+              {errors.email && <div className="auth-error">{errors.email}</div>}
 
-          <label>
-            Mật khẩu <span className="auth-required">*</span>
-          </label>
-          <input
-            type="password"
-            name="password"
-            className="auth-input"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            minLength={6}
-          />
+              <label>Số điện thoại</label>
+              <input
+                type="tel"
+                name="phoneNumber"
+                className="auth-input"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+              />
+              {errors.phoneNumber && <div className="auth-error">{errors.phoneNumber}</div>}
 
-          <label>
-            Xác nhận mật khẩu <span className="auth-required">*</span>
-          </label>
-          <input
-            type="password"
-            name="confirmPassword"
-            className="auth-input"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
+              <label>
+                Xác nhận mật khẩu <span className="auth-required">*</span>
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                className="auth-input"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+              {errors.confirmPassword && <div className="auth-error">{errors.confirmPassword}</div>}
+            </div>
+          </div>
 
           <button
             type="submit"

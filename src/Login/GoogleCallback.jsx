@@ -1,9 +1,9 @@
 import { useEffect, useContext, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";  thay dong nay bang import axiosClient from "../config/axiosClient";
+import axiosClient from "../config/AxiosClient";
 import { AuthContext } from "../Context/AuthContext";
 
-const API_BASE_URL = "https://2642-2405-4802-8033-c420-6d55-f41-2cf0-d4b0.ngrok-free.app";
 
 export default function GoogleCallback() {
   const navigate = useNavigate();
@@ -33,38 +33,51 @@ export default function GoogleCallback() {
   const handleGoogleLogin = async (code) => {
     setLoading(true);
     try {
-      const res = await axios.post(
-        `${API_BASE_URL}/api/v1/auth/login-google`,
-        { code }
-      );
+      // const res = await axios.post(
+      //   `${API_BASE_URL}/api/v1/auth/login-google`,
+      //   { code }
+      // );
+      const res = await axiosClient.post("/api/v1/auth/login-google", { code });
 
-            console.log("✅ Google login success:", res.data);
+      console.log("✅ Google login success:", res.data);
       const user = res.data;
-      
+
       // Always store the user data first
       login(user);
-      
+
       // Check if profile needs to be completed
-      if (!user.username || !user.phone || !user.fullName) {
+      if (!user.username || !user.phoneNumber || !user.fullName) {
         // Store email for profile completion
-        localStorage.setItem("googleUser", JSON.stringify({ 
+        localStorage.setItem("googleUser", JSON.stringify({
           email: user.email,
-          accessToken: user.accessToken 
+          accessToken: user.accessToken
         }));
         navigate("/completeprofile");
       } else {
-        // User has complete profile, redirect to intended destination
-        const redirectUrl = localStorage.getItem("redirectUrl");
-        navigate(redirectUrl || "/");
+        // User has complete profile, redirect by role
+        switch (user.role) {
+          case "ADMIN":
+            navigate("/admin/dashboard");
+            break;
+          case "RECORDER_STAFF":
+            navigate("/staff/dashboard");
+            break;
+          case "LAB_STAFF":
+            navigate("/lab/dashboard");
+            break;
+          case "CUSTOMER":
+          default:
+            navigate("/");
+        }
         localStorage.removeItem("redirectUrl");
       }
-      } catch (err) {
-        console.error("❌ Google login error:", err?.response?.data || err.message);
-        console.log("⛔ Mã code đã gửi:", code);
-        navigate("/login");
-      } finally {
-        setLoading(false);
-      }
+    } catch (err) {
+      console.error("❌ Google login error:", err?.response?.data || err.message);
+      console.log("⛔ Mã code đã gửi:", code);
+      navigate("/login");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

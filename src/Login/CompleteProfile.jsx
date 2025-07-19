@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
+// import axios from "axios"; thay dong nay import axiosClient from "../config/AxiosClient";
+import axiosClient from "../config/AxiosClient";
+import { AuthContext } from "../Context/AuthContext"; // them dong nay no do thieu
+import logo from "../assets/logo.png"; // Đường dẫn đến logo của bạn
 export default function CompleteProfile() {
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
     const [formData, setFormData] = useState({
-        username: "",
+        // username: "",
         email: "",
         fullName: "",
-        phone: ""
+        phoneNumber: ""
     });
 
     useEffect(() => {
@@ -31,35 +34,70 @@ export default function CompleteProfile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        if (!formData.phoneNumber || !formData.email || !formData.fullName) {
+            alert("❌ Vui lòng điền đầy đủ thông tin!");
+            return;
+        }
         try {
-            await axios.post("https://2642-2405-4802-8033-c420-6d55-f41-2cf0-d4b0.ngrok-free.app/api/v1/auth/google-register", formData);
-            alert("Hoàn tất đăng ký. Chuyển về trang chủ...");
-            localStorage.removeItem("googleUser");
-            navigate("/");
+            const res = await axiosClient.post("/api/v1/auth/google-register", formData);
+
+            // Nếu backend trả user mới → đăng nhập lại
+            if (res.data?.result) {
+                // Optional: call login API lại nếu muốn auto đăng nhập
+                alert("✅ Hoàn tất đăng ký. Vui lòng đăng nhập lại!");
+                localStorage.removeItem("googleUser");
+                navigate("/login");
+            }
         } catch (err) {
-            alert("Lỗi gửi thông tin: " + (err.response?.data?.message || err.message));
+            alert("❌Lỗi gửi thông tin: " + (err.response?.data?.message || err.message));
         }
     };
 
+
     return (
         <div className="auth-root">
-            <h2>Hoàn tất hồ sơ</h2>
-            <form className="auth-box" onSubmit={handleSubmit}>
-                <label>Tên người dùng</label>
-                <input name="username" required value={formData.username} onChange={handleChange} className="auth-input" />
+            <img src={logo} alt="GENEX MEDICAL CENTER" className="auth-logo" />
+            <div className="auth-box">
+                <h2 style={{ textAlign: "center", color: "#fff", marginBottom: "20px" }}>
+                    Hoàn tất hồ sơ
+                </h2>
 
-                <label>Họ và tên</label>
-                <input name="fullName" required value={formData.fullName} onChange={handleChange} className="auth-input" />
+                <form onSubmit={handleSubmit}>
+                    <label>Họ và tên</label>
+                    <input
+                        type="text"
+                        name="fullName"
+                        className="auth-input"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        required
+                    />
 
-                <label>Email</label>
-                <input name="email" required value={formData.email} disabled className="auth-input" />
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        className="auth-input"
+                        value={formData.email}
+                        disabled
+                        required
+                    />
 
-                <label>Số điện thoại</label>
-                <input name="phone" required value={formData.phone} onChange={handleChange} className="auth-input" />
+                    <label>Số điện thoại</label>
+                    <input
+                        type="tel"
+                        name="phoneNumber"
+                        className="auth-input"
+                        value={formData.phoneNumber}
+                        onChange={handleChange}
+                        required
+                    />
 
-                <button type="submit" className="auth-btn main">HOÀN TẤT</button>
-            </form>
+                    <button type="submit" className="auth-btn main">
+                        HOÀN TẤT
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }

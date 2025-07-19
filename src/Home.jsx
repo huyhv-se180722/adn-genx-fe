@@ -21,10 +21,12 @@ import { useAuth } from "./Context/AuthContext";
 
 import { useNavigate } from "react-router-dom";
 import Header from './Header/Header.jsx';
+import Footer from './Footer/Footer.jsx';
+import { useEffect } from "react";
 
 const Home = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, loading } = useAuth();
+  const { isLoggedIn, loading, role, user } = useAuth();
   const [btnLoading, setBtnLoading] = useState(false); // Now useState is properly imported
 
 
@@ -39,6 +41,25 @@ const Home = () => {
     navigate("/service");
   };
 
+  useEffect(() => {
+    if (isLoggedIn && user && !loading) {
+      switch (user.role) {
+        case 'ADMIN':
+          navigate('/admin/dashboard');
+          break;
+        case 'RECORDER_STAFF':
+          navigate('/staff/dashboard');
+          break;
+        case 'LAB_STAFF':
+          navigate('/lab/dashboard');
+          break;
+        case 'CUSTOMER':
+          break;
+        default:
+          break;
+      }
+    }
+  }, [isLoggedIn, loading, user, navigate]);
   //xử lý đăng ký form
   const handleRegisterClick = async () => {
     // Don't process if still checking auth status
@@ -136,57 +157,59 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Section: Xét nghiệm ADN tại Gene+ */}
-        <div className="adn-pricing-section">
-          <div className="adn-pricing-title">XÉT NGHIỆM ADN TẠI GENE+</div>
-          <div className="adn-pricing-list">
-            <div className="adn-pricing-box">
-              <div className="adn-pricing-price blue">1.500.000đ</div>
-              <div className="adn-pricing-old">1.990.000đ/người</div>
-              <div className="adn-pricing-type pink">GÓI XÉT NGHIỆM ADN DÂN SỰ</div>
-              <div className="adn-pricing-desc">
-                "là xét nghiệm ADN dân sự, tự nguyện với mục đích giải tỏa nghi ngờ, xác định mối quan hệ giữa các cá nhân"
-              </div>
-              <ul className="adn-pricing-features">
-                <li>Kết quả sau 4h.</li>
-                <li>Chính xác 99,99999998%.</li>
-                <li>Không dùng cho mục đích pháp lý.</li>
-                <li>Thủ tục đơn giản / dễ thực hiện.</li>
-                <li>Thu mẫu tại nhà / trung tâm.</li>
-                <li>Bảo mật bằng hệ thống mã vạch.</li>
-                <li>Thanh toán tiện lợi.</li>
-                <li>Bảo hiểm kết quả giá trị cao.</li>
-                <li>Tổng đài hỗ trợ 24/7.</li>
-              </ul>
-              <button className="adn-pricing-btn" onClick={handleRegisterClick}>
-                ĐĂNG KÝ NGAY
-              </button>
-            </div>
-            <div className="adn-pricing-box">
-              <div className="adn-pricing-price red">2.000.000đ</div>
-              <div className="adn-pricing-old">2.490.000đ/người</div>
-              <div className="adn-pricing-type yellow">GÓI XÉT NGHIỆM ADN HÀNH CHÍNH</div>
-              <div className="adn-pricing-desc">
-                "được bảo hộ về mặt pháp lý trong các thủ tục hành chính: nhận cha con, giấy khai sinh, nhập tịch, thừa kế, cấp visa,..."
-              </div>
-              <ul className="adn-pricing-features">
-                <li>Kết quả sau 6h.</li>
-                <li>Chính xác 100%.</li>
-                <li>Có giá trị pháp lý.</li>
-                <li>Thủ tục đơn giản / dễ thực hiện.</li>
-                <li>Thu mẫu tại nhà / trung tâm.</li>
-                <li>Bảo mật bằng hệ thống mã vạch.</li>
-                <li>Thanh toán tiện lợi.</li>
-                <li>Bảo hiểm kết quả giá trị cao.</li>
-                <li>Tổng đài hỗ trợ 24/7.</li>
-              </ul>
-              <button className="adn-pricing-btn" onClick={handleRegisterClick}>
-                ĐĂNG KÝ NGAY
-              </button>
-            </div>
-          </div>
-        </div>
+        <div className="adn-pricing-section" id="adn-pricing-section">
+  <div className="adn-pricing-title">XÉT NGHIỆM ADN TẠI GENE+</div>
+  <div className="adn-pricing-list">
+    {/* Gói dân sự */}
+    <div className="adn-pricing-box basic">
+      <div className="adn-pricing-price blue">DÂN SỰ</div>
+      <div className="adn-pricing-type pink">GÓI XÉT NGHIỆM ADN DÂN SỰ</div>
+      <div className="adn-pricing-desc">
+        Là xét nghiệm tự nguyện giúp xác định mối quan hệ giữa các cá nhân.
       </div>
+      <ul className="adn-pricing-features">
+        <li>✔ Kết quả sau 4h</li>
+        <li>✔ Chính xác 99.99999998%</li>
+        <li>✖ Không dùng cho mục đích pháp lý</li>
+        <li>✔ Thủ tục đơn giản</li>
+        <li>✔ Thu mẫu tại nhà/trung tâm</li>
+        <li>✔ Bảo mật mã vạch</li>
+        <li>✔ Thanh toán tiện lợi</li>
+        <li>✔ Hỗ trợ 24/7</li>
+      </ul>
+      <button className="adn-pricing-btn" onClick={handleRegisterClick}>
+        ĐĂNG KÝ NGAY
+      </button>
+    </div>
+
+    {/* Gói hành chính */}
+    <div className="adn-pricing-box highlight">
+      
+      <div className="adn-pricing-price red">HÀNH CHÍNH</div>
+      <div className="adn-pricing-type yellow">GÓI XÉT NGHIỆM ADN HÀNH CHÍNH</div>
+      <div className="adn-pricing-desc">
+        Dùng cho thủ tục hành chính: nhận cha con, khai sinh, visa,...
+      </div>
+      <ul className="adn-pricing-features">
+        <li>✔ Kết quả sau 6h</li>
+        <li>✔ Chính xác 100%</li>
+        <li>✔ Có giá trị pháp lý</li>
+        <li>✔ Thủ tục đơn giản</li>
+        <li>✔ Thu mẫu tại nhà/trung tâm</li>
+        <li>✔ Bảo mật mã vạch</li>
+        <li>✔ Thanh toán tiện lợi</li>
+        <li>✔ Hỗ trợ 24/7</li>
+      </ul>
+      <button className="adn-pricing-btn" onClick={handleRegisterClick}>
+        ĐĂNG KÝ NGAY
+      </button>
+    </div>
+  </div>
+</div>
+      </div>
+      
+      <Footer />
+      
     </>
   );
 };
