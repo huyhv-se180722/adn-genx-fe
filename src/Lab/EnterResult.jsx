@@ -57,7 +57,7 @@ export default function EnterResult() {
   // Xử lý thay đổi loại kết luận
   const handleConclusionTypeChange = (type) => {
     setConclusionType(type);
-    
+
     if (type === "yes") {
       setConclusion("Có quan hệ huyết thống");
     } else if (type === "no") {
@@ -75,10 +75,10 @@ export default function EnterResult() {
     }
 
     // Validate loci data (optional - có thể bỏ nếu không bắt buộc)
-    const hasAnyData = LOCUS_LIST.some(locus => 
+    const hasAnyData = LOCUS_LIST.some(locus =>
       participants.some(p => lociData[`${locus}_${p.kitCode}`]?.trim())
     );
-    
+
     if (!hasAnyData) {
       const confirmProceed = window.confirm("Chưa có dữ liệu Locus nào được nhập. Bạn có muốn tiếp tục không?");
       if (!confirmProceed) return;
@@ -88,7 +88,7 @@ export default function EnterResult() {
     LOCUS_LIST.forEach((locus) => {
       const values = participants.map((p) => lociData[`${locus}_${p.kitCode}`] || "");
       if (values.some((v) => v.trim() !== "")) { // Thay đổi từ every thành some
-        lociResults[locus] = values.join(" - ");
+        lociResults[locus] = values.join(" , ");
       }
     });
 
@@ -101,7 +101,7 @@ export default function EnterResult() {
     try {
       await axiosClient.post("/api/adn-results", body);
       await axiosClient.post(`/api/adn-results/complete-sample/${bookingId}`);
-      
+
       alert("✅ Kết quả đã được lưu và trạng thái đơn đã cập nhật!");
       setIsSaved(true);
     } catch (err) {
@@ -134,6 +134,82 @@ export default function EnterResult() {
     }
   };
 
+
+  const handlePaste = (e, locus, kitCode) => {
+    e.preventDefault();
+    const clipboardData = e.clipboardData || window.clipboardData;
+    const pastedData = clipboardData.getData("text");
+
+    const rows = pastedData.trim().split(/\r?\n/).map(row => row.split(/\t|,/).map(cell => cell.trim()));
+
+    if (rows.length === 1) {
+      // Dán 1 hàng (nhiều participant cùng 1 locus)
+      const values = rows[0];
+      const startCol = participants.findIndex(p => p.kitCode === kitCode);
+      const updates = {};
+      values.forEach((val, i) => {
+        const participant = participants[startCol + i];
+        if (participant) {
+          updates[`${locus}_${participant.kitCode}`] = val;
+        }
+      });
+      setLociData(prev => ({ ...prev, ...updates }));
+    } else {
+      // Dán nhiều hàng nhiều cột (bảng Excel)
+      const startRow = LOCUS_LIST.findIndex(l => l === locus);
+      const startCol = participants.findIndex(p => p.kitCode === kitCode);
+      const updates = {};
+
+      rows.forEach((cols, rowIdx) => {
+        const currentLocus = LOCUS_LIST[startRow + rowIdx];
+        if (!currentLocus) return;
+        cols.forEach((val, colIdx) => {
+          const participant = participants[startCol + colIdx];
+          if (participant) {
+            updates[`${currentLocus}_${participant.kitCode}`] = val;
+          }
+        });
+      });
+
+      setLociData(prev => ({ ...prev, ...updates }));
+    }
+  };
+
+
+  const handleBulkPaste = (e) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData("text/plain");
+
+    const lines = pastedText.trim().split(/\r?\n/);
+    const updates = {};
+
+    lines.forEach((line) => {
+      // Dòng hợp lệ: có locus + giá trị người 1 + người 2 + ...
+      const parts = line.trim().split(/\s{2,}|\t+/).map(part => part.trim());
+
+      if (parts.length < 2) return; // Không có dữ liệu
+      const locusName = parts[0];
+      const values = parts.slice(1);
+
+      if (!LOCUS_LIST.includes(locusName)) return;
+
+      values.forEach((val, idx) => {
+        const participant = participants[idx];
+        if (participant) {
+          updates[`${locusName}_${participant.kitCode}`] = val;
+        }
+      });
+    });
+
+    if (Object.keys(updates).length === 0) {
+      alert("⚠️ Không tìm thấy dữ liệu hợp lệ trong đoạn dán.");
+      return;
+    }
+
+    setLociData((prev) => ({ ...prev, ...updates }));
+  };
+
+
   return (
     <div className="d-flex">
       <div className="p-3 border-end" style={{ width: "260px", minHeight: "100vh", background: "#f8f9fa" }}>
@@ -155,6 +231,15 @@ export default function EnterResult() {
             </ul>
           </div>
         )}
+        <div className="mb-4">
+          <label className="form-label fw-bold">📋 Dán toàn bộ dữ liệu Locus:</label>
+          <textarea
+            className="form-control"
+            rows={6}
+            placeholder="Dán dữ liệu bảng gồm tên locus và giá trị của từng người, ví dụ:\nD7S820        18-23    10-12    18-23"
+            onPaste={(e) => handleBulkPaste(e)}
+          />
+        </div>
 
         {showForm && (
           <>
@@ -182,6 +267,8 @@ export default function EnterResult() {
                             disabled={isSaved}
                             value={lociData[`${locus}_${p.kitCode}`] || ""}
                             onChange={(e) => handleLocusChange(locus, p.kitCode, e.target.value)}
+                            onPaste={(e) => handlePaste(e, locus, p.kitCode)}
+                            onClick={(e) => e.target.select()}
                             placeholder="Nhập giá trị"
                           />
                         </td>
@@ -195,7 +282,7 @@ export default function EnterResult() {
             {/* KẾT LUẬN - ĐÃ SỬA */}
             <div className="mb-4">
               <label className="form-label fw-bold">Kết luận:</label>
-              
+
               {/* Radio buttons */}
               <div className="mb-3">
                 <div className="form-check">
@@ -213,7 +300,7 @@ export default function EnterResult() {
                     Có quan hệ huyết thống
                   </label>
                 </div>
-                
+
                 <div className="form-check">
                   <input
                     className="form-check-input"
@@ -229,7 +316,7 @@ export default function EnterResult() {
                     Không đủ bằng chứng xác nhận quan hệ huyết thống
                   </label>
                 </div>
-                
+
                 <div className="form-check">
                   <input
                     className="form-check-input"
@@ -259,7 +346,7 @@ export default function EnterResult() {
                   value={conclusion}
                   onChange={(e) => setConclusion(e.target.value)}
                   placeholder={
-                    conclusionType === "custom" 
+                    conclusionType === "custom"
                       ? "VD: Người 1 và Người 2 có quan hệ huyết thống. Người 3 không có quan hệ với Người 1..."
                       : "Kết luận sẽ hiển thị ở đây"
                   }

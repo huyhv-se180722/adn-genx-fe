@@ -102,6 +102,7 @@ export default function ListPage() {
       const res = await axiosClient.get(`/api/registrations/${id}`);
       const order = res.data;
       setSelectedOrder(order);
+      console.log("📦 selectedOrder:", order);
       setHighlightedId(order.id);
 
       const kits = {};
@@ -201,6 +202,8 @@ export default function ListPage() {
     const map = {
       HOME: "Tại nhà",
       HOSPITAL: "Tại bệnh viện",
+      CIVIL: "Dân sự",
+      ADMINISTRATIVE: "Hành chính",
     };
     return map[method] || "Không";
   };
@@ -419,6 +422,10 @@ export default function ListPage() {
                             <strong>Email:</strong>{" "}
                             {formatValue(selectedOrder.email)}
                           </p>
+                          <p>
+                            <strong>Ngày tạo đơn:</strong>{" "}
+                            {formatValue(selectedOrder.createdAt)}
+                          </p>
                         </div>
                         <div className="col-md-6">
                           <p>
@@ -434,6 +441,10 @@ export default function ListPage() {
                             {formatCollectionMethod(
                               selectedOrder.collectionMethod
                             )}
+                          </p>
+                          <p>
+                            <strong>Loại Đơn:</strong>{" "}
+                            {formatCollectionMethod(selectedOrder.caseType)}
                           </p>
                         </div>
                       </div>

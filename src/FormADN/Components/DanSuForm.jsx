@@ -92,13 +92,12 @@ export default function DanSuForm() {
   }, [formData.numberOfParticipants]);
 
   useEffect(() => {
-    if (!caseType) return;
     axiosClient.get("/api/registrations/services", {
-      params: { caseType }
+      params: { caseType: "CIVIL" }
     })
       .then(res => setServices(res.data))
       .catch(err => console.error("Lỗi lấy danh sách dịch vụ:", err));
-  }, [caseType]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

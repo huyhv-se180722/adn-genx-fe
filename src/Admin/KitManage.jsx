@@ -6,7 +6,7 @@ import "./index.css";
 
 const KitManage = () => {
   const navigate = useNavigate();
-  
+
   // States
   const [kits, setKits] = useState([]);
   const [search, setSearch] = useState("");
@@ -38,7 +38,7 @@ const KitManage = () => {
       console.log("First item keys:", Object.keys(res.data[0] || {}));
       console.log("First item ID field:", res.data[0]?.id);
       console.log("========================");
-      
+
       setKits(res.data || []);
     } catch (err) {
       console.error("Lỗi khi lấy danh sách kit:", err);
@@ -71,23 +71,23 @@ const KitManage = () => {
   const handleSave = async (idx) => {
     console.log("=== HANDLE SAVE DEBUG ===");
     const isNewItem = idx >= kits.length;
-    
+
     // Validation
-    if (!editRow.totalQuantity || !editRow.remainingQuantity) {
+    if (!editRow.totalQuantity) {
       alert("Vui lòng nhập đầy đủ thông tin!");
       return;
     }
-    
+
     if (Number(editRow.remainingQuantity) > Number(editRow.totalQuantity)) {
       alert("Số lượng còn lại không thể lớn hơn tổng kho!");
       return;
     }
-    
+
     const dto = {
       totalQuantity: Number(editRow.totalQuantity),
       remainingQuantity: Number(editRow.remainingQuantity),
     };
-    
+
     try {
       if (isNewItem) {
         // Item mới - chỉ POST
@@ -100,7 +100,7 @@ const KitManage = () => {
         const response = await axiosClient.post("/api/admin/kit-stock", dto);
         console.log("Update response:", response);
       }
-      
+
       await fetchKits();
       setEditIdx(null);
       setEditRow({
@@ -108,7 +108,7 @@ const KitManage = () => {
         remainingQuantity: 0,
         lastUpdated: null,
       });
-      
+
       console.log("Save completed successfully!");
     } catch (err) {
       console.error("Error in handleSave:", err);
@@ -135,7 +135,7 @@ const KitManage = () => {
   // Get latest update time from database
   const getLatestUpdateTime = () => {
     if (kits.length === 0) return "Chưa có dữ liệu";
-    
+
     // Tìm thời gian cập nhật mới nhất từ database
     const latestUpdate = kits.reduce((latest, kit) => {
       if (!kit.lastUpdated) return latest;
@@ -144,7 +144,7 @@ const KitManage = () => {
     }, null);
 
     if (!latestUpdate) return "Chưa có dữ liệu";
-    
+
     const time = latestUpdate.toLocaleTimeString('vi-VN', { hour12: false });
     const date = latestUpdate.toLocaleDateString('vi-VN');
     return `${time} - ${date}`;
@@ -218,7 +218,7 @@ const KitManage = () => {
                 <i className="bi bi-search text-white/60"></i>
               </div>
             </div>
-            
+
             <button
               onClick={handleAdd}
               disabled={!canAdd}
@@ -243,9 +243,8 @@ const KitManage = () => {
                 <thead>
                   <tr className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-b border-white/10">
                     <th className="px-6 py-4 text-left text-white font-semibold">ID</th>
-                    <th className="px-6 py-4 text-left text-white font-semibold">Tổng kho</th>
+                    <th className="px-6 py-4 text-left text-white font-semibold">Số lượng còn lại </th>
                     <th className="px-6 py-4 text-left text-white font-semibold">Đã sử dụng</th>
-                    <th className="px-6 py-4 text-left text-white font-semibold">Chưa sử dụng</th>
                     <th className="px-6 py-4 text-left text-white font-semibold">Thao tác</th>
                   </tr>
                 </thead>
@@ -270,44 +269,16 @@ const KitManage = () => {
                               }
                             />
                           ) : (
-                            <span className="text-white/90">{(k.totalQuantity || 0).toLocaleString("vi-VN")}</span>
+                            <span className="text-white/90">{(
+                              kits.reduce((total, kit) => total + (kit.remainingQuantity || 0), 0)
+                            ).toLocaleString("vi-VN")}</span>
                           )}
                         </td>
                         <td className="px-6 py-4 text-white/90">{usedQuantity.toLocaleString("vi-VN")}</td>
-                        <td className="px-6 py-4">
-                          {isEditing ? (
-                            <input
-                              type="number"
-                              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white outline-none focus:border-cyan-400 transition-colors"
-                              value={editRow.remainingQuantity}
-                              onChange={(e) =>
-                                setEditRow({
-                                  ...editRow,
-                                  remainingQuantity: e.target.value,
-                                })
-                              }
-                            />
-                          ) : (
-                            <span className="text-white/90">{(k.remainingQuantity || 0).toLocaleString("vi-VN")}</span>
-                          )}
-                        </td>
+
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
-                            {isEditing ? (
-                              <button
-                                onClick={() => handleSave(idx)}
-                                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-4 py-2 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-                              >
-                                <i className="bi bi-check-lg"></i>
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => handleEdit(idx)}
-                                className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white px-4 py-2 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
-                              >
-                                <i className="bi bi-pencil"></i>
-                              </button>
-                            )}
+
                             <button
                               onClick={() => handleDelete(k)}
                               className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white px-4 py-2 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
@@ -319,7 +290,7 @@ const KitManage = () => {
                       </tr>
                     );
                   })}
-                  
+
                   {/* Row thêm mới */}
                   {editIdx === kits.length && (
                     <tr className="border-b border-white/10 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
@@ -327,20 +298,18 @@ const KitManage = () => {
                       <td className="px-6 py-4">
                         <input
                           type="number"
-                          className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white outline-none focus:border-cyan-400 transition-colors"
+                          placeholder="Nhập thêm vào kho"
                           value={editRow.totalQuantity}
                           onChange={(e) =>
                             setEditRow({
                               ...editRow,
-                              totalQuantity: e.target.value,
+                              totalQuantity: parseInt(e.target.value, 10) || 0,
                             })
                           }
-                          placeholder="Nhập tổng kho"
+                          min={0}
                         />
                       </td>
-                      <td className="px-6 py-4 text-white/90">
-                        {(Number(editRow.totalQuantity) || 0) - (Number(editRow.remainingQuantity) || 0)}
-                      </td>
+
                       <td className="px-6 py-4">
                         <input
                           type="number"
@@ -355,6 +324,10 @@ const KitManage = () => {
                           placeholder="Nhập còn lại"
                         />
                       </td>
+                      <td className="px-6 py-4 text-white/90">
+                        {(Number(editRow.totalQuantity) || 0) - (Number(editRow.remainingQuantity) || 0)}
+                      </td>
+
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <button
@@ -441,7 +414,7 @@ const KitManage = () => {
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute top-10 right-10 w-20 h-20 border-2 border-cyan-400/30 rounded-full animate-spin" style={{animationDuration: '20s'}}></div>
+      <div className="absolute top-10 right-10 w-20 h-20 border-2 border-cyan-400/30 rounded-full animate-spin" style={{ animationDuration: '20s' }}></div>
     </div>
   );
 };

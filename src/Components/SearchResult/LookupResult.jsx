@@ -19,6 +19,7 @@ export default function LookupResult() {
         trackingCode,
         trackingPassword,
       });
+      console.log("✅ Full result từ API:", res.data);
       setResult(res.data);
     } catch (err) {
       setError("Không tìm thấy kết quả hoặc thông tin không đúng.");
@@ -26,6 +27,21 @@ export default function LookupResult() {
       setLoading(false);
     }
   };
+
+  const parsedLociResults = {};
+
+  if (result && result.lociResults && result.participants) {
+    const names = result.participants.map(p => p.fullName);
+
+    for (const [locus, valueStr] of Object.entries(result.lociResults)) {
+      const values = valueStr.split(" , ").map(s => s.trim());
+      parsedLociResults[locus] = {};
+      names.forEach((name, idx) => {
+        parsedLociResults[locus][name] = values[idx] || "—";
+      });
+    }
+  }
+
 
   return (
     <>
@@ -159,25 +175,31 @@ export default function LookupResult() {
                       </span>
                     </div>
 
-                    {result.lociResults && Object.keys(result.lociResults).length > 0 && (
+                    {Object.keys(parsedLociResults).length > 0 && (
                       <div className="mt-3">
                         <h6 className="fw-bold mb-2">Chi tiết kết quả Loci:</h6>
                         <div
                           className="border rounded p-2"
-                          style={{ maxHeight: 200, overflowY: "auto", background: "#fff" }}
+                          style={{ maxHeight: 300, overflowX: "auto", background: "#fff" }}
                         >
                           <table className="table table-sm table-bordered mb-0">
                             <thead className="table-light">
                               <tr>
-                                <th style={{ width: "50%" }}>Locus</th>
-                                <th>Kết quả</th>
+                                <th>Locus</th>
+                                {result.participants.map((p) => (
+                                  <th key={p.id}>
+                                    {p.fullName}
+                                  </th>
+                                ))}
                               </tr>
                             </thead>
                             <tbody>
-                              {Object.entries(result.lociResults).map(([locus, value]) => (
+                              {Object.entries(parsedLociResults).map(([locus, valueMap]) => (
                                 <tr key={locus}>
                                   <td>{locus}</td>
-                                  <td>{value}</td>
+                                  {result.participants.map((p) => (
+                                    <td key={p.id}>{valueMap[p.fullName] || "—"}</td>
+                                  ))}
                                 </tr>
                               ))}
                             </tbody>

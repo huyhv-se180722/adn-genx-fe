@@ -40,7 +40,7 @@ export default function PaymentResult() {
             navigate("/customer/list", {
               state: { paymentSuccess: true }
             });
-          }, 12000);
+          }, 4000);
         } else {
           setStatus("failed");
           setMessage("❌ Giao dịch thất bại.");
