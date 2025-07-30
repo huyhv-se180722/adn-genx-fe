@@ -67,65 +67,65 @@ const AdminSidebar = ({ activeMenu = "" }) => {
             TRANG CHỦ
           </button>
 
-          <div className="relative group">
-            <button
-              className={`w-full flex items-center gap-3 backdrop-blur-sm text-white px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 ${
-                activeMenu === "account"
-                  ? "bg-gradient-to-r from-cyan-500 to-purple-600"
-                  : "bg-white/10 hover:bg-white/20"
-              }`}
-            >
-              <i className="bi bi-people"></i>
-              QUẢN LÝ TÀI KHOẢN
-              <i className="bi bi-chevron-down ml-auto group-hover:rotate-180 transition-transform duration-300"></i>
-            </button>
-            <div className="w-full bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-300 ease-in-out">
-              <div className="p-3">
-                <button
-                  onClick={() => navigate("/account-manage")}
-                  className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
-                >
-                  Nhân viên
-                </button>
-                <button
-                  onClick={() => navigate("/customer-manage")}
-                  className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
-                >
-                  Khách hàng
-                </button>
-              </div>
-            </div>
-          </div>
+        <div className="relative group">
+  <button
+    className={`w-full flex items-center gap-3 backdrop-blur-sm px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 ${
+      activeMenu === "account"
+        ? "bg-white text-black"
+        : "bg-white/10 hover:bg-black/20 text-black"
+    }`}
+  >
+    <i className="bi bi-people"></i>
+    QUẢN LÝ TÀI KHOẢN
+    <i className="bi bi-chevron-down ml-auto group-hover:rotate-180 transition-transform duration-300"></i>
+  </button>
+  <div className="w-full bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-300 ease-in-out">
+    <div className="p-3">
+      <button
+        onClick={() => navigate("/account-manage")}
+        className="w-full text-left text-black  py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
+      >
+        Nhân viên
+      </button>
+      <button
+        onClick={() => navigate("/customer-manage")}
+        className="w-full text-left text-black  py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
+      >
+        Khách hàng
+      </button>
+    </div>
+  </div>
+</div>
 
-          <div className="relative group">
-            <button
-              className={`w-full flex items-center gap-3 backdrop-blur-sm text-white px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 ${
-                activeMenu === "service"
-                  ? "bg-gradient-to-r from-cyan-500 to-purple-600"
-                  : "bg-white/10 hover:bg-white/20"
-              }`}
-            >
-              <i className="bi bi-gear"></i>
-              QUẢN LÝ DỊCH VỤ
-              <i className="bi bi-chevron-down ml-auto group-hover:rotate-180 transition-transform duration-300"></i>
-            </button>
-            <div className="w-full bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-300 ease-in-out">
-              <div className="p-3">
-                <button
-                  onClick={() => navigate("/service-manage")}
-                  className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
-                >
-                  Gói dịch vụ
-                </button>
-                <button
-                  onClick={() => navigate("/kit-manage")}
-                  className="w-full text-left text-white hover:text-cyan-400 py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
-                >
-                  Quản lý KIT
-                </button>
-              </div>
-            </div>
-          </div>
+         <div className="relative group">
+  <button
+    className={`w-full flex items-center gap-3 backdrop-blur-sm px-4 py-3 rounded-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-300 ${
+      activeMenu === "service"
+        ? "bg-white text-black"
+        : "bg-white/10 hover:bg-black/20 text-black"
+    }`}
+  >
+    <i className="bi bi-gear"></i>
+    QUẢN LÝ DỊCH VỤ
+    <i className="bi bi-chevron-down ml-auto group-hover:rotate-180 transition-transform duration-300"></i>
+  </button>
+  <div className="w-full bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl shadow-2xl max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-300 ease-in-out">
+    <div className="p-3">
+      <button
+        onClick={() => navigate("/service-manage")}
+        className="w-full text-left text-black py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium border-b border-white/20"
+      >
+        Gói dịch vụ
+      </button>
+      <button
+        onClick={() => navigate("/kit-manage")}
+        className="w-full text-left text-black py-2 px-3 rounded-lg hover:bg-white/10 transition-colors duration-200 font-medium"
+      >
+        Quản lý KIT
+      </button>
+    </div>
+  </div>
+</div>
 
           <button
             onClick={() => navigate("/blog-manage")}

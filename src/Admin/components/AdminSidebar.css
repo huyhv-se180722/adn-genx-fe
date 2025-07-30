@@ -1,8 +1,8 @@
 /* Sidebar Container */
 .admin-sidebar {
   width: 320px;
-  background: linear-gradient(to bottom, #581c87, #1e3a8a);
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(to bottom, #ffffff, #e7efff); /* blue gradient */
+  border-right: 1px solid rgba(12, 12, 12, 0.2);
   padding: 24px;
   position: relative;
   z-index: 10;
@@ -18,20 +18,20 @@
 .logo-title {
   font-size: 30px;
   font-weight: bold;
-  color: white;
+  color: rgb(9, 9, 9);
   margin-bottom: 8px;
 }
 
 .logo-underline {
   width: 64px;
   height: 4px;
-  background: linear-gradient(to right, #22d3ee, #a855f7);
+  background: linear-gradient(to right, #000000, #000000); /* cyan to blue */
   border-radius: 9999px;
 }
-
-/* User Profile Section */
+  
+/* User Profile Section */  
 .user-profile {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4px);
   border-radius: 16px;
   padding: 24px;
@@ -53,7 +53,7 @@
 .avatar-bg {
   width: 48px;
   height: 48px;
-  background: linear-gradient(to right, #22d3ee, #a855f7);
+  background: linear-gradient(to right, #ffffff, #f7f7f7);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -76,7 +76,7 @@
   height: 16px;
   background: #10b981;
   border-radius: 50%;
-  border: 2px solid white;
+  border: 2px solid rgb(255, 255, 255);
   animation: pulse 2s infinite;
 }
 
@@ -90,8 +90,8 @@
 }
 
 .admin-badge {
-  background: linear-gradient(to right, #22d3ee, #a855f7);
-  color: white;
+  background: linear-gradient(to right, #38bdf8, #3b82f6);
+  color: rgb(245, 244, 244);
   padding: 4px 12px;
   border-radius: 9999px;
   font-size: 12px;
@@ -103,12 +103,12 @@
 .user-name {
   font-size: 18px;
   font-weight: bold;
-  color: white;
+  color: rgb(0, 0, 0);
 }
 
 .logout-btn {
-  background: linear-gradient(to right, #ef4444, #ec4899);
-  color: white;
+  background: linear-gradient(to right, #ffffff, #ffffff);
+  color: rgb(0, 0, 0);
   padding: 8px 16px;
   border-radius: 8px;
   font-weight: 600;
@@ -125,7 +125,7 @@
 }
 
 .logout-btn:hover {
-  background: linear-gradient(to right, #dc2626, #be185d);
+  background: linear-gradient(to right, #ffffff, #ababab);
   transform: scale(1.05);
 }
 
@@ -140,46 +140,14 @@
   gap: 12px;
 }
 
-.nav-btn-dashboard {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  backdrop-filter: blur(4px);
-  color: white;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  transform: scale(1);
-  transition: all 0.3s ease;
-  border: none;
-  cursor: pointer;
-}
-
-.nav-btn-dashboard:hover {
-  transform: scale(1.05);
-}
-
-.nav-btn-dashboard-default {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.nav-btn-dashboard-default:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.nav-btn-dashboard-active {
-  background: linear-gradient(to right, #06b6d4, #8b5cf6);
-}
-
+.nav-btn-dashboard,
 .nav-btn-blog {
   width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
   backdrop-filter: blur(4px);
-  color: white;
+  color: rgb(0, 0, 0);
   padding: 12px 16px;
   border-radius: 8px;
   font-weight: 600;
@@ -190,18 +158,22 @@
   cursor: pointer;
 }
 
+.nav-btn-dashboard:hover,
 .nav-btn-blog:hover {
   transform: scale(1.05);
 }
 
+.nav-btn-dashboard-default,
 .nav-btn-blog-default {
   background: rgba(255, 255, 255, 0.1);
 }
 
+.nav-btn-dashboard-default:hover,
 .nav-btn-blog-default:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
+.nav-btn-dashboard-active,
 .nav-btn-blog-active {
-  background: linear-gradient(to right, #06b6d4, #8b5cf6);
+  background: linear-gradient(to right, #ffffff, #ffffff);
 }
