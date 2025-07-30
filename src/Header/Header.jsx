@@ -42,8 +42,8 @@ const Header = ({ children }) => {
       <div className="home-header">
         <div className="home-header-left">
           <div className="home-search-box">
-            <input placeholder="Tìm kiếm" />
-            <img src={iconSearch} alt="search" />
+            <span className="placeholder-text">Chào mừng bạn đến với <span className="home-mail-blue">gene</span>
+              <span className="home-mail-red">x</span></span>
           </div>
         </div>
         <div className="home-header-center">
@@ -53,9 +53,9 @@ const Header = ({ children }) => {
           <div className="home-header-contact">
             <img src={iconMail} alt="mail" />
             <span>
-              <span className="home-mail-red">gen</span>
-              <span className="home-mail-blue">e</span>
-              <span className="home-mail-black">x@gmail.com</span>
+              <span className="home-mail-blue">gene</span>
+              <span className="home-mail-red">x</span>
+              <span className="home-mail-black">@gmail.com</span>
             </span>
           </div>
           <div className="home-header-contact">

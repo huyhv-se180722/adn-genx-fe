@@ -25,8 +25,10 @@ const AccountManage = () => {
           `/api/admin/users/filter?page=0&size=1000`
         );
         const filtered = (response.data.content || []).filter(
-          (acc) => acc.role !== "CUSTOMER"
+          (acc) => acc.role !== "CUSTOMER" &&
+            acc.accountNonLocked === true
         );
+        console.log("Danh sách full tài khoản (bao gồm status=false):", filtered);
         setAllAccounts(filtered);
       } catch (error) {
         console.error("Lỗi khi tải danh sách tài khoản:", error);
@@ -120,9 +122,9 @@ const AccountManage = () => {
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 relative z-10">
           {/* Title */}
           <div className="text-center mb-8">
-           <h2 className="text-4xl font-bold text-white mb-2">
+            <h2 className="text-4xl font-bold text-white mb-2">
 
-               Quản lý tài khoản - Nhân viên 
+              Quản lý tài khoản - Nhân viên
             </h2>
             <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full mx-auto"></div>
           </div>

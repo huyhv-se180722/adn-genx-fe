@@ -56,8 +56,13 @@ export default function SampleCollection() {
 
   // Reset highlight khi thay đổi search
   useEffect(() => {
-    setHighlightedId(null);
-  }, [searchTerm]);
+  const delayDebounce = setTimeout(() => {
+    setPage(1); // Reset về trang đầu
+    fetchBookings();
+  }, 300); // debounce 300ms
+
+  return () => clearTimeout(delayDebounce);
+}, [searchTerm]);
 
   // Scroll đến đơn được highlight sau khi bookings đã load
   useEffect(() => {
@@ -118,7 +123,13 @@ export default function SampleCollection() {
 
   const fetchBookings = () => {
     axiosClient
-      .get(`/api/v1/staff/booking/all?page=${page - 1}&size=${size}`)
+      .get(`/api/v1/staff/booking/all`, {
+        params: {
+          page: page - 1,
+          size,
+          code: searchTerm || undefined,
+        },
+      })
       .then((res) => {
         const content = res.data.content || [];
         const safe = content.map((b) => ({
@@ -126,19 +137,19 @@ export default function SampleCollection() {
           participants: Array.isArray(b.participants) ? b.participants : [],
         }));
         setBookings(safe);
-
         setTotalPages(res.data.totalPages);
+
         const fingerprintMap = {};
         safe.forEach((b) => {
           b.participants.forEach((p) => {
-            if (p.fingerprintImageUrl)
-              fingerprintMap[p.id] = p.fingerprintImageUrl;
+            if (p.fingerprintImageUrl) fingerprintMap[p.id] = p.fingerprintImageUrl;
           });
         });
         setPersistedFingerprintLinks(fingerprintMap);
       })
       .catch((err) => console.error(err));
   };
+
 
   const handleKitInput = (participantId, value) => {
     setKitInputs((prev) => ({ ...prev, [participantId]: value }));
@@ -231,7 +242,7 @@ export default function SampleCollection() {
             <input
               type="text"
               className="form-control mb-3"
-              placeholder="Tìm kiếm theo mã đơn hoặc tên khách hàng"
+              placeholder="Tìm mã đơn"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -507,7 +518,7 @@ export default function SampleCollection() {
 
                     {allConfirmed && (
                       <div className="text-end mt-2">
-                        {booking.sampleCollectionStatus === "SENT_TO_LAB" || booking.sampleCollectionStatus ==="COMPLETED" ? (
+                        {booking.sampleCollectionStatus === "SENT_TO_LAB" || booking.sampleCollectionStatus === "COMPLETED" ? (
                           <span className="text-success fw-semibold">
                             ✅ Mẫu đã gửi tới phòng xét nghiệm
                           </span>

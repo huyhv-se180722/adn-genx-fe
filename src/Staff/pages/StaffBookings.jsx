@@ -66,7 +66,7 @@ function StaffBookings() {
         const response = await axiosClient.get("/api/v1/staff/booking", {
           params: {
             status: statusFilter || undefined,
-            bookingId: searchText || undefined,
+            code: searchText || undefined,
             page: currentPage,
             size: rowsPerPage,
           },
@@ -112,7 +112,7 @@ function StaffBookings() {
       const response = await axiosClient.get("/api/v1/staff/booking", {
         params: {
           status: statusFilter || undefined,
-          bookingId: searchText || undefined,
+          code: searchText || undefined,
           paymentStatus: "PAID",
           page: page - 1,
           size: rowsPerPage,
@@ -184,7 +184,7 @@ function StaffBookings() {
                   type="text"
                   className="form-control"
                   style={{ minWidth: 220 }}
-                  placeholder="Tìm mã đơn hoặc tên người đăng ký"
+                  placeholder="Tìm mã đơn"
                   value={searchText}
                   onChange={(e) => {
                     setSearchText(e.target.value);

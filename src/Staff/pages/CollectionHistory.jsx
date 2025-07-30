@@ -43,6 +43,28 @@ export default function CollectionHistory() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [historyBookings, setHistoryBookings] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await axiosClient.get('/api/v1/staff/sample-collection/history', {
+          params: {
+            code: searchTerm || undefined,
+            status: filterStatus !== 'all' ? filterStatus : undefined,
+          }
+        });
+        setHistoryBookings(res.data);
+      } catch (err) {
+        console.error('Lỗi khi tải lịch sử thu mẫu:', err);
+        setHistoryBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [searchTerm, filterStatus]);
 
   useEffect(() => {
     axiosClient.get('/api/v1/staff/sample-collection/history')
@@ -54,13 +76,6 @@ export default function CollectionHistory() {
       });
   }, []);
 
-  const filteredBookings = historyBookings.filter(booking => {
-    const matchesSearch = booking.bookingCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.collectedByName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || booking.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
 
   return (
     <div className="staff-bg">
@@ -80,21 +95,10 @@ export default function CollectionHistory() {
                   type="text"
                   className="form-control staff-search-input"
                   style={{ minWidth: 260 }}
-                  placeholder="🔍 Tìm mã đơn, tên khách hoặc người thu mẫu"
+                  placeholder="Tìm mã đơn"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <select
-                  className="form-control"
-                  style={{ minWidth: 170 }}
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                >
-                  <option value="all">Tất cả trạng thái</option>
-                  <option value="SENT_TO_LAB">Đã gửi lab</option>
-                  <option value="COMPLETED">Hoàn tất</option>
-                  <option value="CANCELED">Đã hủy</option>
-                </select>
               </div>
             </div>
 
@@ -118,7 +122,13 @@ export default function CollectionHistory() {
                     </tr>
                   </thead>
                   <tbody className="bg-white rounded-bottom-4">
-                    {filteredBookings.length > 0 ? filteredBookings.map((booking) => (
+                    {loading ? (
+                      <tr>
+                        <td colSpan="8" className="text-center py-3 text-muted">
+                          Đang tải dữ liệu...
+                        </td>
+                      </tr>
+                    ) : historyBookings.length > 0 ? historyBookings.map((booking) => (
                       <tr key={booking.collectionId} className="align-middle">
                         <td className="fw-semibold">{booking.bookingCode}</td>
                         <td>{booking.customerName}</td>
