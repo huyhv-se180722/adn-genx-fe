@@ -224,6 +224,24 @@ export default function ListPage() {
       : value;
   };
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return "Không";
+  const date = new Date(dateStr);
+  if (isNaN(date)) return dateStr;
+
+  if (dateStr.length > 10) {
+    return date.toLocaleString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  return date.toLocaleDateString("vi-VN");
+};
+
   const renderCMND = (p) => {
     if (!p.identityNumber && !p.issueDate && !p.issuePlace) return null;
     let extras = [];
@@ -424,7 +442,11 @@ export default function ListPage() {
                           </p>
                           <p>
                             <strong>Ngày tạo đơn:</strong>{" "}
-                            {formatValue(selectedOrder.createdAt)}
+                            {formatDate(selectedOrder.createdAt)}
+                          </p>
+                          <p>
+                            <strong>Ngày hẹn:</strong>{" "}
+                            {formatDate(selectedOrder.appointmentDate)}
                           </p>
                         </div>
                         <div className="col-md-6">

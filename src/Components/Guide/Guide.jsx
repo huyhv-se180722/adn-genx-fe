@@ -1,14 +1,46 @@
 // Guide.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Guide.css";
 import Header from "../../Header/Header";
 import Footer from "../../Footer/Footer.jsx";
 import kimThuMau from "../../assets/Guide/kim-thu-mau.png";
 import thuMauNgonTay from "../../assets/Guide/thu-mau-ngon-tay.png";
 import dongGoiMau from "../../assets/Guide/dong-goi-mau.png";
+import axiosClient from "../../config/AxiosClient";
 
 const Guide = () => {
   const [isTocOpen, setIsTocOpen] = useState(true);
+
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosClient.get('/api/services');
+        setServices(response.data);
+        setError(null);
+      } catch (err) {
+        setError("Không thể tải dữ liệu dịch vụ");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
+  // Lọc dịch vụ dân sự và hành chính
+  const civilServices = services.filter(
+    (service) =>
+      service.caseType === "CIVIL" &&
+      service.enabled &&
+      !service.name.toLowerCase().includes("thai nhi")
+  );
+  const administrativeServices = services.filter(
+    (service) => service.caseType === "ADMINISTRATIVE" && service.enabled
+  );
 
   return (
     <div className="guide-wrapper">
@@ -100,7 +132,7 @@ const Guide = () => {
                   <div className="step-text">
                     <ul>
                       <li>
-                        - Chuẩn bị kim thu mẫu máu, thẻ thu mẫu máu FTA hoặc tăm bông, 
+                        - Chuẩn bị kim thu mẫu máu, thẻ thu mẫu máu FTA hoặc tăm bông,
                         phong bì trắng đựng mẫu, bông cồn sát khuẩn, túi đựng.
                       </li>
                       <li>
@@ -258,105 +290,6 @@ const Guide = () => {
               </ul>
             </div>
 
-            <div id="timing" className="info-section">
-              <h2>3. Xét nghiệm ADN bằng máu hết bao nhiều tiền?</h2>
-              <div className="price-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Loại xét nghiệm</th>
-                      <th>Thời gian trả kết quả</th>
-                      <th>Chi phí 2 người tham gia</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        Xét nghiệm ADN cha (mẹ) - con dân sự
-                        <br />
-                        Để giải tỏa nghi ngờ, kết quả không có tính pháp lý
-                      </td>
-                      <td>
-                        2 ngày
-                        <br />
-                        24 giờ
-                        <br />6 giờ
-                      </td>
-                      <td>
-                        3 triệu
-                        <br />6 triệu
-                        <br />8 triệu
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        Xét nghiệm ADN dân sự theo dòng nội
-                        <br />
-                        Xác định các mối quan hệ huyết thống: ông nội – cháu
-                        trai, bà nội – cháu gái, chú/ bác – cháu trai, hai anh
-                        chị em cùng cha, anh em trai dòng nội
-                      </td>
-                      <td>24 giờ</td>
-                      <td>7 triệu</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        Xét nghiệm ADN tư nguyện theo ngoại
-                        <br />
-                        Xác định các mối quan hệ huyết thống: bà ngoại – cháu,
-                        cô/ dì – cháu, anh em trai cùng mẹ, anh chị em con cô
-                      </td>
-                      <td>6 giờ</td>
-                      <td>10 triệu</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        Xét nghiệm ADN thành chính cha con/ mẹ con để phục vụ
-                        các thủ tục pháp lý, tòa án,...
-                      </td>
-                      <td>2 ngày</td>
-                      <td>5 triệu</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        Xét nghiệm ADN Hành chính theo dòng nội
-                        <br />
-                        Xác định các mối quan hệ huyết thống: ông nội – cháu
-                        trai, bà nội – cháu gái, chú/ bác – cháu trai, hai anh
-                        chị em cùng cha, anh em trai dòng nội
-                      </td>
-                      <td>
-                        3 ngày
-                        <br />
-                        24 giờ
-                        <br />3 giờ
-                      </td>
-                      <td>
-                        8 triệu
-                        <br />9 triệu
-                        <br />
-                        11 triệu
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        Xét nghiệm ADN Hành chính theo dòng ngoại
-                        <br />
-                        Xác định các mối quan hệ huyết thống: bà ngoại – cháu,
-                        cô/ dì – cháu, anh em trai cùng mẹ, anh chị em con cô
-                      </td>
-                      <td>7 ngày</td>
-                      <td>6 triệu</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p>
-                <strong>Lưu ý:</strong> Các dịch vụ này không có trên bảng giá,
-                liên hệ đến trung tâm để được tư vấn cụ thể từng trường hợp
-              </p>
-            </div>
-
             <div className="order-section">
               <h2>4. Tiến hành đặt mẫu máu xét nghiệm ADN</h2>
               <p>Chọn loại mẫu bạn muốn thực hiện:</p>
@@ -374,17 +307,95 @@ const Guide = () => {
                   <span>Mẫu Dân Sự</span>
                 </div>
               </div>
-              <div className="contact-info">
-                <h4>Liên hệ đặt hàng:</h4>
-                <p>📞 Hotline: +98 0123456789</p>
-                <p>📧 Email: genex@gmail.com</p>
-                <p>🏠 Địa chỉ: Khu công nghệ cao, Q9, Tp. Hồ Chí Minh</p>
+
+              {/* Thêm bảng giá dịch vụ */}
+              <div className="service-pricing">
+                <h3>Bảng giá dịch vụ xét nghiệm ADN</h3>
+                {loading ? (
+                  <p>Đang tải dữ liệu...</p>
+                ) : error ? (
+                  <p className="text-danger">{error}</p>
+                ) : (
+                  <>
+                    <h4>Dịch vụ Dân Sự</h4>
+                    <table className="pricing-table">
+                      <thead>
+                        <tr>
+                          <th>Tên dịch vụ</th>
+                          <th>Giá</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {civilServices.length > 0 ? (
+                          civilServices.map((service) => (
+                            <tr key={service.id}>
+                              <td>{service.name}</td>
+                              <td>{service.price.toLocaleString("vi-VN")} VNĐ</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={2}>Không có dịch vụ dân sự</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                    <h4 className="mt-4">Dịch vụ Hành Chính</h4>
+                    <table className="pricing-table">
+                      <thead>
+                        <tr>
+                          <th>Tên dịch vụ</th>
+                          <th>Giá</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {administrativeServices.length > 0 ? (
+                          administrativeServices.map((service) => (
+                            <tr key={service.id}>
+                              <td>{service.name}</td>
+                              <td>{service.price.toLocaleString("vi-VN")} VNĐ</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={2}>Không có dịch vụ hành chính</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </>
+                )}
+              </div>
+
+              <div className="order-section">
+                <h2>4. Tiến hành đặt mẫu máu xét nghiệm ADN</h2>
+                <p>Chọn loại mẫu bạn muốn thực hiện:</p>
+                <div className="service-options">
+                  <div
+                    className="service-option"
+                    style={{ backgroundColor: "#e74c3c" }}
+                  >
+                    <span>Mẫu Hành Chính</span>
+                  </div>
+                  <div
+                    className="service-option"
+                    style={{ backgroundColor: "#e74c3c" }}
+                  >
+                    <span>Mẫu Dân Sự</span>
+                  </div>
+                </div>
+                <div className="contact-info">
+                  <h4>Liên hệ đặt hàng:</h4>
+                  <p>📞 Hotline: +98 0123456789</p>
+                  <p>📧 Email: genex@gmail.com</p>
+                  <p>🏠 Địa chỉ: Khu công nghệ cao, Q9, Tp. Hồ Chí Minh</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <Footer />
       </div>
-      <Footer />
     </div>
   );
 };

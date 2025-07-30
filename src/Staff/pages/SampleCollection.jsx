@@ -507,7 +507,7 @@ export default function SampleCollection() {
 
                     {allConfirmed && (
                       <div className="text-end mt-2">
-                        {booking.sampleCollectionStatus === "SENT_TO_LAB" ? (
+                        {booking.sampleCollectionStatus === "SENT_TO_LAB" || booking.sampleCollectionStatus ==="COMPLETED" ? (
                           <span className="text-success fw-semibold">
                             ✅ Mẫu đã gửi tới phòng xét nghiệm
                           </span>
